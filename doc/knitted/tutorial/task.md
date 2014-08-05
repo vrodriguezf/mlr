@@ -5,10 +5,18 @@ Learning tasks are the basic elements of the package to encapsulate the
 data set and all relevant information regarding the purpose of the
 task, e.g, the target variable.
 
-Currently these subclasses of a [SupervisedTask](http://berndbischl.github.io/mlr/man/SupervisedTask.html) exist: [ClassifTask](http://berndbischl.github.io/mlr/man/SupervisedTask.html) for classification and \man2[RegrTask][SupervisedTask] for regression problems.
-**mlr** also offers survival analysis ([SurvTask](http://berndbischl.github.io/mlr/man/SupervisedTask.html)) and cost-sensitive learning (\man2[SurvTask][CostSensTask]).
-A classification task is created by using [makeClassifTask](http://berndbischl.github.io/mlr/man/SupervisedTask.html),
-[makeRegrTask](http://berndbischl.github.io/mlr/man/SupervisedTask.html) is used for regression task.
+The tasks are organised in a hierarchy, with the generic
+[Task](http://berndbischl.github.io/mlr/man/Task.html) at the top.
+The concrete tasks that can be instantiated are [ClassifTask](http://berndbischl.github.io/mlr/man/Task.html) for classification,
+[RegrTask](http://berndbischl.github.io/mlr/man/Task.html) for regression, \man2[SurvTask][Task] for survival
+analysis, [CostSensTask](http://berndbischl.github.io/mlr/man/Task.html) for
+cost-sensitive learning, and [ClusterTask](http://berndbischl.github.io/mlr/man/Task.html) for clustering.
+
+There are dedicated functions to create these tasks given data and other
+relevant information. These are [makeClassifTask](http://berndbischl.github.io/mlr/man/Task.html),
+[makeRegrTask](http://berndbischl.github.io/mlr/man/Task.html),
+[makeSurvTask](http://berndbischl.github.io/mlr/man/Task.html), \man2[makeCostSensTask()][Task], and
+\man2[akeClusterTask()][Task].
 
 In the following example, we define a classification task for the data
 set ``BreastCancer`` (from the package mlbench) and exclude the ID
@@ -45,11 +53,11 @@ classif.task
 
 
 As we can see, the task records basic information about the data set,
-e.g., the types of the features, the number of observations, whether
+e.g. the types of the features, the number of observations, whether
 missing values are present, the number of observations per class and so on.
 
 
-In many of the following regression examples we will use the ``BostonHousing`` data set:
+In many of the regression examples in this tutorial, we will use the ``BostonHousing`` data set:
 
 
 ```splus
@@ -91,7 +99,7 @@ classif.task = makeClassifTask(id = "BreastCancer", data = df, target = "Class",
 
 
 There are also some convenient methods to access properties and parts of the task.
-The most important ones are listed in [SupervisedTask](http://berndbischl.github.io/mlr/man/SupervisedTask.html).
+The most important ones are listed in [Task](http://berndbischl.github.io/mlr/man/Task.html).
 
 Here are some examples.
 
@@ -148,11 +156,12 @@ str(getTaskData(classif.task))
 ```
 
 
-Note the many options [getTaskData](http://berndbischl.github.io/mlr/man/getTaskData.html) provides to convert the data set into a covenient format.
-This is especially handy when you integrate a learner from another package into mlr.
+Note the many options [getTaskData](http://berndbischl.github.io/mlr/man/getTaskData.html) provides to convert the data set into a convenient format.
+This is especially handy when you integrate a learner from another package into
+**mlr**.
 
-If you are more technically inclined, you could also directly access
-the information stored in the slot called `task$task.desc`,
+If you are more technically minded, you could also access
+the information directly stored in the slot called `task$task.desc`,
 which stands for "description" and is of class [TaskDesc](http://berndbischl.github.io/mlr/man/TaskDesc.html).
 
 
@@ -178,11 +187,10 @@ str(classif.task$task.desc)
 ```
 
 
-The [SupervisedTask](http://berndbischl.github.io/mlr/man/SupervisedTask.html) help page also lists several other arguments
+The [Task](http://berndbischl.github.io/mlr/man/Task.html) help page also lists several other arguments
 to describe further details of the problem.
 
-E.g., we could include a blocking factor into the task.
-This would tell the task that some observations "belong together", so they are either put all
-in the training or the test set during a resampling iteration.
-Or you could weight observations according to their importance.
-
+For example, we could include a blocking factor into the task.
+This would tell the task that some observations "belong together", and should
+not be separated when splitting into training and test sets during a resampling iteration.
+Another possibility is to weight observations according to their importance.

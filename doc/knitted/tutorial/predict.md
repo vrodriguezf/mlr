@@ -2,8 +2,10 @@ Predicting Outcomes for New Data
 ================================
 
 Predicting the target values for new observations is
-implemented the same way as most of the other predict methods in *R*, i.e. just 
-call [predict](http://berndbischl.github.io/mlr/man/predict.WrappedModel.html) on the object returned by [train](http://berndbischl.github.io/mlr/man/train.html) and pass the data to be predicted.
+implemented the same way as most of the other predict methods in *R*.
+In general, all you need to do is
+call \man2[predict][predict.WrappedModel] on the object returned by [train](http://berndbischl.github.io/mlr/man/train.html)
+and pass the data to be predicted.
 
 
 Quick start
@@ -73,52 +75,80 @@ predict(mod, newdata = BostonHousing)
 ```
 
 
+### Clustering example
+
+We cluster the ``iris`` data set without the target variable and predict using
+the same data.
+
+
+```splus
+library("mlr")
+task = makeClusterTask(data = iris[, -5])
+lrn = makeLearner("cluster.XMeans")
+mod = train(lrn, task)
+predict(mod, newdata = iris[, -5])
+```
+
+```
+## Prediction:
+## predict.type: response
+## threshold: 
+## time: 0.04
+##   response
+## 1        2
+## 2        2
+## 3        2
+## 4        2
+## 5        2
+## 6        2
+```
+
+
 
 Further information
 -------------------
 
-There are several possibilities how to pass the observations for which 
-predictions are required.
-The first possibility, via the ``newdata``-argument, was already shown in the 
+There are several possibilities to pass the observations for which to make
+predictions.
+The first possibility is via the ``newdata`` argument and was already shown in the 
 examples above.
 If the data for which predictions are required are already contained in 
 the [Learner](http://berndbischl.github.io/mlr/man/makeLearner.html), it is also possible to pass the task and optionally specify 
 the subset argument that contains the indices of the test observations.
 
-Predictions are encapsulated in a special [Prediction](http://berndbischl.github.io/mlr/man/Prediction.html) object. Read the
-documentation of the [Prediction](http://berndbischl.github.io/mlr/man/Prediction.html) class to see all available
-accessors.
+Predictions are encapsulated in a special [Prediction](http://berndbischl.github.io/mlr/man/Prediction.html) object. The available
+accessors are documented in the man page for [Prediction](http://berndbischl.github.io/mlr/man/Prediction.html).
 
 
 ### Classification example
 
-In case of a classification task, the result of [predict](http://berndbischl.github.io/mlr/man/predict.WrappedModel.html) depends on 
-the predict type, which was set when generating the [Learner](http://berndbischl.github.io/mlr/man/makeLearner.html). Per default, 
-class labels are predicted.
+In case of a classification task, the result of
+\man2[predict][predict.WrappedModel] depends on the predict type, which was set
+when generating the [Learner](http://berndbischl.github.io/mlr/man/makeLearner.html). The default is to predict class
+labels.
 
 We start again by loading **mlr** and creating a classification task for the 
-iris data set. We select two subsets of the data. We train a decision tree on the
-first one and [predict](http://berndbischl.github.io/mlr/man/predict.WrappedModel.html) the class labels on the test set.
+``iris`` data set. We select two subsets of the data. We train a decision tree on the
+first one and predict the class labels on the test set.
 
 
 ```splus
 library("mlr")
 
-# At first we define the classification task.
+# Define the classification task
 task = makeClassifTask(data = iris, target = "Species")
 
 # Define the learning algorithm
 lrn = makeLearner("classif.rpart")
 
-# Split the iris data into a training set for learning and a test set.
+# Split the iris data into a training set for learning and a test set
 training.set = seq(from = 1, to = nrow(iris), by = 2)
 test.set = seq(from = 2, to = nrow(iris), by = 2)
 
-# Now, we can train a decision tree using only the observations in
-# ``train.set``:
+# Now, we can train a decision tree using only the observations in train.set
 mod = train(lrn, task, subset = training.set)
 
-# Finally, to predict the outcome on new values, we use the predict method:
+# Finally, predict the label on new values using the predict method
 pred = predict(mod, newdata = iris, subset = test.set)
 ```
 
@@ -161,9 +191,8 @@ head(as.data.frame(pred))
 
 
 When predicting from a `task`, the resulting `data.frame` contains an additional column, 
-called *ID*, which tells us for which element in the original data set the prediction 
-is done. 
-(In the iris example the IDs and the rownames coincide.)
+called *ID*, which tells us which element in the original data set the prediction 
+corresponds to. In the iris example the IDs and the rownames coincide.
 
 In order to get predicted posterior probabilities, we have to change the ``predict.type``
 of the learner.
@@ -191,7 +220,7 @@ As you can see, in addition to the predicted probabilities, a response
 is produced by choosing the class with the maximum probability and
 breaking ties at random.
 
-The predicted posterior probabilities can be accessed via the [getProbabilities](http://berndbischl.github.io/mlr/man/getProbabilities.html)-function.
+The predicted posterior probabilities can be accessed via the [getProbabilities](http://berndbischl.github.io/mlr/man/getProbabilities.html) function.
 
 
 ```splus
@@ -212,14 +241,16 @@ head(getProbabilities(pred))
 
 ### Binary classification
 
-In case of binary classification, two things are noteworthy. As you might recall, 
+In case of binary classification, two things are worth mentioning. As you may recall, 
 we can specify a positive class when generating the task. Moreover, we can set the
 threshold value that is used to assign class labels based on the predicted 
 posteriors.
 
-To illustrate binary classification we use the Sonar data set from the
+To illustrate binary classification, we use the Sonar data set from the
 [mlbench](http://cran.r-project.org/web/packages/mlbench/index.html) package. 
-Again, we create a classification task and a learner, which predicts probabilities, train the learner and then predict the class labels.
+Again we create a classification task and a learner which predicts
+probabilities, train the learner and then predict the class labels based on the
+probabilities.
 
 
 ```splus
@@ -245,7 +276,7 @@ head(pred$data)
 
 
 In a binary classification setting, we can adjust the threshold, used
-to map probabilities, to class labels using [setThreshold](http://berndbischl.github.io/mlr/man/setThreshold.html). Here, we set
+to map probabilities to class labels using [setThreshold](http://berndbischl.github.io/mlr/man/setThreshold.html). Here, we set
 the threshold for the *positive* class to 0.8:
 
 
@@ -277,9 +308,10 @@ pred$threshold
 
 ### Regression example
 
-We again use the BostonHousing data set and learn a Gradient Boosting
-Machine. We use every second observation for training/test. The
-proceeding is analog to the classification case.
+We again use the BostonHousing data set and learn a Gradient Boosting Machine
+model. We take all observations with an odd index as training and all
+observations with an even index as test. The procedure is the same as in the
+classification case.
 
 
 ```splus
@@ -302,10 +334,10 @@ head(pred$data)
 ```
 ##   truth response
 ## 1  21.6    22.23
-## 2  33.4    23.18
-## 3  28.7    22.33
-## 4  27.1    22.15
-## 5  18.9    22.15
-## 6  18.9    22.15
+## 2  33.4    23.34
+## 3  28.7    22.26
+## 4  27.1    22.16
+## 5  18.9    22.16
+## 6  18.9    22.16
 ```
 

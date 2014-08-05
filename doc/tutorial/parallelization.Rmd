@@ -1,8 +1,11 @@
 Parallelization
 ===============
 
-*R* usually doesn't make use of multiple cores.
-With the integration of [parallelMap](https://github.com/berndbischl/parallelMap) into **mlr** it becomes easy to activate the parallel computing already implemented into **mlr**.
+*R* by default doesn't make use of multiple cores.
+With the integration of
+[parallelMap](https://github.com/berndbischl/parallelMap) into **mlr**, it
+becomes easy to activate the parallel computing capabilities already supported
+by **mlr**.
 
 ```{r}
 library("mlr")
@@ -15,6 +18,7 @@ r = resample(lrn, task, rdesc)
 parallelStop()
 ```
 
-Under Linux or OSX you might want to use `parallelStartMulticore()` instead.
+In Linux or Mac OS X, you may want to use `parallelStartMulticore()` instead.
 
-For further ways of parallelizing the computing consult the [parallelMap tutorial](https://github.com/berndbischl/parallelMap#parallelmap) and help.
+For further ways of parallelizing your computations, consult the [parallelMap
+tutorial](https://github.com/berndbischl/parallelMap#parallelmap) and help.

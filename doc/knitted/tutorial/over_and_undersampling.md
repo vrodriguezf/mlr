@@ -1,12 +1,13 @@
 Over- and Undersampling
 =======================
 
-In the case you have uneven distributed classes in your training data but know that this won't be the case for the test data then it might be handy to oversample the minority or undersample the majority class.
+For unevenly distributed classes in the data, it might be useful to oversample
+the minority or undersample the majority class.
 
-data.frames
------------
+``data.frame``
+--------------
 
-First we show how it is done for `data.frames`:
+First we show how it is done for `data.frame`s:
 
 
 ```splus
@@ -28,7 +29,7 @@ data.over = oversample(data, "class", rate = 4)
 ```
 
 ```
-## Error: unbenutztes Argument ("class")
+## Error: unused argument ("class")
 ```
 
 ```splus
@@ -36,7 +37,7 @@ table(data.over$class)
 ```
 
 ```
-## Error: Objekt 'data.over' nicht gefunden
+## Error: object 'data.over' not found
 ```
 
 ```splus
@@ -44,7 +45,7 @@ data.under = undersample(data, "class", rate = 1/4)
 ```
 
 ```
-## Error: unbenutztes Argument ("class")
+## Error: unused argument ("class")
 ```
 
 ```splus
@@ -52,14 +53,14 @@ table(data.under$class)
 ```
 
 ```
-## Error: Objekt 'data.under' nicht gefunden
+## Error: object 'data.under' not found
 ```
 
 
-tasks
+Tasks
 -----
 
-Now let's see what the effect is for a **classification task**:
+Now let's see what the effect is for a classification task:
 
 ```splus
 data.even = rbind(data.frame(x = rnorm(50, mean = 1), class = "A"), data.frame(x = rnorm(50, 
@@ -85,7 +86,7 @@ performance(predict(mod.over, newdata = data.even), measures = mmce)
 
 ```
 ## mmce 
-## 0.38
+## 0.33
 ```
 
 ```splus
@@ -94,15 +95,15 @@ performance(predict(mod.under, newdata = data.even), measures = mmce)
 
 ```
 ## mmce 
-## 0.38
+##  0.5
 ```
 
 
-learners
+Learners
 --------
 
-Note that it is _highly dependent_ on the learner if _over_ or _undersampling_ is useful.
-You are also able to wrap the over and undersampling within the _learner_.
+Note that it is _highly dependent_ on the learner if over- or undersampling will
+be useful. You are also able to wrap the over- and undersampling within the learner.
 
 ```splus
 lrn.over = makeOversampleWrapper(lrn, osw.rate = 4)
@@ -124,7 +125,7 @@ performance(predict(mod.over, newdata = data.even), measures = mmce)
 
 ```
 ## mmce 
-## 0.27
+## 0.33
 ```
 
 ```splus
@@ -133,6 +134,6 @@ performance(predict(mod.under, newdata = data.even), measures = mmce)
 
 ```
 ## mmce 
-## 0.33
+##  0.5
 ```
 

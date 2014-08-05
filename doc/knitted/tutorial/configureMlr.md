@@ -1,10 +1,12 @@
 Configure mlr
 =============
 
-If you really know what you are doing you might think *mlr* is limiting you.
-Actually *mlr* is just designed to make errors due to misspellings or illogical parameter values as unlikely as possible.
-But sometimes you want to brake those barriers to gain deeper access.
-For all the parameters simply refer to the documentation [`?configureMlr`](http://berndbischl.github.io/mlr/man/configureMlr.html).
+If you really know what you are doing you may think **mlr** is limiting you in
+certain ways.
+Actually **mlr** is just designed to make errors due to typos or
+invalid parameter values as unlikely as possible. But sometimes you want to
+break those barriers and get full access. For all parameters, simply refer
+to the documentation of [configureMlr](http://berndbischl.github.io/mlr/man/configureMlr.html).
 
 You are bothered by all the output on the console like in this example?
 
@@ -14,13 +16,6 @@ library("mlr")
 ## Define a learning task and an appropriate learner
 task = makeClassifTask(data = iris, target = "Species")
 lrn = makeLearner("classif.ksvm")
-```
-
-```
-## Loading required package: kernlab
-```
-
-```splus
 
 ## Perform a 3-fold cross-validation
 rdesc = makeResampleDesc("CV", iters = 3)
@@ -52,10 +47,12 @@ r = resample(lrn, task, rdesc)
 ```
 
 ```
-## [Resample] Result: mmce.test.mean=0.0467
+## [Resample] Result: mmce.test.mean=0.04
 ```
 
+
 Just try the following:
+
 
 ```splus
 configureMlr(show.learner.output = FALSE)
@@ -70,10 +67,12 @@ r = resample(lrn, task, rdesc)
 ```
 
 
-One further scenario:
-You want to access a new parameter of a learner which is already available through *mlr* but it is not implemented in *mlr* yet.
-(If this is the case you might want to [contact us](https://github.com/berndbischl/mlr#get-in-touch) or [write an issue](https://github.com/berndbischl/mlr/issues/new) as well!)
-But until then you can turn off *mlr*'s paramater checking like this:
+In an additional scenario, you want to access a new parameter of a learner which
+is already available in **mlr**, but the parameter is not implemented in **mlr** yet.
+If this is the case you might want to [contact
+us](https://github.com/berndbischl/mlr#get-in-touch) or [open an issue](https://github.com/berndbischl/mlr/issues/new) as well!
+But until then you can turn off **mlr**'s paramater checking like this:
+
 
 ```splus
 library("mlr")

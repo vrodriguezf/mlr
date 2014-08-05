@@ -5,10 +5,18 @@ Learning tasks are the basic elements of the package to encapsulate the
 data set and all relevant information regarding the purpose of the
 task, e.g, the target variable.
 
-Currently these subclasses of a \man[SupervisedTask] exist: \man2[ClassifTask][SupervisedTask] for classification and \man2[RegrTask][SupervisedTask] for regression problems.
-**mlr** also offers survival analysis (\man2[SurvTask][SupervisedTask]) and cost-sensitive learning (\man2[SurvTask][CostSensTask]).
-A classification task is created by using \man2[makeClassifTask][SupervisedTask],
-\man2[makeRegrTask][SupervisedTask] is used for regression task.
+The tasks are organised in a hierarchy, with the generic
+\man[Task] at the top.
+The concrete tasks that can be instantiated are \man2[ClassifTask][Task] for classification,
+\man2[RegrTask][Task] for regression, \man2[SurvTask][Task] for survival
+analysis, \man2[CostSensTask][Task] for
+cost-sensitive learning, and \man2[ClusterTask][Task] for clustering.
+
+There are dedicated functions to create these tasks given data and other
+relevant information. These are \man2[makeClassifTask][Task],
+\man2[makeRegrTask][Task],
+\man2[makeSurvTask][Task], \man2[makeCostSensTask()][Task], and
+\man2[akeClusterTask()][Task].
 
 In the following example, we define a classification task for the data
 set ``BreastCancer`` (from the package mlbench) and exclude the ID
@@ -26,11 +34,11 @@ classif.task
 ```
 
 As we can see, the task records basic information about the data set,
-e.g., the types of the features, the number of observations, whether
+e.g. the types of the features, the number of observations, whether
 missing values are present, the number of observations per class and so on.
 
 
-In many of the following regression examples we will use the ``BostonHousing`` data set:
+In many of the regression examples in this tutorial, we will use the ``BostonHousing`` data set:
 
 ```{r}
 data(BostonHousing)
@@ -55,7 +63,7 @@ classif.task = makeClassifTask(id = "BreastCancer", data = df, target = "Class",
 ```
 
 There are also some convenient methods to access properties and parts of the task.
-The most important ones are listed in \man[SupervisedTask].
+The most important ones are listed in \man[Task].
 
 Here are some examples.
 
@@ -72,22 +80,22 @@ head(getTaskTargets(regr.task))
 str(getTaskData(classif.task))
 ```
 
-Note the many options \man[getTaskData] provides to convert the data set into a covenient format.
-This is especially handy when you integrate a learner from another package into mlr.
+Note the many options \man[getTaskData] provides to convert the data set into a convenient format.
+This is especially handy when you integrate a learner from another package into
+**mlr**.
 
-If you are more technically inclined, you could also directly access
-the information stored in the slot called `task$task.desc`,
+If you are more technically minded, you could also access
+the information directly stored in the slot called `task$task.desc`,
 which stands for "description" and is of class \man[TaskDesc].
 
 ```{r}
 str(classif.task$task.desc)
 ```
 
-The \man[SupervisedTask] help page also lists several other arguments
+The \man[Task] help page also lists several other arguments
 to describe further details of the problem.
 
-E.g., we could include a blocking factor into the task.
-This would tell the task that some observations "belong together", so they are either put all
-in the training or the test set during a resampling iteration.
-Or you could weight observations according to their importance.
-
+For example, we could include a blocking factor into the task.
+This would tell the task that some observations "belong together", and should
+not be separated when splitting into training and test sets during a resampling iteration.
+Another possibility is to weight observations according to their importance.

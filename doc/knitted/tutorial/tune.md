@@ -1,28 +1,26 @@
 Tuning Hyperparameters
 ======================
 
-Many classification algorithms feature a set of hyperparameters that
-either need to be selected by the user or through resampling,
+Many machine learning algorithms have hyperparameters that need to be set.
+They can either be selected by the user or through resampling,
 e.g. cross-validation. Setting them by hand was already covered in the
 section about [training](train.md) and [resampling](resample.md) -- simply use the
 `par.val` argument in the [makeLearner](http://berndbischl.github.io/mlr/man/makeLearner.html) method.
 
-Assuming, you have understood how [resampling](resample.md) works, it is
-quite simple to implement a grid search, which is one of the standard
--- albeit slow -- ways to choose an appropriate set of parameters from a
-given range of values.
+Grid search is one of the standard -- albeit slow -- ways to choose an
+appropriate set of parameters from a given range of values.
 
 
 Classification example
 ----------------------
 
-We again use the iris data set, included in R, but now, we want to
-tune a SVM with a polynomial kernel.
+We again use the ``iris`` data set, included in R, but now we want to
+set the parameters of a SVM with a polynomial kernel.
 
-### Simple Grid Search witch Cross Validation
+### Simple Grid Search with cross validation
 
 We start by loading the *mlr* package and creating a classification
-task, just like in the tutorial on [training](train.md):
+task (see the part on [training](train.md) for more information):
 
 
 ```splus
@@ -31,11 +29,12 @@ task = makeClassifTask(data = iris, target = "Species")
 ```
 
 
-Next, we need to create a [ParamSet](http://berndbischl.github.io/ParamHelpers/man/makeParamSet.html) object, which describes the parameter space 
-we wish to search in. This is done via the function [makeParamSet](http://berndbischl.github.io/ParamHelpers/man/makeParamSet.html).
-Since we will use a grid search strategy, we add a discrete parameter for the 
-`C` and `sigma` parameter of the SVM to the parameter set.
-More details concerning parameter sets are explained in section [parameters](parameters.md).
+Next, we need to create a [ParamSet](http://berndbischl.github.io/mlr/man/makeParamSet.html) object that describes
+the parameter space we wish to search. This is done through the function
+[makeParamSet](http://berndbischl.github.io/mlr/man/makeParamSet.html). We add discrete parameters for the `C` and `sigma` parameter
+of the SVM to the parameter set. More details concerning parameter sets are
+explained in section
+[parameters](parameters.md).
 
 
 ```splus
@@ -44,8 +43,8 @@ ps = makeParamSet(makeDiscreteParam("C", values = 2^(-2:2)), makeDiscreteParam("
 ```
 
 
-We will use cross-validation to assess the quality of a parameter
-combination. For this we need to create a resampling description just
+We will use cross-validation to assess the quality of a specific parameter
+setting. For this we need to create a resampling description just
 like in the [resampling](resample.md) part of the tutorial:
 
 
@@ -54,9 +53,9 @@ rdesc = makeResampleDesc("CV", iters = 3)
 ```
 
 
-Before we can actually tune our classifier, we need an instance of a
-[TuneControl](http://berndbischl.github.io/mlr/man/TuneControl.html) object. These describe the optimization strategy
-used. Here we use a grid search:
+Before we can actually tune our classifier and identify the best parameter
+setting, we need an instance of a [TuneControl](http://berndbischl.github.io/mlr/man/TuneControl.html) object. These describe the
+optimization strategy used. Here we use a grid search:
 
 
 ```splus
@@ -64,8 +63,8 @@ ctrl = makeTuneControlGrid()
 ```
 
 
-Finally, by combining all the previous pieces, we can tune the SVM
-using our [TuneControl](http://berndbischl.github.io/mlr/man/TuneControl.html) instance and the resampling strategy,
+Finally, combining all the previous pieces, we can tune the SVM
+using our [TuneControl](http://berndbischl.github.io/mlr/man/TuneControl.html) instance and the resampling strategy
 described by the `rdesc` variable.
 
 
@@ -81,6 +80,7 @@ r = tuneParams(makeLearner("classif.ksvm"), task = task, resampling = rdesc,
 ## C     discrete   -   - 0.25,0.5,1,2,4   -     -
 ## sigma discrete   -   - 0.25,0.5,1,2,4   -     -
 ## With control class: TuneControlGrid
+## Imputation value: 1Imputation value: Inf
 ## [Tune] 1: C=0.25; sigma=0.25 : mmce.test.mean=0.0533,mmce.test.sd=0.0503
 ## [Tune] 2: C=0.5; sigma=0.25 : mmce.test.mean=0.06,mmce.test.sd=0.04
 ## [Tune] 3: C=1; sigma=0.25 : mmce.test.mean=0.0333,mmce.test.sd=0.0115
@@ -110,8 +110,11 @@ r = tuneParams(makeLearner("classif.ksvm"), task = task, resampling = rdesc,
 ```
 
 
-We used a trick also described [here](multicriteria_evaluation.md) to also obtain the Standard Deviation by adding a second measure.
-A quick visualization of the Grid Search can be achived by accessing the opt.path as follows
+We used a trick, also described [here](multicriteria_evaluation.md), to
+obtain the standard deviation in addition to the default by adding a second
+measure. A quick visualization of the Grid Search can be achieved by accessing
+the ``opt.path`` as follows.
+
 
 ```splus
 library(ggplot2)
@@ -119,13 +122,13 @@ head((opt.grid = as.data.frame(r$opt.path)))
 ```
 
 ```
-##      C sigma mmce.test.mean mmce.test.sd dob eol
-## 1 0.25  0.25        0.05333      0.05033   1  NA
-## 2  0.5  0.25        0.06000      0.04000   2  NA
-## 3    1  0.25        0.03333      0.01155   3  NA
-## 4    2  0.25        0.04667      0.02309   4  NA
-## 5    4  0.25        0.04000      0.02000   5  NA
-## 6 0.25   0.5        0.06667      0.03055   6  NA
+##      C sigma mmce.test.mean mmce.test.sd dob eol error.message exec.time
+## 1 0.25  0.25        0.05333      0.05033   1  NA          <NA>     0.066
+## 2  0.5  0.25        0.06000      0.04000   2  NA          <NA>     0.064
+## 3    1  0.25        0.03333      0.01155   3  NA          <NA>     0.063
+## 4    2  0.25        0.04667      0.02309   4  NA          <NA>     0.063
+## 5    4  0.25        0.04000      0.02000   5  NA          <NA>     0.063
+## 6 0.25   0.5        0.06667      0.03055   6  NA          <NA>     0.064
 ```
 
 ```splus
@@ -136,30 +139,32 @@ g + geom_tile() + geom_text(color = "white")
 
 ![plot of chunk tune_gridSearchVisualized](figs/tune/tune_gridSearchVisualized.png) 
 
-Let's take another closer look at the example above. The parameter grid has
-to be a named list, where every entry has to be named according to the
-corresponding parameter of the underlying R function (in this case
-"ksvm" from the kernlab package, see its respective help page).  Its
-value is a vector of feasible values for this hyperparameter. The
-complete grid is just the cross-product of all feasible values.
 
-(Please note whenever parameters in the underlaying R functions should be 
-passed within a list structure *mlr* tries to give you direct access to
-each parameter and get rid of the list structure -- Like this is the case with `ksvm`) 
+Let's take a closer look at the example above. The parameter grid has to be a
+named list and every entry has to be named according to the corresponding
+parameter of the underlying R function (in this case "ksvm" from the kernlab
+package, see its respective help page). The value of each entry is a vector of
+feasible values for this hyperparameter. The complete grid is simply the
+cross-product of all feasible values.
+
+Please note that whenever parameters in the underlying R functions should be 
+passed within a list structure, **mlr** tries to give you direct access to
+each parameter and get rid of the list structure. This is the case for example
+with `ksvm`.
 
 Tune now simply performs the cross-validation for every element of the
 cross-product and selects the one with the best mean performance
 measure.
 
-Unfortunately, it's not clear, how reliable the results are. One might
-want to find out, if the configurations vary for slightly different data sets.
+Unfortunately, it's not clear how reliable the results are. One might
+want to find out if the configurations vary for slightly different data sets.
 A good approach for getting a better feeling of the best parameter setting
-would be a nested cross-validation.
+is a nested cross-validation.
 
 ### Nested Cross Validation
 
 Let's run a nested CV with 5 folds in the outer loop and 3 folds in the
-inner loop on the example from above.
+inner loop on the above example.
 
 
 ```splus
@@ -176,9 +181,9 @@ lrn = makeTuneWrapper(makeLearner("classif.ksvm"), resampling = rin, par.set = p
 ```
 
 
-Now, we can run our nested CV. For further evaluations, we might
-want to extract the tune results as well. Please note, that storing the
-entire models might be expensive.
+Now we can run our nested CV. For further evaluations, we may
+want to extract the results of the tuning run as well. Please note that storing
+entire models may be expensive.
 
 
 ```splus
@@ -186,9 +191,9 @@ r = resample(lrn, task, resampling = rout, extract = getTuneResult, show.info = 
 ```
 
 
-Finally, we can compare our results. We receive one optimal setting for
-each of the 5 outer folds, including the corresponding mmce on the inner
-cross-validations:
+Finally, we can compare the results obtained in the different iterations. We
+receive one optimal setting for each of the 5 outer folds, including the
+corresponding mmce on the inner cross-validations:
 
 
 ```splus
@@ -223,12 +228,13 @@ r$extract
 ```
 
 
-As you can see, the optimal configuration usually differs based on the data.
-But you might be able to find a range of the best settings, e.g. the values
-for C should be at least 1 and the values for sigma should be between 0 and 1.
+As you can see, the optimal configuration usually depends on the data. You may
+be able to identify a *range* of parameter settings that achieve good
+performance though, e.g. the values for C should be at least 1 and the values
+for sigma should be between 0 and 1.
 
-If we want to find out, how good those configurations are on the entire data
-set, we might still look at the measures that we already know from
+If we want to find out how good those configurations are on the entire data
+set, we can still look at the measures that we already know from
 [Resampling](resample.md).
 
 
@@ -263,6 +269,7 @@ of those 5 values.
 
 To extract the `opt.path`s we have to access the inner cross validations.
 
+
 ```splus
 opt.paths = lapply(r$extract, function(x) as.data.frame(x$opt.path))
 opt.mmce = lapply(opt.paths, function(x) x$mmce.test.mean)
@@ -278,7 +285,7 @@ g + geom_tile()
 Regression example
 ------------------
 
-Let's tune `k` of a `k`-nearest-neighbor-regression model (implemented
+Let's tune `k` of a `k`-nearest neighbour regression model (implemented
 in package ``kknn``) on the ``BostonHousing`` data set.
 
 
@@ -300,7 +307,7 @@ ctrl = makeTuneControlGrid()
 ## Create a learner:
 lrn = makeLearner("regr.kknn")
 
-## Tune k-nearest-neighbor-regression with mean squared error as default
+## Tune k-nearest neighbour regression with mean squared error as default
 ## measure
 tuneParams(learner = lrn, task = task, resampling = rdesc, par.set = ps, control = ctrl, 
     measures = mse)

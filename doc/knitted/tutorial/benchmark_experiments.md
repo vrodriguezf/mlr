@@ -3,23 +3,23 @@ Benchmark Experiments
 
 
 In order to get an unbiased estimate of the performance on new data,
-it is generally not enough to simply use repeated cross-validations
+it is generally not enough to simply use repeated cross-validation
 for a given set of hyperparameters and methods (see section [tuning](tune.md)), 
 as this might produce an overly optimistic result.
 
-A better (although more time-consuming) approach is nesting two
-resampling methods.  To make the explanation easier, let's take
-cross-validations, in this case also called "double cross-validation".
+A better (although more time-consuming) approach is to nest two
+resampling methods. To keep it simple, let's take
+cross-validations, which in this case is also called "double cross-validation".
 In the so called "outer" cross-validation the data is split repeatedly
 into a (larger) training set and a (smaller) test set in the usual
 way. Now, in every outer iteration the learner is tuned on the
-training set by performing an "inner" cross-validation. The best found
+training set by performing an "inner" cross-validation. The best
 hyperparameters are selected and afterwards used for fitting the learner 
 to the complete "outer" training set. The resulting model is used to
-access the (outer) test set. This results in much more reliable
+on the (outer) test set. This results in much more reliable
 estimates of the true performance distribution of the learner for unseen
 data. These can now be used to estimate locations (e.g. of the mean
-or median performance value) and to compare learning methods in a fair
+or median performance value) and compare learning methods in a fair
 way.
 
 In the following we will see four examples to show different benchmark settings:
@@ -50,13 +50,14 @@ res = bench.exp(learners, task, rdesc)
 ```
 
 
-The above code should be mainly self-explanatory. In the result every
-column corresponds to one learner.  The entries show the mean test
+The above code should be self-explanatory. In the result every
+column corresponds to one learner. The entries show the mean test
 error and its standard deviation for the final fitted model.
 
-But the Benchmark result contains much more information, which you can
-access if you want to see details. Let's have a look to the benchmark
+But the benchmark results contain much more information, which you can
+access if you want to see details. Let's have a look at the benchmark
 result from the example above:
+
 
 
 ```splus
@@ -72,11 +73,11 @@ res["conf.mats"]
 Example 2: One task, one learner, tuning
 ----------------------------------------
 
-Now we have a learner with hyperparameters and we want to find out,
-which are the best ones. In that case we have two resampling levels.
+Now we have a learner with hyperparameters and we want to find the best ones. In
+that case we have two resampling levels.
 
 We show an example with outer bootstrap and inner cross-validation,
-our learner will be k-nearest-neighbor.
+our learner will be k-nearest neighbour.
 
 
 ```splus
@@ -90,20 +91,20 @@ ctrl = makeTuneControlGrid(ranges = ps)
 ## Define 'inner' cross-validation indices
 inner.rdesc = makeResampleDesc("CV", iters = 3)
 
-## Tune k-nearest-neighbor
+## Tune k-nearest neighbour
 lrn = makeTuneWrapper("classif.kknn", resampling = inner.rdesc, control = ctrl)
 
 ## Define 'outer' bootstrap indices
 rdesc = makeResampleDesc("BS", iters = 5)
 
-## Merge it to a benchmark experiment Choose accuracy instead of default
+## Merge it into a benchmark experiment Choose accuracy instead of default
 ## measure mean misclassification error
 res = bench.exp(lrn, task, rdesc, measure = acc)
 
-## Which performances did we get in the single runs?
+## What performances did we get in the single runs?
 res["perf"]
 
-## Which parameter belong to the performances?
+## What parameter setting achieved this performances?
 res["tuned.par"]
 
 ## What does the confusion matrix look like?
@@ -111,14 +112,13 @@ res["conf.mats"]
 ```
 
 
-Of course everything works the same way if we exchange the resampling
-strategy either in the outer or inner run.  They can be freely
-mixed.
+Of course everything works the same way if we change the resampling
+strategy either in the outer or inner run. They can be mixed as desired.
 
 Example 3: Three tasks, three learners, tuning
 ----------------------------------------------
 
-Extensive example which shows a benchmark experiment with three data
+Now we look at an extensive example that shows a benchmark experiment with three data
 sets, three learners and tuning.
 
 
@@ -179,7 +179,7 @@ res["opt.perf", learner = "classif.ksvm"]
 Example 4: One task, two learners, variable selection
 -----------------------------------------------------
 
-Let's see how we can do [variable selection](variable_selection.md) in
+Let's see how we can do [feature selection](feature_selection.md) in
 a benchmark experiment:
 
 
@@ -187,13 +187,13 @@ a benchmark experiment:
 ## Classification task with iris data set
 task = makeClassifTask("iris", data = iris, target = "Species")
 
-## Control object for variable selection
+## Control object for feature selection
 ctrl = makeFeatselControlSequential(beta = 100, method = "sfs")
 
 ## Inner resampling
 inner.rdesc = makeResampleDesc("CV", iter = 2)
 
-## Variable selection with Sequential Forward Search
+## Feature selection with Sequential Forward Search
 lrn = makeFeatselWrapper("classif.lda", resampling = inner.rdesc, control = ctrl)
 
 ## Let's compare two learners
@@ -205,7 +205,7 @@ rdesc = makeResampleDesc("subsample", iter = 3)
 ## Merge to a benchmark experiment
 res = bench.exp(tasks = task, learners = learners, resampling = rdesc)
 
-## Which variables have been selected (in the outer resampling steps)?
+## Which features have been selected (in the outer resampling steps)?
 res["sel.var", learner = "classif.lda"]
 ```
 

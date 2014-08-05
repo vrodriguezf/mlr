@@ -1,11 +1,15 @@
-Multicriteria Evaluation
+Multi-criteria Evaluation
 ========================
 
-For this example we have to deal with some of the *inner workings of mlr* and the characteristics of different *measures*.
-In a lot of cases you get more than just one measure value but are interested in just one *aggregated value*.
-For instance in a 10-fold cross validation you obtain 10 values for the *mmce*.
-The *aggregated value* is the mean of these 10 values.
+In this example, we have to deal with some of the implementation details of
+**mlr** and the characteristics of different measures.
+In a lot of cases you get more than just one measure value but are interested in
+just one aggregated value.
+For example, a 10-fold cross validation computes 10 values for the chosen
+performance measure.
+The aggregated value is the mean of these 10 numbers.
 **mlr** knows how to handle it because each `measure` knows how it is aggregated:
+
 
 ```splus
 library(mlr)
@@ -24,7 +28,9 @@ rmse$aggr  #Root mean square error
 ## Aggregation function: test.sqrt.of.mean
 ```
 
-You can also create a new `measure` by using a different aggregation (see `?aggregations`).
+
+You can also create a new `measure` by using a different aggregation (see [aggregations](http://berndbischl.github.io/mlr/man/aggregations.html)).
+
 
 ```splus
 mmceAggrBySd = setAggregation(mmce, test.sd)
@@ -41,13 +47,15 @@ r = resample(lrn, task, rdesc, measures = list(mmce, mmceAggrBySd))
 ## [Resample] cross-validation iter: 3
 ## [Resample] cross-validation iter: 4
 ## [Resample] cross-validation iter: 5
-## [Resample] Result: mmce.test.mean=0.0733,mmce.test.sd=0.0365
+## [Resample] Result: mmce.test.mean=0.0733,mmce.test.sd=0.0279
 ```
 
 
-It is even possible to create your own *aggregation funtion* by calling the intern **mlr** function `makeAggregation()`.
-You can use intern (also *not exported*) functions of R-packages by `packagename:::function()`.
-So in this case:
+It is even possible to create your own aggregation function by calling the
+internal **mlr** function [makeAggregation](http://berndbischl.github.io/mlr/man/makeAggregation.html).
+You can use internal (not exported) functions of R packages by prefixing the
+name of the function with the name of the package, i.e. `packagename:::function()`.
+In this case:
 
 ```splus
 mlr:::makeAggregation(id = "some.name", fun = function(task, perf.test, perf.train, 
@@ -60,12 +68,12 @@ mlr:::makeAggregation(id = "some.name", fun = function(task, perf.test, perf.tra
 ## Aggregation function: some.name
 ```
 
-Remember: It is important that the head of the function looks exactly like given above!
+Remember: it is important that the head of the function looks exactly as above!
 `perf.test` and `perf.train` are both numerical vectors containing the measure values.
-In the usual cases (e.g. *cross validation*) the `perf.train` vector is empty.
+In the usual case (e.g. cross validation), the `perf.train` vector is empty.
 
-Practical example: Evaluate the range
--------------------------------------
+Practical Example: Evaluate the Range of Measures
+-------------------------------------------------
 
 Let's say you are interested in the range of the obtained measures:
 
@@ -75,7 +83,8 @@ my.range.aggr = mlr:::makeAggregation(id = "test.range", fun = function(task,
 ```
 
 
-Now we can run a feature selection based on the first measure in the provided list and see how the other measures turn out.
+Now we can run a feature selection based on the first measure in the provided
+list and see how the other measures turn out.
 
 ```splus
 library(ggplot2)
@@ -89,7 +98,7 @@ ms1max = setAggregation(ms1, test.max)
 
 ```
 ## FeatSel result:
-## Features (3): Sepal.Length, Sepal.Width, Petal.Width
+## Features (2): Sepal.Width, Petal.Width
 ## mmce.test.mean=0.0467,mmce.test.range=0.0333,mmce.test.min=0.0333,mmce.test.max=0.0667
 ```
 

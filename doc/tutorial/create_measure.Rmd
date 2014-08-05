@@ -6,20 +6,22 @@ library("mlr")
 Integrating another measure
 ===========================
 
-Maybe you want to evaluate a prediction with a measure, which ist not yet implemented 
-in **mlr**. This can either be a performance measure, which is not included in the in mlr 
-provided list of [measures](http://berndbischl.github.io/mlr/man/measures.html) or a measure using a non-standard misclassification cost matrix.
+Maybe you want to evaluate a prediction with a measure which is not yet implemented 
+in **mlr**. This could be either a performance measure which is not included in the in **mlr**
+list of \man[measures] or a measure that uses a non-standard misclassification cost matrix.
 
 
 Construct performance measure
 -----------------------------
 
-The [makeMeasure](http://berndbischl.github.io/mlr/man/makeMeasure.html) function is a simple way to construct your own performance 
-measure. In the following this is exemplified by an implemantion of the mean 
+The \man[makeMeasure] function provides a simple way of constructing your own performance 
+measure. Below, this is exemplified by an implementation of the mean 
 misclassification error (mmce) for the iris dataset. For this purpose we write a simple 
-function, that computes the measure on the basis of the predictions and subsequently wrap it 
-in a Measure object. Then, we work with it as usual with the [performance](http://berndbischl.github.io/mlr/man/performance.html) function. See the 
-R documentation of the [makeMeasure](http://berndbischl.github.io/mlr/man/makeMeasure.html) function for details on the various parameters.
+function that computes the measure on the basis of the predictions and subsequently wrap it 
+in a \man[Measure] object. Then, we work with it as usual with the
+[performance](http://berndbischl.github.io/mlr/man/performance.html) function.
+See the R documentation of the \man[makeMeasure] function for details on the
+various parameters.
 
 ```{splus}
 # Define the measure.
@@ -49,11 +51,11 @@ performance(pred, measures = mmce)
 Construct measure for non-standard misclassification costs
 ----------------------------------------------------------
 
-For creating a measure that involves non-standard misclassification costs you can use
-the [makeCostMeasure](http://berndbischl.github.io/mlr/man/makeCostMeasure.html) function. In order to do this, you first need to define the cost
+To create a measure that involves non-standard misclassification costs you can use
+the \man[makeCostMeasure] function. In order to do this, you first need to define the cost
 matrix you want to use and include all class labels. The cost matrix can then be 
-wraped in a Measure object and then a prediction can be evaluated as normally with the
-[performance](http://berndbischl.github.io/mlr/man/performance.html) function. See the R documentation of the [makeCostMeasure](http://berndbischl.github.io/mlr/man/makeCostMeasure.html) function for 
+wrapped in a \man[Measure] object and a prediction can be evaluated as usual with the
+\man[performance] function. See the R documentation of the \man[makeCostMeasure] function for 
 details on the various parameters.
 
 ```{splus}
