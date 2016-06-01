@@ -2,7 +2,7 @@
 % Please edit documentation in R/hyperparameterValidation.R
 \name{generateValidationData}
 \alias{generateValidationData}
-\title{Generate validation data from a tuning result.}
+\title{Generate hyperparameter validation data from a tuning result.}
 \usage{
 generateValidationData(TuneResult, include.diagnostics = FALSE)
 }
@@ -10,26 +10,24 @@ generateValidationData(TuneResult, include.diagnostics = FALSE)
 \item{TuneResult}{\code{\link{TuneResult}} & \code{\link{OptResult}}\cr
 The tuning results, also containing the optimizer results}
 
-\item{include.diagnostics}{[\code{logical(1)}]\cr
+\item{include.diagnostics}{\code{logical(1)}\cr
 Should diagnostic info (eol and error msg) be included?}
 }
 \value{
-\code{\link{ValidationData}}
- Object containing the validation dataframe, the tuning performance measures
+\code{ValidationData}
+ object containing the validation dataframe, the tuning performance measures
  used, the hyperparameters used, a flag for including diagnostic info, and 
  the optimization algorithm used.
 }
 \description{
-Generate cleaned validation from a tuning result. The object returned
-can be used for custom visualization or passed downstream to an out of the
-box mlr method, \code{\link{plotValidationData}}.
+Generate cleaned hyperparameter validation from a tuning result. The object 
+returned can be used for custom visualization or passed downstream to an out 
+of the box mlr method, \code{\link{plotValidation}}.
 }
 \examples{
-\dontrun{
 res = tuneParams("classif.ksvm", task = pid.task, resampling = rdesc,
 par.set = ps, control = ctrl)
 valid = generateValidationData(res)
 valid$data
-}
 }
 
