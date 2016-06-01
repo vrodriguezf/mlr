@@ -44,6 +44,7 @@ or effect of a particular hyperparameter on some performance measure and/or
 optimizer.
 }
 \examples{
+\dontrun{
 ps = makeParamSet(makeDiscreteParam("C", values = 2^(-4:4)))
 ctrl = makeTuneControlRandom()
 rdesc = makeResampleDesc("CV", iters = 3L)
@@ -51,5 +52,6 @@ res = tuneParams("classif.ksvm", task = pid.task, resampling = rdesc,
 par.set = ps, control = ctrl, measures = acc)
 valid = generateValidationData(res)
 plotValidation(valid, x.axis = "C", y.axis = "acc.test.mean")
+}
 }
 

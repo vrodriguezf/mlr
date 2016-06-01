@@ -7,7 +7,7 @@
 generateValidationData(TuneResult, include.diagnostics = FALSE)
 }
 \arguments{
-\item{TuneResult}{\code{\link{TuneResult}} & \code{\link{OptResult}}\cr
+\item{TuneResult}{\code{\link{TuneResult}} & \code{OptResult}\cr
 The tuning results, also containing the optimizer results}
 
 \item{include.diagnostics}{\code{logical(1)}\cr
@@ -25,9 +25,14 @@ returned can be used for custom visualization or passed downstream to an out
 of the box mlr method, \code{\link{plotValidation}}.
 }
 \examples{
+\dontrun{
+ps = makeParamSet(makeDiscreteParam("C", values = 2^(-4:4)))
+ctrl = makeTuneControlRandom()
+rdesc = makeResampleDesc("CV", iters = 3L)
 res = tuneParams("classif.ksvm", task = pid.task, resampling = rdesc,
 par.set = ps, control = ctrl)
 valid = generateValidationData(res)
 valid$data
+}
 }
 

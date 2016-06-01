@@ -4,7 +4,7 @@
 #' Generate cleaned hyperparameter validation from a tuning result. The object 
 #' returned can be used for custom visualization or passed downstream to an out 
 #' of the box mlr method, \code{\link{plotValidation}}.
-#' @param TuneResult \code{\link{TuneResult}} & \code{\link{OptResult}}\cr
+#' @param TuneResult \code{\link{TuneResult}} & \code{OptResult}\cr
 #'  The tuning results, also containing the optimizer results
 #' @param include.diagnostics \code{logical(1)}\cr
 #'  Should diagnostic info (eol and error msg) be included?
@@ -14,12 +14,17 @@
 #'  used, the hyperparameters used, a flag for including diagnostic info, and 
 #'  the optimization algorithm used.
 #'
-#' @examples
+#' @examples \dontrun{
+#' ps = makeParamSet(makeDiscreteParam("C", values = 2^(-4:4)))
+#' ctrl = makeTuneControlRandom()
+#' rdesc = makeResampleDesc("CV", iters = 3L)
 #' res = tuneParams("classif.ksvm", task = pid.task, resampling = rdesc,
 #' par.set = ps, control = ctrl)
 #' valid = generateValidationData(res)
 #' valid$data
+#' }
 #' @export
+#' @importFrom utils type.convert
 generateValidationData = function(TuneResult, include.diagnostics = FALSE) {
   checkmate::assertClass(TuneResult, classes = c("TuneResult", "OptResult"))
   d = as.data.frame(TuneResult$opt.path)
@@ -84,7 +89,7 @@ print.ValidationData = function(x, ...) {
 #'  ggplot2 plot object
 #' @export
 #'
-#' @examples
+#' @examples \dontrun{
 #' ps = makeParamSet(makeDiscreteParam("C", values = 2^(-4:4)))
 #' ctrl = makeTuneControlRandom()
 #' rdesc = makeResampleDesc("CV", iters = 3L)
@@ -92,6 +97,7 @@ print.ValidationData = function(x, ...) {
 #' par.set = ps, control = ctrl, measures = acc)
 #' valid = generateValidationData(res)
 #' plotValidation(valid, x.axis = "C", y.axis = "acc.test.mean")
+#' }
 plotValidation = function(ValidationData, x.axis = NULL, y.axis = NULL, 
                           plot.line = TRUE, local.optima = FALSE, 
                           facet = NULL, pretty.names = TRUE, title = NULL) {
