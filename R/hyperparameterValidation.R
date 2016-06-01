@@ -38,7 +38,7 @@ generateValidationData = function(TuneResult, include.diagnostics = FALSE) {
     
   # off by default unless needed by user
   if (include.diagnostics == FALSE)
-    d = within(d, rm(eol, error.message))
+    d = within(d, rm("eol", "error.message"))
   
   # users might not know what dob means, so let's call it iteration
   names(d)[names(d) == "dob"] = "iteration"
@@ -152,7 +152,7 @@ plotValidation = function(ValidationData, x.axis = NULL, y.axis = NULL,
         local_maxs = which(diff(sign(diff(d[, measure_axis]))) == -2)
         d[local_maxs + 1, "local_optima"] = TRUE
       }
-      plt = plt + geom_point(data = d, aes(color = local_optima)) +
+      plt = plt + geom_point(data = d, aes_string(color = "local_optima")) +
         scale_color_manual(values = c("TRUE" = "green", "FALSE" = "red"))
     } else if (measure_used == 0) {
       print("You asked for local optima but didn't specify a measure!")
