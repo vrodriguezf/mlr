@@ -119,7 +119,7 @@ plotValidation = function(ValidationData, x.axis = NULL, y.axis = NULL,
   x_measure = x.axis %in% ValidationData$measures
   y_measure = y.axis %in% ValidationData$measures
   
-  plt = ggplot(d, aes_string(x = x.axis, y = y.axis))
+  plt = ggplot(d, aes_string(x = x.axis, y = y.axis)) + geom_point()
   
   if (plot.line) 
     plt = plt + geom_line()
