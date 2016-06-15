@@ -6,8 +6,7 @@ date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{mlr}
-  #%\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEngine{rmarkdown::render()}
+  %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
 # mlr: Machine Learning in R
