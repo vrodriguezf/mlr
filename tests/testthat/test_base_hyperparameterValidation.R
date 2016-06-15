@@ -1,7 +1,7 @@
 context("hyperparameterValidation")
 
-test_that("hyperparameterValidation", {
-  # 1 numeric hyperparam
+test_that("1 numeric hyperparam", {
+  # generate data
   ps = makeParamSet(makeDiscreteParam("C", values = 2^(-5:5)))
   ctrl = makeTuneControlRandom(maxit = 50)
   rdesc = makeResampleDesc("CV", iters = 3L)
@@ -12,12 +12,19 @@ test_that("hyperparameterValidation", {
   new = generateValidationData(res, include.diagnostics = TRUE)
   expect_equivalent(new$data, orig)
   
-  # plotting
-  # TODO: comparing pixel data? Looks like this requires a package?
-  plotValidation(new, x.axis = "iteration", y.axis = "acc.test.mean", 
+  # make sure plot is created and can be saved
+  plt = plotValidation(new, x.axis = "iteration", y.axis = "acc.test.mean", 
                  plot.type = "line")
+  print(plt)
   dir = tempdir()
   path = stri_paste(dir, "/test.svg")
   ggsave(path)
-  doc = XML::xmlParse(path)
+  
+  # make sure plot has expected attributes
+  expect_set_equal(sapply(plt$layers, function(x) class(x$geom)[1]), 
+                   c("GeomPoint", "GeomLine"))
+  expect_equal(plt$labels$x, "iteration")
+  expect_equal(plt$labels$y, "Accuracy")
+  
+  # TODO: make sure plot looks as expected
 })
