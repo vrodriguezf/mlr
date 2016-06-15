@@ -5,8 +5,8 @@
 \title{Plot the hyperparameter validation data}
 \usage{
 plotValidation(ValidationData, x.axis = NULL, y.axis = NULL,
-  plot.line = TRUE, local.optima = FALSE, facet = NULL,
-  pretty.names = TRUE, title = NULL)
+  extra.axis = NULL, plot.type = NULL, loess.smooth = FALSE,
+  facet = NULL, pretty.names = TRUE, title = NULL)
 }
 \arguments{
 \item{ValidationData}{\code{ValidationData}\cr}
@@ -19,11 +19,16 @@ Specify what should be plotted on the x axis. Must be a column from
 Specify what should be plotted on the y axis. Must be a column from
 \code{ValidationData$data}}
 
-\item{plot.line}{\code{logical(1)}\cr
-If TRUE, will connect plotted points with a line}
+\item{extra.axis}{\code{character(1)}\cr
+Specify what should be used as the extra axis for a particular geom. This
+could be for the fill on a heatmap or color aesthetic for a line. Must be a 
+column from \code{ValidationData$data}}
 
-\item{local.optima}{\code{logical(1)}\cr
-If TRUE, will color found local optima points green}
+\item{plot.type}{\code{character(1)}\cr
+Specify the type of plot: scatter, heatmap, or line}
+
+\item{loess.smooth}{\code{logical(1)}\cr
+If TRUE, will add loess smoothing line to plots where possible}
 
 \item{facet}{\code{character(1)}\cr
 TODO: not yet implemented}

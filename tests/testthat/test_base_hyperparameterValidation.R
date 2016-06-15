@@ -15,7 +15,7 @@ test_that("hyperparameterValidation", {
   # plotting
   # TODO: comparing pixel data? Looks like this requires a package?
   plotValidation(new, x.axis = "iteration", y.axis = "acc.test.mean", 
-                 local.optima = TRUE)
+                 plot.type = "line")
   dir = tempdir()
   path = stri_paste(dir, "/test.svg")
   ggsave(path)

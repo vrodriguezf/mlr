@@ -74,10 +74,14 @@ print.ValidationData = function(x, ...) {
 #' @param y.axis \code{character(1)}\cr
 #'  Specify what should be plotted on the y axis. Must be a column from
 #'  \code{ValidationData$data}
-#' @param plot.line \code{logical(1)}\cr
-#'  If TRUE, will connect plotted points with a line
-#' @param local.optima \code{logical(1)}\cr
-#'  If TRUE, will color found local optima points green
+#' @param extra.axis \code{character(1)}\cr
+#'  Specify what should be used as the extra axis for a particular geom. This
+#'  could be for the fill on a heatmap or color aesthetic for a line. Must be a 
+#'  column from \code{ValidationData$data}
+#' @param plot.type \code{character(1)}\cr
+#'  Specify the type of plot: scatter, heatmap, or line
+#' @param loess.smooth \code{logical(1)}\cr
+#'  If TRUE, will add loess smoothing line to plots where possible
 #' @param facet \code{character(1)}\cr
 #'  TODO: not yet implemented
 #' @param pretty.names \code{logical(1)}\cr
@@ -99,74 +103,67 @@ print.ValidationData = function(x, ...) {
 #' plotValidation(valid, x.axis = "C", y.axis = "acc.test.mean")
 #' }
 plotValidation = function(ValidationData, x.axis = NULL, y.axis = NULL, 
-                          plot.line = TRUE, local.optima = FALSE, 
-                          facet = NULL, pretty.names = TRUE, title = NULL) {
+                          extra.axis = NULL, plot.type = NULL, 
+                          loess.smooth = FALSE, facet = NULL, 
+                          pretty.names = TRUE, title = NULL) {
   checkmate::assertClass(ValidationData, classes = "ValidationData")
   if (is.null(x.axis) || is.null(y.axis))
     stopf("x.axis and y.axis must both be specified!")
+  if (is.null(plot.type))
+    stopf("plot type must be one of: scatter, line, heatmap")
   # TODO later once functionality implemented
   if (!is.null(facet))
     stopf("Facet argument is not yet supported")
-  if (length(x.axis) > 1 || length(y.axis) > 1)
-    stopf("Greater than 1 length x.axis or y.axis not yet supported")
+  if (length(x.axis) > 1 || length(y.axis) > 1 || length(extra.axis) > 1)
+    stopf("Greater than 1 length x.axis, y.axis or fill not yet supported")
   
   d = ValidationData$data
   d_names = names(d)
   if (!(x.axis %in% d_names) || !(y.axis %in% d_names))
-    stopf("x.axis and y.axis must both match column names in the data!")
+    stopf("x.axis, y.axis and fill must match column names in the data!")
   
-  # save for later formatting checks
-  x_measure = x.axis %in% ValidationData$measures
-  y_measure = y.axis %in% ValidationData$measures
-  
-  plt = ggplot(d, aes_string(x = x.axis, y = y.axis)) + geom_point()
-  
-  if (plot.line) 
-    plt = plt + geom_line()
-  
-  if (local.optima){
-    # did we even ask to plot a measure so local optima matters?
-    measure_used = 0
-    if (x_measure) {
-      measure_used = measure_used + 1
-      measure_axis = x.axis
+  # x, y, "third" axis
+  if ((length(x.axis) == 1) && (length(y.axis) == 1) && (!is.null(extra.axis))  
+      && (!is.null(plot.type))){
+    if (plot.type == "heatmap"){
+      # ensure we get a "tabled" heatmap
+      d[, x.axis] = as.factor(d[, x.axis])
+      d[, y.axis] = as.factor(d[, y.axis])
+      d[, extra.axis] = round(d[, extra.axis], 3)
+      plt = ggplot(d, aes_string(x = x.axis, y = y.axis, fill = extra.axis)) + 
+        geom_tile() + geom_text(aes_string(label = extra.axis), color = "white")
+    } else if (plot.type == "line"){
+      plt = ggplot(d, aes_string(x = x.axis, y = y.axis)) + geom_point()
+      plt = plt + geom_line(aes_string(color = extra.axis))
+    } else if (plot.type == "scatter"){
+      plt = ggplot(d, aes_string(x = x.axis, y = y.axis)) + 
+        geom_point(aes_string(color = extra.axis))
     }
-    if (y_measure) {
-      measure_used = measure_used + 1
-      if (measure_used > 1) {
-        print("Local optima for multiple measures not yet supported!")
-      } else {
-        measure_axis = y.axis
-      }
-    } 
-    if (measure_used == 1) {
-      d$local_optima = FALSE
-      # do we care about local min or max?
-      if (eval(as.name(stri_split_fixed(measure_axis, 
-                                        ".test.mean")[[1]][1]))$minimize) {
-        # find local mins
-        local_mins = which(diff(sign(diff(d[, measure_axis]))) == 2)
-        d[local_mins + 1, "local_optima"] = TRUE
-      } else {
-        # find local maxs
-        local_maxs = which(diff(sign(diff(d[, measure_axis]))) == -2)
-        d[local_maxs + 1, "local_optima"] = TRUE
-      }
-      plt = plt + geom_point(data = d, aes_string(color = "local_optima")) +
-        scale_color_manual(values = c("TRUE" = "green", "FALSE" = "red"))
-    } else if (measure_used == 0) {
-      print("You asked for local optima but didn't specify a measure!")
-    }
+  # just x, y  
+  } else if ((length(x.axis) == 1) && (length(y.axis) == 1) && 
+             (is.null(extra.axis)) && (!is.null(plot.type))){
+    if (plot.type == "scatter")
+      plt = ggplot(d, aes_string(x = x.axis, y = y.axis)) + geom_point()
+    else if (plot.type == "line")
+      plt = ggplot(d, aes_string(x = x.axis, y = y.axis)) + geom_point() +
+        geom_line()
+      if (loess.smooth)
+        plt = plt + geom_smooth()
   }
   
   # pretty name changing
   if (pretty.names) {
-    if (x_measure)
+    if (x.axis %in% ValidationData$measures)
       plt = plt + 
         xlab(eval(as.name(stri_split_fixed(x.axis, ".test.mean")[[1]][1]))$name)
-    if (y_measure)
+    if (y.axis %in% ValidationData$measures)
       plt = plt + 
         ylab(eval(as.name(stri_split_fixed(y.axis, ".test.mean")[[1]][1]))$name)
+    if (!is.null(extra.axis))
+      if (extra.axis %in% ValidationData$measures)
+        plt = plt +
+          labs(fill = eval(as.name(stri_split_fixed(extra.axis, 
+                                                ".test.mean")[[1]][1]))$name) 
   }
   
   if (!is.null(title))
