@@ -660,10 +660,13 @@ plotPartialDependence = function(obj, geom = "line", facet = NULL, facet.wrap.nr
 
     features = obj$features[which(obj$features != facet)]
 
-    if (!is.factor(obj$data[[facet]]))
-      obj$data[[facet]] = stri_paste(facet, "=", as.factor(obj$data[[facet]]), sep = " ")
-    else
+    if (is.factor(obj$data[[facet]])) {
       obj$data[[facet]] = stri_paste(facet, "=", obj$data[[facet]], sep = " ")
+    } else if (is.character(obj$data[[facet]])) {
+      obj$data[[facet]] = stri_paste(facet, "=", as.factor(obj$data[[facet]]), sep = " ")
+    } else {
+      obj$data[[facet]] = stri_paste(facet, "=", as.factor(signif(obj$data[[facet]], 3L)), sep = " ")
+    }
 
     scales = "fixed"
   } else {
