@@ -1,10 +1,11 @@
-computeAverageMarginalEffects = function(model, task, features = getTaskFeatureNames(task),
-  resampling = makeResampleDesc("Bootstrap", iters = 2)) {
+computeAverageMarginalEffects = function(model, task,
+  features = getTaskFeatureNames(task), gridsize = 10L) {
 
   data = getTaskData(task)
-  target = getTaskTargetNames(task)
+  tt = getTaskType(task)
+  target = if(tt == "classif") "Probability" else getTaskTargetNames(task)
   res = namedList(features)
-  pdat = generatePartialDependenceData(model, task, features)$data
+  pdat = generatePartialDependenceData(model, task, features = features, gridsize = gridsize)$data
 
   # calculate AMEs for all features
   for (f in features) {
@@ -31,7 +32,9 @@ computeAverageMarginalEffects = function(model, task, features = getTaskFeatureN
     if (is.numeric(data[, f])) { # handle numeric features
       r$type = "numeric"
       r$values = vals
-      r$effects = mean(diff(y))
+      # FIXME: the ame effect should be interpretable as what happens if x increases by one,
+      #        i.e. using only mean(diff(y)) can be wrong as this does not take into account the "grid-step-size" of the x-values
+      r$effects = mean(diff(y)/diff(vals))
     }
     res[[f]] = r
   }

@@ -36,9 +36,9 @@ getNameProposals = function(input, possible.inputs, nproposals = 3L) {
 
 # generates a grid for a vector of features and returns a list
 # expand.grid can be applied to this to find all possible combinations of the features
-generateFeatureGrid = function(features, data, resample, gridsize, fmin, fmax) {
+generateFeatureGrid = function(features, data, resample, gridsize, fmin, fmax, unique.values = FALSE) {
   sapply(features, function(feature) {
-      nunique = length(unique(data[[feature]]))
+      nunique = if(unique.values) length(unique(data[[feature]])) else gridsize
       cutoff = ifelse(gridsize >= nunique, nunique, gridsize)
       if (resample == "none") {
         switch(paste0(class(data[[feature]]), collapse = ":"),
