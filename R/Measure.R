@@ -135,17 +135,35 @@ makeMeasure = function(id, minimize, properties = character(0L),
 #' @return [\code{\link{Measure}}].
 #' @export
 getDefaultMeasure = function(x) {
-  type = if (inherits(x, "TaskDesc"))
-    x$type
-  else if (inherits(x, "Task"))
-    x$task.desc$type
-  else if (inherits(x, "Learner"))
-    x$type
-  else if (x %in% listLearners()$class)
-    stri_split_fixed(x, ".", simplify = TRUE)[1]
-  else
-    x
-  switch(type,
+  UseMethod("getDefaultMeasure")
+}
+
+#' @export
+getDefaultMeasure.TaskDesc = function(x) {
+  getDefaultMeasure2(x$type)
+}
+
+#' @export
+getDefaultMeasure.Task = function(x) {
+  getDefaultMeasure(getTaskDescription(x))
+}
+
+#' @export
+getDefaultMeasure.Learner = function(x) {
+  getDefaultMeasure2(x$type)
+}
+
+#' @export
+getDefaultMeasure.character = function(x) {
+  if (x %in% getSupportedTaskTypes()) {
+    getDefaultMeasure2(x)
+  } else {
+    getDefaultMeasure(checkLearner(x))
+  }
+}
+
+getDefaultMeasure2 = function(x){
+  switch(x,
     classif = mmce,
     cluster = db,
     regr = mse,
