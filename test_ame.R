@@ -3,38 +3,50 @@ library(BBmisc)
 # see also https://diffuseprior.wordpress.com/2012/04/23/probitlogit-marginal-effects-in-r-2/
 
 load_all()
-
-# use case 1: in a lm without interactions, the ame should equate to the coefficients!
+#mtcars$carb = as.factor(mtcars$carb)
 mt.task = makeRegrTask(data = mtcars, target = "mpg")
+
+################################################################################
+# use case 1: in a lm without interactions, the ame should equate to the coefficients!
+################################################################################
 lrn = makeLearner("regr.lm")
 m = train(lrn, mt.task)
 ame = computeAverageMarginalEffects(m, mt.task, gridsize = getTaskSize(mt.task))
 vnapply(ame, function(x) x$effects)
 coefficients(m$learner.model)[-1]
 
-# compare with margins github package
+# compare with margins github package https://github.com/leeper/margins
 library("margins")
-mod = lm(mpg~., data = mtcars)
-summary(margins(mod))
+mod = lm(mpg ~., data = mtcars)
+colMeans(marginal_effects(mod, change = "dydx"))
+margins(mod)
 
+################################################################################
 # use case 2: in a lm with interactions
+################################################################################
 library("margins")
-mod = lm(mpg ~ cyl + hp + I(cyl^2) + I(hp^2) + cyl:hp, data = mtcars)
+f = mpg ~ cyl + hp + (cyl + hp):am
+mod = lm(f, data = mtcars)
 coefficients(mod)
-(m <- margins(mod))
-# FIXME: Effects are colMeans(meff) -> check what happens there
-meff <- marginal_effects(mod, change = "sd")
-cplot(mod, x = c("hp"))
-out = cplot(mod, x = "cyl")
+margins(mod, type = "terms")
+par(mfrow=c(1,3))
+cplot(mod, x = "cyl")
+cplot(mod, x = "hp")
+cplot(mod, x = "carb")
 
-# FIXME: partialDependencePlot just predicts on unique(#values) and not on a continous grid
-lrn = makeLearner("regr.rsm", modelfun = "SO")
-m = train(lrn, subsetTask(mt.task, features = c("cyl", "hp")))
-coefficients(m$learner.model)[-1]
-pdat = generatePartialDependenceData(m, mt.task, getTaskFeatureNames(mt.task), gridsize = getTaskSize(mt.task), unique.values = FALSE)
+# FIXME: partialDependencePlot just predicts on unique(#values) and not on all data points
+mt.task$formula = f
+m = train(lrn, subsetTask(mt.task, features = c("cyl", "hp", "carb")))
+pdat = generatePartialDependenceData(m, mt.task, c("cyl", "hp", "carb"))
 plotPartialDependence(pdat)
-ame = computeAverageMarginalEffects(m, mt.task, gridsize =10, features = c("cyl", "hp"))
-vnapply(ame, function(x) x$effects)
+ame = computeAverageMarginalEffects(m, mt.task, gridsize = 100, features = c("cyl", "hp", "carb"))
+lapply(ame, function(x) x$effects)
+coefficients(m$learner.model)[-1]
+
+pdat.deriv = generatePartialDependenceData(m, mt.task, c("cyl", "hp"),
+  gridsize = getTaskSize(mt.task), derivative = TRUE)
+weighted.mean(pdat.deriv$data[!is.na(pdat.deriv$data$cyl),"mpg"], table(getTaskData(mt.task)$cyl))
+
 
 cplot(mod, x = c("cyl"))
 lines(pdat$data$cyl, pdat$data$mpg, col ="red")
@@ -83,7 +95,11 @@ derivative = function(model, data, variable, change = "dydx", eps = 1e-8){
     out <- (P1 - P0)#/ (d1[[variable]] - d0[[variable]])
   }
 }
-
+numDerivative = function(f, x, eps = .Machine$double.eps) {
+  delta = x + (max(abs(x), 1, na.rm = TRUE) * sqrt(eps)) - x # x + sqrt(eps)*x
+  x1 = x + delta
+  (f(x1) - f(x))/(x1 - x)
+}
 a = derivative(mod, mtcars, c("cyl"))
 mean(a)
 

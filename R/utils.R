@@ -38,22 +38,46 @@ getNameProposals = function(input, possible.inputs, nproposals = 3L) {
 # expand.grid can be applied to this to find all possible combinations of the features
 generateFeatureGrid = function(features, data, resample, gridsize, fmin, fmax, unique.values = FALSE) {
   sapply(features, function(feature) {
-      nunique = if(unique.values) length(unique(data[[feature]])) else gridsize
-      cutoff = ifelse(gridsize >= nunique, nunique, gridsize)
-      if (resample == "none") {
-        switch(paste0(class(data[[feature]]), collapse = ":"),
-          "integer" = as.integer(seq.int(fmin[[feature]], fmax[[feature]], length.out = cutoff)),
-          "numeric" = seq(fmin[[feature]], fmax[[feature]], length.out = cutoff),
-          "ordered:factor" = sort(unique(data[[feature]]))[as.integer(seq.int(1, nunique, length.out = cutoff))],
-          "factor" = sample(unique(data[[feature]]), size = cutoff) ## impossible to order selection if cutoff < nunique w/o ordering
-        )
+    nunique = length(unique(data[[feature]]))
+    cutoff = ifelse(gridsize >= nunique, nunique, gridsize)
+    if (resample == "none") {
+      switch(paste0(class(data[[feature]]), collapse = ":"),
+        "integer" = as.integer(seq.int(fmin[[feature]], fmax[[feature]], length.out = cutoff)),
+        "numeric" = seq(fmin[[feature]], fmax[[feature]], length.out = cutoff),
+        "ordered:factor" = sort(unique(data[[feature]]))[as.integer(seq.int(1, nunique, length.out = cutoff))],
+        "factor" = sample(unique(data[[feature]]), size = cutoff) ## impossible to order selection if cutoff < nunique w/o ordering
+      )
 
+    } else {
+      if (is.ordered(data[[feature]])) {
+        sort(sample(data[[feature]], size = cutoff, replace = resample == "bootstrap"))
       } else {
-        if (is.ordered(data[[feature]])) {
-          sort(sample(data[[feature]], size = cutoff, replace = resample == "bootstrap"))
-        } else {
-          sample(data[[feature]], size = cutoff, replace = resample == "bootstrap")
-        }
+        sample(data[[feature]], size = cutoff, replace = resample == "bootstrap")
       }
+    }
   }, simplify = FALSE)
 }
+# generateFeatureGrid = function(features, data, resample, gridsize, fmin, fmax, unique.values = FALSE) {
+#   sapply(features, function(feature) {
+#     nunique =  if (unique.values) length(unique(data[[feature]])) else gridsize
+#     cutoff = ifelse(gridsize >= nunique, nunique, gridsize)
+#     if (resample == "none") {
+#       if (unique.values) {
+#         unique(data[[feature]])
+#       } else {
+#         switch(paste0(class(data[[feature]]), collapse = ":"),
+#           "integer" = as.integer(seq.int(fmin[[feature]], fmax[[feature]], length.out = cutoff)),
+#           "numeric" = seq(fmin[[feature]], fmax[[feature]], length.out = cutoff),
+#           "ordered:factor" = sort(unique(data[[feature]]))[as.integer(seq.int(1, nunique, length.out = cutoff))],
+#           "factor" = sample(unique(data[[feature]]), size = cutoff) ## impossible to order selection if cutoff < nunique w/o ordering
+#         )
+#       }
+#     } else {
+#       if (is.ordered(data[[feature]])) {
+#         sort(sample(data[[feature]], size = cutoff, replace = resample == "bootstrap"))
+#       } else {
+#         sample(data[[feature]], size = cutoff, replace = resample == "bootstrap")
+#       }
+#     }
+#   }, simplify = FALSE)
+# }

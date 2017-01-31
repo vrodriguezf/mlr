@@ -86,8 +86,6 @@
 #'   than the theoretical maximum for a given feature. This only applies to numeric features and a
 #'   \code{NA} should be inserted into the vector if the corresponding feature is a factor.
 #'   Default is the empirical maximum of each numeric feature and NA for factor features.
-#' @param unique.values [\code{logical(1)}]\cr
-#'   Should unique values of the feature be used instead of the gridsize? Default is \code{FALSE}.
 #' @param gridsize [\code{integer(1)}]\cr
 #'   The length of the prediction grid created for each feature.
 #'   If \code{resample = "bootstrap"} or \code{resample = "subsample"} then this defines
@@ -168,7 +166,7 @@
 generatePartialDependenceData = function(obj, input, features,
   interaction = FALSE, derivative = FALSE, individual = FALSE, center = NULL,
   fun = mean, bounds = c(qnorm(.025), qnorm(.975)),
-  resample = "none", fmin, fmax, unique.values = FALSE, gridsize = 10L, ...) {
+  resample = "none", fmin, fmax, gridsize = 10L, ...) {
 
   assertClass(obj, "WrappedModel")
   if (obj$learner$predict.type == "se" & individual)
@@ -232,7 +230,7 @@ generatePartialDependenceData = function(obj, input, features,
     stop("fmax must be a named list with an NA or value corresponding to each feature.")
   assertCount(gridsize, positive = TRUE)
 
-  rng = generateFeatureGrid(features, data, resample, gridsize, fmin, fmax, unique.values)
+  rng = generateFeatureGrid(features, data, resample, gridsize, fmin, fmax)
   if (length(features) > 1L & interaction)
     rng = expand.grid(rng)
 
