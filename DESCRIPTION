@@ -104,6 +104,7 @@ Suggests:
     mco,
     mda,
     mlbench,
+    mmpf,
     modeltools,
     mRMRe,
     nnet,
