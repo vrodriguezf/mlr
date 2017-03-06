@@ -24,14 +24,14 @@ makeRLearner.regr.ctree = function() {
 }
 
 #' @export
-trainLearner.regr.ctree = function(.learner, .task, .subset, .weights = NULL, teststat, testtype,
+trainLearner.regr.ctree = function(.learner, .task, .weights = NULL, teststat, testtype,
   mincriterion, minsplit, minbucket, stump, nresample, maxsurrogate, mtry,
   savesplitstats, maxdepth, ...) {
 
   ctrl = learnerArgsToControl(party::ctree_control, teststat, testtype, mincriterion, minsplit,
     minbucket, stump, nresample, maxsurrogate, mtry, savesplitstats, maxdepth)
   f = getTaskFormula(.task)
-  party::ctree(f, data = getTaskData(.task, .subset), controls = ctrl, weights = .weights, ...)
+  party::ctree(f, data = getTaskData(.task), controls = ctrl, weights = .weights, ...)
 }
 
 #' @export

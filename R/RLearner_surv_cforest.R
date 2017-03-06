@@ -31,12 +31,12 @@ makeRLearner.surv.cforest = function() {
 }
 
 #' @export
-trainLearner.surv.cforest = function(.learner, .task, .subset,
+trainLearner.surv.cforest = function(.learner, .task,
   .weights = NULL, ntree, mtry, replace, fraction, trace, teststat,
   testtype, mincriterion, minsplit, minbucket, stump,
   nresample, maxsurrogate, maxdepth, savesplitstats, ...) {
   f = getTaskFormula(.task)
-  d = getTaskData(.task, .subset)
+  d = getTaskData(.task)
   defaults = getDefaults(getParamSet(.learner))
   if (missing(teststat)) teststat = defaults$teststat
   if (missing(testtype)) testtype = defaults$testtype

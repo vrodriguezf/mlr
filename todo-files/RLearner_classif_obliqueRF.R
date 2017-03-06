@@ -17,8 +17,8 @@ makeRLearner.classif.obliqueRF = function() {
 }
 
 #' @export
-trainLearner.classif.obliqueRF = function(.learner, .task, .subset, .weights = NULL, ...) {
-  df = getTaskData(.task, .subset, target.extra = TRUE)
+trainLearner.classif.obliqueRF = function(.learner, .task, .weights = NULL, ...) {
+  df = getTaskData(.task, target.extra = TRUE)
   features = as.matrix(df$data)
   target = ifelse(df$target == .task$task.desc$positive, 1, 0)
   obliqueRF::obliqueRF(x = features, y = target, bImportance = FALSE,

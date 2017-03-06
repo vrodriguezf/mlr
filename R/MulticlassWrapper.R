@@ -48,8 +48,7 @@ makeMulticlassWrapper = function(learner, mcw.method = "onevsrest") {
 }
 
 #' @export
-trainLearner.MulticlassWrapper = function(.learner, .task, .subset, .weights = NULL, mcw.method, ...) {
-  .task = subsetTask(.task, .subset)
+trainLearner.MulticlassWrapper = function(.learner, .task, .weights = NULL, mcw.method, ...) {
   tn = getTaskTargetNames(.task)
   d = getTaskData(.task)
   y = getTaskTargets(.task)

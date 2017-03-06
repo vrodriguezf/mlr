@@ -38,7 +38,7 @@ makeRLearner.classif.blackboost = function() {
 }
 
 #' @export
-trainLearner.classif.blackboost = function(.learner, .task, .subset, .weights = NULL, Binomial.link = "logit", family, custom.family.definition, mstop, nu, risk, stopintern, trace, teststat, testtype, mincriterion, maxdepth, savesplitstats, ...) {
+trainLearner.classif.blackboost = function(.learner, .task, .weights = NULL, Binomial.link = "logit", family, custom.family.definition, mstop, nu, risk, stopintern, trace, teststat, testtype, mincriterion, maxdepth, savesplitstats, ...) {
   ctrl = learnerArgsToControl(mboost::boost_control, mstop, nu, risk, stopintern, trace)
   # learner defaults need to be passed to ctree_control since tree_controls defaults
   # of blackboost differ from party::ctree_control defaults
@@ -58,9 +58,9 @@ trainLearner.classif.blackboost = function(.learner, .task, .subset, .weights = 
     #PropOdds = mboost::PropOdds(nuirange = nuirange, offrange = offrange),
     custom.family = custom.family.definition)
   if (!is.null(.weights))
-    mboost::blackboost(f, data = getTaskData(.task, .subset), control = ctrl, tree_controls = tc, weights = .weights, family = family, ...)
+    mboost::blackboost(f, data = getTaskData(.task), control = ctrl, tree_controls = tc, weights = .weights, family = family, ...)
   else
-    mboost::blackboost(f, data = getTaskData(.task, .subset), control = ctrl, tree_controls = tc, family = family, ...)
+    mboost::blackboost(f, data = getTaskData(.task), control = ctrl, tree_controls = tc, family = family, ...)
 }
 
 #' @export

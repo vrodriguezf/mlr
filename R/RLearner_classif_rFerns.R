@@ -18,8 +18,8 @@ makeRLearner.classif.rFerns = function() {
 }
 
 #' @export
-trainLearner.classif.rFerns = function(.learner, .task, .subset, .weights = NULL, ...) {
-  d = getTaskData(.task, .subset, target.extra = TRUE)
+trainLearner.classif.rFerns = function(.learner, .task, .weights = NULL, ...) {
+  d = getTaskData(.task, target.extra = TRUE)
   rFerns::rFerns(x = d$data, y = d$target, ...)
 }
 

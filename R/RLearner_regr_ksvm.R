@@ -38,14 +38,14 @@ makeRLearner.regr.ksvm = function() {
 }
 
 #' @export
-trainLearner.regr.ksvm = function(.learner, .task, .subset, .weights = NULL, degree, offset, scale, sigma, order, length, lambda, ...) {
+trainLearner.regr.ksvm = function(.learner, .task, .weights = NULL, degree, offset, scale, sigma, order, length, lambda, ...) {
   kpar = learnerArgsToControl(list, degree, offset, scale, sigma, order, length, lambda)
   f = getTaskFormula(.task)
   # difference in missing(kpar) and kpar = list()!
   if (base::length(kpar))
-    kernlab::ksvm(f, data = getTaskData(.task, .subset), kpar = kpar, ...)
+    kernlab::ksvm(f, data = getTaskData(.task), kpar = kpar, ...)
   else
-    kernlab::ksvm(f, data = getTaskData(.task, .subset), ...)
+    kernlab::ksvm(f, data = getTaskData(.task), ...)
 }
 
 #' @export

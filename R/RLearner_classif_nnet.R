@@ -31,13 +31,13 @@ makeRLearner.classif.nnet = function() {
 }
 
 #' @export
-trainLearner.classif.nnet = function(.learner, .task, .subset, .weights = NULL,  ...) {
+trainLearner.classif.nnet = function(.learner, .task, .weights = NULL,  ...) {
   if (is.null(.weights)) {
     f = getTaskFormula(.task)
-    nnet::nnet(f, data = getTaskData(.task, .subset), ...)
+    nnet::nnet(f, data = getTaskData(.task), ...)
   } else  {
     f = getTaskFormula(.task)
-    nnet::nnet(f, data = getTaskData(.task, .subset), weights = .weights, ...)
+    nnet::nnet(f, data = getTaskData(.task), weights = .weights, ...)
   }
 }
 

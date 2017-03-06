@@ -25,7 +25,7 @@ makeRLearner.surv.penalized.ridge = function() {
 }
 
 #' @export
-trainLearner.surv.penalized.ridge = function(.learner, .task, .subset, .weights = NULL,  ...) {
+trainLearner.surv.penalized.ridge = function(.learner, .task, .weights = NULL,  ...) {
   f = getTaskFormula(.task)
   penalized::penalized(f, data = getTaskData(.task, subset = .subset),
     model = "cox", fusedl = FALSE, ...)

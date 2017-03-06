@@ -31,12 +31,12 @@ makeRLearner.cluster.kkmeans = function() {
 }
 
 #' @export
-trainLearner.cluster.kkmeans = function(.learner, .task, .subset, .weights = NULL, degree, offset, scale, sigma, order, length, lambda, normalized, ...) {
+trainLearner.cluster.kkmeans = function(.learner, .task, .weights = NULL, degree, offset, scale, sigma, order, length, lambda, normalized, ...) {
   kpar = learnerArgsToControl(list, degree, offset, scale, sigma, order, length, lambda, normalized)
   if (base::length(kpar) > 0L)
-    kernlab::kkmeans(as.matrix(getTaskData(.task, .subset)), kpar = kpar, ...)
+    kernlab::kkmeans(as.matrix(getTaskData(.task)), kpar = kpar, ...)
   else
-    kernlab::kkmeans(as.matrix(getTaskData(.task, .subset)), ...)
+    kernlab::kkmeans(as.matrix(getTaskData(.task)), ...)
 }
 
 #' @export

@@ -41,11 +41,11 @@ makeRLearner.classif.lqa = function() {
 }
 
 #' @export
-trainLearner.classif.lqa = function(.learner, .task, .subset, .weights = NULL,
+trainLearner.classif.lqa = function(.learner, .task, .weights = NULL,
   var.eps, max.steps, conv.eps, conv.stop, c1, digits, ...) {
 
   ctrl = learnerArgsToControl(lqa::lqa.control, var.eps, max.steps, conv.eps, conv.stop, c1, digits)
-  d = getTaskData(.task, .subset, target.extra = TRUE, recode.target = "01")
+  d = getTaskData(.task, target.extra = TRUE, recode.target = "01")
   args = c(list(x = d$data, y = d$target, family = binomial(), control = ctrl), list(...))
   rm(d)
   if (!args$penalty %in% c("adaptive.lasso", "ao", "bridge", "genet", "lasso",

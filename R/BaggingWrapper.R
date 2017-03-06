@@ -83,12 +83,11 @@ print.BaggingModel = function(x, ...) {
 }
 
 #' @export
-trainLearner.BaggingWrapper = function(.learner, .task, .subset, .weights = NULL,
+trainLearner.BaggingWrapper = function(.learner, .task, .weights = NULL,
   bw.iters = 10, bw.replace = TRUE, bw.size, bw.feats = 1, ...) {
 
   if (missing(bw.size))
     bw.size = if (bw.replace) 1 else 0.632
-  .task = subsetTask(.task, subset = .subset)
   n = getTaskSize(.task)
   m = round(n * bw.size)
   allinds = seq_len(n)

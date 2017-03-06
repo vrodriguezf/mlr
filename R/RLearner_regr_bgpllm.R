@@ -33,8 +33,8 @@ makeRLearner.regr.bgpllm = function() {
 }
 
 #' @export
-trainLearner.regr.bgpllm = function(.learner, .task, .subset, .weights = NULL, ...) {
-  d = getTaskData(.task, .subset, target.extra = TRUE)
+trainLearner.regr.bgpllm = function(.learner, .task, .weights = NULL, ...) {
+  d = getTaskData(.task, target.extra = TRUE)
   tgp::bgpllm(X = d$data, Z = d$target, pred.n = FALSE, ...)
 }
 

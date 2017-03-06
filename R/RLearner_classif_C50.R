@@ -32,7 +32,7 @@ makeRLearner.classif.C50 = function() {
 }
 
 #' @export
-trainLearner.classif.C50 = function(.learner, .task, .subset, .weights = NULL,
+trainLearner.classif.C50 = function(.learner, .task, .weights = NULL,
   subset, bands, winnow, noGlobalPruning, CF, minCases, fuzzyThreshold, sample,  
   seed, earlyStopping, label, ...) {
   
@@ -40,7 +40,7 @@ trainLearner.classif.C50 = function(.learner, .task, .subset, .weights = NULL,
     noGlobalPruning, CF, minCases, fuzzyThreshold, sample, seed, earlyStopping,
     label)
   
-  d = getTaskData(.task, .subset, target.extra = TRUE)
+  d = getTaskData(.task, target.extra = TRUE)
    C50::C5.0(x = d$data, y = d$target, control = ctrl, weights = .weights, ...)
 }
 

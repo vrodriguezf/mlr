@@ -35,7 +35,7 @@ makeRLearner.regr.blackboost = function() {
   )
 }
 
-trainLearner.regr.blackboost = function(.learner, .task, .subset, .weights = NULL, family = "Gaussian", nuirange = c(0,100), d = NULL, custom.family.definition, mstop, nu, risk, stopintern, trace, teststat, testtype, mincriterion, maxdepth, savesplitstats, ...) {
+trainLearner.regr.blackboost = function(.learner, .task, .weights = NULL, family = "Gaussian", nuirange = c(0,100), d = NULL, custom.family.definition, mstop, nu, risk, stopintern, trace, teststat, testtype, mincriterion, maxdepth, savesplitstats, ...) {
   ctrl = learnerArgsToControl(mboost::boost_control, mstop, nu, risk, stopintern, trace)
   defaults = getDefaults(getParamSet(.learner))
   if (missing(teststat)) teststat = defaults$teststat
@@ -57,9 +57,9 @@ trainLearner.regr.blackboost = function(.learner, .task, .subset, .weights = NUL
   )
   f = getTaskFormula(.task)
   if (!is.null(.weights))
-    mboost::blackboost(f, data = getTaskData(.task, .subset), control = ctrl, tree_controls = tc, weights = .weights, family = family, ...)
+    mboost::blackboost(f, data = getTaskData(.task), control = ctrl, tree_controls = tc, weights = .weights, family = family, ...)
   else
-    mboost::blackboost(f, data = getTaskData(.task, .subset), control = ctrl, tree_controls = tc, family = family, ...)
+    mboost::blackboost(f, data = getTaskData(.task), control = ctrl, tree_controls = tc, family = family, ...)
 }
 
 predictLearner.regr.blackboost = function(.learner, .model, .newdata, ...) {

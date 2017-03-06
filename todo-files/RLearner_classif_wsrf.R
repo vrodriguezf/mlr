@@ -18,9 +18,9 @@ makeRLearner.classif.wsrf = function() {
 }
 
 #' @export
-trainLearner.classif.wsrf = function(.learner, .task, .subset, .weights = NULL, ...) {
+trainLearner.classif.wsrf = function(.learner, .task, .weights = NULL, ...) {
   f = getTaskFormula(.task)
-  wsrf::wsrf(f, data = getTaskData(.task, .subset), ...)
+  wsrf::wsrf(f, data = getTaskData(.task), ...)
 }
 
 #' @export

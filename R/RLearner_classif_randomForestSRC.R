@@ -49,9 +49,9 @@ makeRLearner.classif.randomForestSRC = function() {
 }
 
 #' @export
-trainLearner.classif.randomForestSRC = function(.learner, .task, .subset, .weights = NULL, ...) {
+trainLearner.classif.randomForestSRC = function(.learner, .task, .weights = NULL, ...) {
   f = getTaskFormula(.task)
-  randomForestSRC::rfsrc(f, data = getTaskData(.task, .subset, recode.target = "drop.levels"), case.wt = .weights, ...)
+  randomForestSRC::rfsrc(f, data = getTaskData(.task, recode.target = "drop.levels"), case.wt = .weights, ...)
 }
 
 #' @export

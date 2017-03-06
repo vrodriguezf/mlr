@@ -38,8 +38,8 @@ makeRLearner.regr.km = function() {
 }
 
 #' @export
-trainLearner.regr.km = function(.learner, .task, .subset, .weights = NULL,  ...) {
-  d = getTaskData(.task, .subset, target.extra = TRUE)
+trainLearner.regr.km = function(.learner, .task, .weights = NULL,  ...) {
+  d = getTaskData(.task, target.extra = TRUE)
   args = list(...)
   if (!is.null(args$optim.method) && args$optim.method == "gen")
     requirePackages(packs = "rgenoud", why = "fitting 'regr.km' with 'rgenoud' optimization")

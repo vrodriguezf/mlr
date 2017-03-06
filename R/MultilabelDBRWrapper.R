@@ -32,9 +32,8 @@ makeMultilabelDBRWrapper = function(learner) {
 }
 
 #' @export
-trainLearner.MultilabelDBRWrapper = function(.learner, .task, .subset, .weights = NULL, ...) {
+trainLearner.MultilabelDBRWrapper = function(.learner, .task, .weights = NULL, ...) {
   targets = getTaskTargetNames(.task)
-  .task = subsetTask(.task, subset = .subset)
   data = getTaskData(.task)
   # train level 1 learners (binary relevance)
   models.lvl1 = getLearnerModel(train(makeMultilabelBinaryRelevanceWrapper(.learner$next.learner), .task, weights = .weights))

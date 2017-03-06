@@ -62,8 +62,8 @@ makeRLearner.regr.frbs = function() {
 }
 
 #' @export
-trainLearner.regr.frbs = function(.learner, .task, .subset, .weights = NULL, ...) {
-  d = getTaskData(.task, .subset, target.extra = TRUE)
+trainLearner.regr.frbs = function(.learner, .task, .weights = NULL, ...) {
+  d = getTaskData(.task, target.extra = TRUE)
   args = list(...)
   method.arg = names(args) == "method"
   if (any(method.arg)) {

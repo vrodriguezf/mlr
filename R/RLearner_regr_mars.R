@@ -19,8 +19,8 @@ makeRLearner.regr.mars = function() {
 }
 
 #' @export
-trainLearner.regr.mars = function(.learner, .task, .subset, .weights = NULL,  ...) {
-  d = getTaskData(.task, .subset, target.extra = TRUE)
+trainLearner.regr.mars = function(.learner, .task, .weights = NULL,  ...) {
+  d = getTaskData(.task, target.extra = TRUE)
   mda::mars(x = as.matrix(d$data), y = d$target, ...)
 }
 

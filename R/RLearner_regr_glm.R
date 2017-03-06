@@ -41,11 +41,11 @@ makeRLearner.regr.glm = function() {
 }
 
 #' @export
-trainLearner.regr.glm = function(.learner, .task, .subset, .weights = NULL, epsilon, maxit, trace, family,
+trainLearner.regr.glm = function(.learner, .task, .weights = NULL, epsilon, maxit, trace, family,
   gaussian.link = "identity", poisson.link = "log", Gamma.link = "inverse", inverse.gaussian.link = "1/mu2", ...) {
 
   ctrl = learnerArgsToControl(stats::glm.control, epsilon, maxit, trace)
-  d = getTaskData(.task, .subset)
+  d = getTaskData(.task)
   f = getTaskFormula(.task)
 
   family = switch(family,

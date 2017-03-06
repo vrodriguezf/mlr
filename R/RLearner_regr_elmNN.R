@@ -18,8 +18,8 @@ makeRLearner.regr.elmNN = function() {
 }
 
 #' @export
-trainLearner.regr.elmNN = function(.learner, .task, .subset, .weights = NULL, ...) {
-  d = getTaskData(.task, .subset, target.extra = TRUE)
+trainLearner.regr.elmNN = function(.learner, .task, .weights = NULL, ...) {
+  d = getTaskData(.task, target.extra = TRUE)
   elmNN::elmtrain.default(x = as.matrix(d$data), y = d$target, ...)
 }
 

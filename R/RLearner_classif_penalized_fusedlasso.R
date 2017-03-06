@@ -28,9 +28,9 @@ makeRLearner.classif.penalized.fusedlasso = function() {
 }
 
 #' @export
-trainLearner.classif.penalized.fusedlasso = function(.learner, .task, .subset, .weights = NULL,  ...) {
+trainLearner.classif.penalized.fusedlasso = function(.learner, .task, .weights = NULL,  ...) {
   f = getTaskFormula(.task)
-  penalized::penalized(f, data = getTaskData(.task, .subset), fusedl = TRUE, model = "logistic", ...)
+  penalized::penalized(f, data = getTaskData(.task), fusedl = TRUE, model = "logistic", ...)
 }
 
 #' @export

@@ -26,7 +26,7 @@ makeRLearner.surv.penalized.fusedlasso = function() {
 }
 
 #' @export
-trainLearner.surv.penalized.fusedlasso = function(.learner, .task, .subset, .weights = NULL,  ...) {
+trainLearner.surv.penalized.fusedlasso = function(.learner, .task, .weights = NULL,  ...) {
   f = getTaskFormula(.task)
   penalized::penalized(f, data = getTaskData(.task, subset = .subset), model = "cox", fusedl = TRUE, ...)
 }

@@ -37,8 +37,8 @@ makeRLearner.classif.RRF = function() {
 }
 
 #' @export
-trainLearner.classif.RRF = function(.learner, .task, .subset, .weights, ...) {
-  RRF::RRF(formula = getTaskFormula(.task), data = getTaskData(.task, .subset),
+trainLearner.classif.RRF = function(.learner, .task, .weights, ...) {
+  RRF::RRF(formula = getTaskFormula(.task), data = getTaskData(.task),
            keep.forest= TRUE, ...)
 }
 

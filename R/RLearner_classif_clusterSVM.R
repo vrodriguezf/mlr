@@ -33,8 +33,8 @@ makeRLearner.classif.clusterSVM = function() {
 }
 
 #' @export
-trainLearner.classif.clusterSVM = function(.learner, .task, .subset, .weights = NULL, ...) {
-  d = getTaskData(.task, .subset, target.extra = TRUE)
+trainLearner.classif.clusterSVM = function(.learner, .task, .weights = NULL, ...) {
+  d = getTaskData(.task, target.extra = TRUE)
   SwarmSVM::clusterSVM(x = d$data, y = d$target, ...)
 }
 

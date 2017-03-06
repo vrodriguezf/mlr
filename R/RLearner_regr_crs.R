@@ -47,12 +47,12 @@ makeRLearner.regr.crs = function() {
 }
 
 #' @export
-trainLearner.regr.crs = function(.learner, .task, .subset, .weights = NULL,  ...) {
+trainLearner.regr.crs = function(.learner, .task, .weights = NULL,  ...) {
   f = getTaskFormula(.task)
   if (is.null(.weights)) {
-    crs::crs(formula = f, data = getTaskData(.task, .subset), ...)
+    crs::crs(formula = f, data = getTaskData(.task), ...)
   } else  {
-    crs::crs(formula = f, data = getTaskData(.task, .subset), weights = .weights, ...)
+    crs::crs(formula = f, data = getTaskData(.task), weights = .weights, ...)
   }
 }
 

@@ -25,8 +25,8 @@ makeRLearner.regr.bdk = function() {
 }
 
 #' @export
-trainLearner.regr.bdk = function(.learner, .task, .subset, .weights = NULL, xdim, ydim, topo, ...) {
-  d = getTaskData(.task, .subset, target.extra = TRUE)
+trainLearner.regr.bdk = function(.learner, .task, .weights = NULL, xdim, ydim, topo, ...) {
+  d = getTaskData(.task, target.extra = TRUE)
   grid = learnerArgsToControl(class::somgrid, xdim, ydim, topo)
   kohonen::bdk(as.matrix(d$data), Y = d$target, grid = grid, ...)
 }

@@ -21,8 +21,8 @@ makeRLearner.regr.LiblineaRL2L1SVR = function() {
 }
 
 #' @export
-trainLearner.regr.LiblineaRL2L1SVR = function(.learner, .task, .subset, .weights = NULL, ...) {
-  d = getTaskData(.task, .subset, target.extra = TRUE)
+trainLearner.regr.LiblineaRL2L1SVR = function(.learner, .task, .weights = NULL, ...) {
+  d = getTaskData(.task, target.extra = TRUE)
   LiblineaR::LiblineaR(data = d$data, target = d$target, type = 13L, ...)
 }
 

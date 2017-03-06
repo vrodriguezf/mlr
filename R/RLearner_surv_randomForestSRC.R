@@ -50,7 +50,7 @@ makeRLearner.surv.randomForestSRC = function() {
 }
 
 #' @export
-trainLearner.surv.randomForestSRC = function(.learner, .task, .subset, .weights = NULL, ...) {
+trainLearner.surv.randomForestSRC = function(.learner, .task, .weights = NULL, ...) {
   f = getTaskFormula(.task)
   randomForestSRC::rfsrc(f, data = getTaskData(.task, subset = .subset), case.wt = .weights, ...)
 }

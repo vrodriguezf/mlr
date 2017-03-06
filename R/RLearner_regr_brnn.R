@@ -27,9 +27,9 @@ makeRLearner.regr.brnn = function() {
 }
 
 #' @export
-trainLearner.regr.brnn = function(.learner, .task, .subset, .weights = NULL, ...) {
+trainLearner.regr.brnn = function(.learner, .task, .weights = NULL, ...) {
   f = getTaskFormula(.task)
-  brnn::brnn(f, data = getTaskData(.task, .subset), ...)
+  brnn::brnn(f, data = getTaskData(.task), ...)
 }
 
 #' @export

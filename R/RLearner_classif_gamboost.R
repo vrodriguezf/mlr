@@ -31,7 +31,7 @@ makeRLearner.classif.gamboost = function() {
 }
 
 #' @export
-trainLearner.classif.gamboost = function(.learner, .task, .subset, .weights = NULL, Binomial.link = "logit", mstop, nu, risk, stopintern, trace, family, custom.family.definition,  ...) {
+trainLearner.classif.gamboost = function(.learner, .task, .weights = NULL, Binomial.link = "logit", mstop, nu, risk, stopintern, trace, family, custom.family.definition,  ...) {
   requirePackages("mboost", why = "argument 'baselearner' requires package", suppress.warnings = TRUE)
   ctrl = learnerArgsToControl(mboost::boost_control, mstop, nu, risk, stopintern, trace)
   family = switch(family,
@@ -40,7 +40,7 @@ trainLearner.classif.gamboost = function(.learner, .task, .subset, .weights = NU
     AUC = mboost::AUC(),
     #PropOdds = mboost::PropOdds(nuirange = nuirange, offrange = offrange),
     custom.family = custom.family.definition)
-  d = getTaskData(.task, .subset)
+  d = getTaskData(.task)
   if (.learner$predict.type == "prob") {
     td = getTaskDescription(.task)
     levs = c(td$negative, td$positive)

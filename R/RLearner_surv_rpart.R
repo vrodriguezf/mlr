@@ -26,7 +26,7 @@ makeRLearner.surv.rpart = function() {
 }
 
 #' @export
-trainLearner.surv.rpart = function(.learner, .task, .subset, .weights = NULL, ...) {
+trainLearner.surv.rpart = function(.learner, .task, .weights = NULL, ...) {
   d = getTaskData(.task, subset = .subset)
   f = getTaskFormula(.task)
   if (is.null(.weights)) {

@@ -37,7 +37,7 @@ makeMultilabelNestedStackingWrapper = function(learner, order = NULL, cv.folds =
 }
 
 #' @export
-trainLearner.MultilabelNestedStackingWrapper = function(.learner, .task, .subset, .weights = NULL, ...) {
+trainLearner.MultilabelNestedStackingWrapper = function(.learner, .task, .weights = NULL, ...) {
   if (is.null(.learner$order)) {
     order = sample(getTaskTargetNames(.task)) #random order
   } else {
@@ -45,7 +45,6 @@ trainLearner.MultilabelNestedStackingWrapper = function(.learner, .task, .subset
   }
   assertSetEqual(order, getTaskTargetNames(.task))
   targets = getTaskTargetNames(.task)
-  .task = subsetTask(.task, subset = .subset)
   data = getTaskData(.task)
   models = namedList(order)
   data.nst = dropNamed(data, targets)

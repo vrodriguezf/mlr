@@ -25,8 +25,8 @@ makeRLearner.classif.dbnDNN = function() {
 }
 
 #' @export
-trainLearner.classif.dbnDNN = function(.learner, .task, .subset, .weights = NULL,  ...) {
-  d = getTaskData(.task, .subset, target.extra = TRUE)
+trainLearner.classif.dbnDNN = function(.learner, .task, .weights = NULL,  ...) {
+  d = getTaskData(.task, target.extra = TRUE)
   y = as.numeric(d$target)
   dict = sort(unique(y))
   onehot = matrix(0, length(y), length(dict))

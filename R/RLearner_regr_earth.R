@@ -26,9 +26,9 @@ makeRLearner.regr.earth = function() {
 }
 
 #' @export
-trainLearner.regr.earth = function(.learner, .task, .subset, .weights = NULL,  ...) {
+trainLearner.regr.earth = function(.learner, .task, .weights = NULL,  ...) {
   f = getTaskFormula(.task)
-  earth::earth(f, data = getTaskData(.task, .subset), ...)
+  earth::earth(f, data = getTaskData(.task), ...)
 }
 
 #' @export

@@ -49,9 +49,9 @@ makePreprocWrapper = function(learner, train, predict, par.set = makeParamSet(),
 }
 
 #' @export
-trainLearner.PreprocWrapper = function(.learner, .task, .subset, ...) {
+trainLearner.PreprocWrapper = function(.learner, .task, ...) {
   pvs = .learner$par.vals
-  pp = .learner$train(data = getTaskData(.task, .subset),
+  pp = .learner$train(data = getTaskData(.task),
     target = getTaskTargetNames(.task), args = pvs)
   # FIXME: why is the order important?
   if (!(is.list(pp) && length(pp) == 2L && all(names(pp) == c("data", "control")) &&

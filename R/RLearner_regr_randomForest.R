@@ -81,8 +81,8 @@ makeRLearner.regr.randomForest = function() {
 }
 
 #' @export
-trainLearner.regr.randomForest = function(.learner, .task, .subset, .weights = NULL, se.method = "jackknife", keep.inbag = NULL, se.boot = 50L, se.ntree = 100L, ...) {
-  data = getTaskData(.task, .subset, target.extra = TRUE)
+trainLearner.regr.randomForest = function(.learner, .task, .weights = NULL, se.method = "jackknife", keep.inbag = NULL, se.boot = 50L, se.ntree = 100L, ...) {
+  data = getTaskData(.task, target.extra = TRUE)
   m = randomForest::randomForest(x = data[["data"]], y = data[["target"]],
     keep.inbag = if (is.null(keep.inbag)) TRUE else keep.inbag, ...)
   if (.learner$predict.type == "se" && se.method == "bootstrap") {

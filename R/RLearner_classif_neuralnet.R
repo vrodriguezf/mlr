@@ -36,10 +36,10 @@ makeRLearner.classif.neuralnet = function() {
 }
 
 #' @export
-trainLearner.classif.neuralnet = function(.learner, .task, .subset, .weights = NULL,  ...) {
+trainLearner.classif.neuralnet = function(.learner, .task, .weights = NULL,  ...) {
   f = getTaskFormula(.task)
   cf = as.character(f)
-  taskdat = getTaskData(.task, .subset)
+  taskdat = getTaskData(.task)
   nms = names(taskdat)
   formula_head = as.character(f)[2]
   if (is.character(taskdat[[formula_head]])){

@@ -27,8 +27,8 @@ makeRLearner.classif.pamr = function() {
 }
 
 #' @export
-trainLearner.classif.pamr = function(.learner, .task, .subset, .weights = NULL, ...) {
-  d = getTaskData(.task, .subset, target.extra = TRUE)
+trainLearner.classif.pamr = function(.learner, .task, .weights = NULL, ...) {
+  d = getTaskData(.task, target.extra = TRUE)
   pamr::pamr.train(data = list(x = t(d$data), y = d$target), ...)
 }
 

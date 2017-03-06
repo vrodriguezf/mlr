@@ -36,10 +36,10 @@ makeRLearner.regr.bst = function() {
 }
 
 #' @export
-trainLearner.regr.bst = function(.learner, .task, .subset, .weights = NULL, mstop, nu, twinboost,
+trainLearner.regr.bst = function(.learner, .task, .weights = NULL, mstop, nu, twinboost,
   f.init, xselect.init, center, trace, numsample, df, minsplit, minbucket, cp, maxsurrogate,
   usesurrogate, surrogatestyle, maxdepth, xval, Learner, ...) {
-  d = getTaskData(.task, .subset, target.extra = TRUE)
+  d = getTaskData(.task, target.extra = TRUE)
   ctrl = learnerArgsToControl(bst::bst_control, mstop, nu, twinboost, f.init,
     xselect.init, center, trace, numsample, df)
   control.tree = learnerArgsToControl(list,  minsplit, minbucket, cp, maxsurrogate,

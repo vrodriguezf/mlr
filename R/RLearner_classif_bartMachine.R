@@ -40,8 +40,8 @@ makeRLearner.classif.bartMachine = function() {
 }
 
 #' @export
-trainLearner.classif.bartMachine = function(.learner, .task, .subset, .weights = NULL, ...) {
-  d = getTaskData(.task, .subset, target.extra = TRUE)
+trainLearner.classif.bartMachine = function(.learner, .task, .weights = NULL, ...) {
+  d = getTaskData(.task, target.extra = TRUE)
   y = d$target
   td = getTaskDescription(.task)
   levs = c(td$positive, td$negative)

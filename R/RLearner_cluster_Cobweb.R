@@ -15,9 +15,9 @@ makeRLearner.cluster.Cobweb = function() {
 }
 
 #' @export
-trainLearner.cluster.Cobweb = function(.learner, .task, .subset, .weights = NULL,  ...) {
+trainLearner.cluster.Cobweb = function(.learner, .task, .weights = NULL,  ...) {
   ctrl = RWeka::Weka_control(...)
-  RWeka::Cobweb(getTaskData(.task, .subset), control = ctrl)
+  RWeka::Cobweb(getTaskData(.task), control = ctrl)
 }
 
 #' @export

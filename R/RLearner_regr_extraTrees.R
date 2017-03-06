@@ -25,8 +25,8 @@ makeRLearner.regr.extraTrees = function() {
 }
 
 #' @export
-trainLearner.regr.extraTrees = function(.learner, .task, .subset, .weights = NULL, ...) {
-  d = getTaskData(.task, .subset, target.extra = TRUE)
+trainLearner.regr.extraTrees = function(.learner, .task, .weights = NULL, ...) {
+  d = getTaskData(.task, target.extra = TRUE)
   args = c(list(x = as.matrix(d$data), y = d$target), list(...))
   if (!is.null(.weights))
     args$weights = .weights

@@ -52,8 +52,7 @@ makeFeatSelWrapper = function(learner, resampling, measures, bit.names, bits.to.
 }
 
 #' @export
-trainLearner.FeatSelWrapper = function(.learner, .task, .subset,  ...) {
-  task = subsetTask(.task, .subset)
+trainLearner.FeatSelWrapper = function(.learner, .task,  ...) {
   if (length(.learner$bit.names) == 0)
     #FIXME: really look at bitnames / bits.to.features stuff and test it.
     # do we need the extra case here?

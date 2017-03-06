@@ -26,11 +26,11 @@ makeRLearner.regr.evtree = function() {
 }
 
 #' @export
-trainLearner.regr.evtree = function(.learner, .task, .subset,
+trainLearner.regr.evtree = function(.learner, .task,
   .weights = NULL, pmutatemajor, pmutateminor, pcrossover, psplit,
   pprune, seed, ...) {
   f = getTaskFormula(.task)
-  d = getTaskData(.task, .subset)
+  d = getTaskData(.task)
   defaults = getDefaults(getParamSet(.learner))
   
   if (missing(pmutatemajor)) pmutatemajor = defaults$pmutatemajor

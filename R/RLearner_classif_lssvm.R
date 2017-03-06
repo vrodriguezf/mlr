@@ -32,7 +32,7 @@ makeRLearner.classif.lssvm = function() {
 }
 
 #' @export
-trainLearner.classif.lssvm = function(.learner, .task, .subset, .weights = NULL, degree, offset, scale, sigma, order, length, lambda, normalized, ...) {
+trainLearner.classif.lssvm = function(.learner, .task, .weights = NULL, degree, offset, scale, sigma, order, length, lambda, normalized, ...) {
 # FIXME: custom kernel. freezes? check mailing list
 # FIXME: unify cla + regr, test all sigma stuff
 
@@ -40,9 +40,9 @@ trainLearner.classif.lssvm = function(.learner, .task, .subset, .weights = NULL,
   f = getTaskFormula(.task)
 
   if (base::length(kpar))
-    kernlab::lssvm(f, data = getTaskData(.task, .subset), kpar = kpar, ...)
+    kernlab::lssvm(f, data = getTaskData(.task), kpar = kpar, ...)
   else
-    kernlab::lssvm(f, data = getTaskData(.task, .subset), ...)
+    kernlab::lssvm(f, data = getTaskData(.task), ...)
 }
 
 #' @export

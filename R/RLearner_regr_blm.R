@@ -27,8 +27,8 @@ makeRLearner.regr.blm = function() {
 }
 
 #' @export
-trainLearner.regr.blm = function(.learner, .task, .subset, .weights = NULL, ...) {
-  d = getTaskData(.task, .subset, target.extra = TRUE)
+trainLearner.regr.blm = function(.learner, .task, .weights = NULL, ...) {
+  d = getTaskData(.task, target.extra = TRUE)
   tgp::blm(X = d$data, Z = d$target, pred.n = FALSE, ...)
 }
 

@@ -74,10 +74,8 @@ makeOverBaggingWrapper = function(learner, obw.iters = 10L, obw.rate = 1, obw.ma
 }
 
 #' @export
-trainLearner.OverBaggingWrapper = function(.learner, .task, .subset, .weights = NULL,
+trainLearner.OverBaggingWrapper = function(.learner, .task, .weights = NULL,
    obw.iters = 10L, obw.rate = 1, obw.maxcl = "boot", obw.cl = NULL, ...) {
-
-  .task = subsetTask(.task, subset = .subset)
   y = getTaskTargets(.task)
   if (is.null(obw.cl)) {
     z = getMinMaxClass(y)

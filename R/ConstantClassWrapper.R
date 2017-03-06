@@ -30,17 +30,17 @@ makeConstantClassWrapper = function(learner, frac = 0) {
 }
 
 #' @export
-trainLearner.ConstantClassWrapper = function(.learner, .task, .subset, .weights = NULL, frac = 0, ...) {
-  labels.distribution = sort(prop.table(table(getTaskTargets(subsetTask(.task, .subset)))), decreasing = TRUE)
+trainLearner.ConstantClassWrapper = function(.learner, .task, .weights = NULL, frac = 0, ...) {
+  labels.distribution = sort(prop.table(table(getTaskTargets(.task))), decreasing = TRUE)
   most.frequent = labels.distribution[1L]
   if (most.frequent >= (1 - frac)) {
     mod = makeS3Obj("ConstantClassModelConstant",
         label = factor(names(most.frequent)),
         levels = .task$task.desc$class.levels)
-    m = makeWrappedModel.Learner(.learner, mod, getTaskDescription(.task), .subset,
+    m = makeWrappedModel.Learner(.learner, mod, getTaskDescription(.task),
         getTaskFeatureNames(.task), getTaskFactorLevels(.task), 0)
   } else {
-    m = train(.learner$next.learner, .task, .subset, weights = .weights)
+    m = train(.learner$next.learner, .task, weights = .weights)
   }
   cm = makeChainModel(next.model = m, cl = "ConstantClassModel")
   return(cm)

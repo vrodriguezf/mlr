@@ -38,8 +38,8 @@ makeRLearner.regr.bartMachine = function() {
 }
 
 #' @export
-trainLearner.regr.bartMachine = function(.learner, .task, .subset, .weights = NULL, ...) {
-  d = getTaskData(.task, .subset, target.extra = TRUE)
+trainLearner.regr.bartMachine = function(.learner, .task, .weights = NULL, ...) {
+  d = getTaskData(.task, target.extra = TRUE)
   bartMachine::bartMachine(X = d$data, y = d$target, ...)
 }
 

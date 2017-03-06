@@ -35,10 +35,10 @@ makeRLearner.surv.ranger = function() {
 }
 
 #' @export
-trainLearner.surv.ranger = function(.learner, .task, .subset, .weights, ...) {
+trainLearner.surv.ranger = function(.learner, .task, .weights, ...) {
   tn = getTaskTargetNames(.task)
   ranger::ranger(formula = NULL, dependent.variable.name = tn[1L],
-    status.variable.name = tn[2L], data = getTaskData(.task, .subset), ...)
+    status.variable.name = tn[2L], data = getTaskData(.task), ...)
 }
 
 #' @export

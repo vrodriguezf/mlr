@@ -42,8 +42,8 @@ makeRLearner.classif.cvglmnet = function() {
 }
 
 #' @export
-trainLearner.classif.cvglmnet = function(.learner, .task, .subset, .weights = NULL, ...) {
-  d = getTaskData(.task, .subset, target.extra = TRUE, recode.target = "drop.levels")
+trainLearner.classif.cvglmnet = function(.learner, .task, .weights = NULL, ...) {
+  d = getTaskData(.task, target.extra = TRUE, recode.target = "drop.levels")
   info = getFixDataInfo(d$data, factors.to.dummies = TRUE, ordered.to.int = TRUE)
   args = c(list(x = as.matrix(fixDataForLearner(d$data, info)), y = d$target), list(...))
   rm(d)

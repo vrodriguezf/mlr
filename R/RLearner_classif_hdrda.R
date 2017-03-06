@@ -18,8 +18,8 @@ makeRLearner.classif.hdrda = function() {
 }
 
 #' @export
-trainLearner.classif.hdrda = function(.learner, .task, .subset, .weights = NULL, ...) {
-  d = getTaskData(.task, .subset, target.extra = TRUE)
+trainLearner.classif.hdrda = function(.learner, .task, .weights = NULL, ...) {
+  d = getTaskData(.task, target.extra = TRUE)
   sparsediscrim::hdrda(x = as.matrix(d$data), y = d$target, ...)
 }
 

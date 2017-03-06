@@ -31,11 +31,11 @@ makeRLearner.multilabel.cforest = function() {
 }
 
 #' @export
-trainLearner.multilabel.cforest = function(.learner, .task, .subset, .weights = NULL,
+trainLearner.multilabel.cforest = function(.learner, .task, .weights = NULL,
   ntree, mtry, replace, fraction, trace, teststat, testtype, mincriterion,
   minsplit, minbucket, stump, nresample, maxsurrogate,
   maxdepth, savesplitstats, ...) {
-  d = getTaskData(.task, .subset)
+  d = getTaskData(.task)
   f = getTaskFormula(.task)
   defaults = getDefaults(getParamSet(.learner))
   if (missing(teststat)) teststat = defaults$teststat

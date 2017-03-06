@@ -19,8 +19,8 @@ makeRLearner.classif.rknn = function(){
 }
 
 #' @export
-trainLearner.classif.rknn = function(.learner, .task, .subset, .weights = NULL,  ...){
-  z = getTaskData(.task, .subset, target.extra = TRUE)
+trainLearner.classif.rknn = function(.learner, .task, .weights = NULL,  ...){
+  z = getTaskData(.task, target.extra = TRUE)
   c(list(data = z$data, y = z$target ), list(...))
 }
 

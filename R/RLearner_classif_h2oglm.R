@@ -29,7 +29,7 @@ makeRLearner.classif.h2o.glm = function() {
 }
 
 #' @export
-trainLearner.classif.h2o.glm = function(.learner, .task, .subset, .weights = NULL,  ...) {
+trainLearner.classif.h2o.glm = function(.learner, .task, .weights = NULL,  ...) {
   # check if h2o connection already exists, otherwise start one
   conn.up = tryCatch(h2o::h2o.getConnection(), error = function(err) return(FALSE))
   if (!inherits(conn.up, "H2OConnection")) {

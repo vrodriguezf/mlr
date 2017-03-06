@@ -29,8 +29,8 @@ makeRLearner.regr.btlm = function() {
 }
 
 #' @export
-trainLearner.regr.btlm = function(.learner, .task, .subset, .weights = NULL, ...) {
-  d = getTaskData(.task, .subset, target.extra = TRUE)
+trainLearner.regr.btlm = function(.learner, .task, .weights = NULL, ...) {
+  d = getTaskData(.task, target.extra = TRUE)
   # factor variables must be in the last columns as dummy variables:
   col.types = vcapply(d$data, function(x) class(x))
   factor.ind = (col.types == "factor")

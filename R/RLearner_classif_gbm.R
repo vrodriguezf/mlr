@@ -25,12 +25,12 @@ makeRLearner.classif.gbm = function() {
 }
 
 #' @export
-trainLearner.classif.gbm = function(.learner, .task, .subset, .weights = NULL,  ...) {
+trainLearner.classif.gbm = function(.learner, .task, .weights = NULL,  ...) {
   td = getTaskDescription(.task)
   if (length(td$class.levels) == 2L)
-    d = getTaskData(.task, .subset, recode.target = "01")
+    d = getTaskData(.task, recode.target = "01")
   else
-    d = getTaskData(.task, .subset)
+    d = getTaskData(.task)
   if (is.null(.weights)) {
     f = getTaskFormula(.task)
     gbm::gbm(f, data = d, ...)

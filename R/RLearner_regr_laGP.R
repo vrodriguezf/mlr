@@ -24,8 +24,8 @@ makeRLearner.regr.laGP = function() {
 }
 
 #' @export
-trainLearner.regr.laGP = function(.learner, .task, .subset, .weights = NULL, ...) {
-  d = getTaskData(.task, .subset, target.extra = TRUE)
+trainLearner.regr.laGP = function(.learner, .task, .weights = NULL, ...) {
+  d = getTaskData(.task, target.extra = TRUE)
   return(list(data = d$data, target = d$target, parset = list(...)))
 }
 

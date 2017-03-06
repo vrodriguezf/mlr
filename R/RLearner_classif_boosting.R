@@ -32,7 +32,7 @@ makeRLearner.classif.boosting = function() {
 trainLearner.classif.boosting= function(.learner, .task, .subset, .weights = NULL, minsplit, minbucket, cp, maxcompete, maxsurrogate, usesurrogate, surrogatestyle, maxdepth, xval, ...) {
   f = getTaskFormula(.task)
   ctrl = learnerArgsToControl(rpart::rpart.control, minsplit, minbucket, cp, maxcompete, maxsurrogate, usesurrogate, surrogatestyle, maxdepth, xval)
-  adabag::boosting(f, data = getTaskData(.task, .subset), control = ctrl, ...)
+  adabag::boosting(f, data = getTaskData(.task), control = ctrl, ...)
 }
 
 #' @export

@@ -20,9 +20,9 @@
 #  )
 #}
 #
-#trainLearner.regr.logicreg = function(.learner, .task, .subset,  ...) {
+#trainLearner.regr.logicreg = function(.learner, .task,  ...) {
 #  xs = learnerArgsToControl(logreg.tree.control, c("treesize", "opers", "minmass"), list(...))
-#  d = getTaskData(.task, .subset, target.extra=TRUE)
+#  d = getTaskData(.task, target.extra=TRUE)
 #  logreg(bin=d$data, resp=d$target, type=2, tree.control=xs$control, 
 #    select=select, ntrees=ntrees, nleaves=nleaves, penalty=penalty, seed=seed)
 #}

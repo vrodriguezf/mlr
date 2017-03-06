@@ -46,7 +46,7 @@ train = function(learner, task, subset, weights = NULL) {
   tn = getTaskTargetNames(task)
 
   # make pars list for train call
-  pars = list(.learner = learner, .task = task, .subset = subset)
+  pars = list(.learner = learner, .task = subsetTask(task, subset))
 
   # FIXME: code is bad here, set weights, the simply check it in checktasklearner
   if (!is.null(weights)) {

@@ -27,9 +27,9 @@ makeRLearner.regr.penalized.ridge = function() {
 }
 
 #' @export
-trainLearner.regr.penalized.ridge = function(.learner, .task, .subset, .weights = NULL,  ...) {
+trainLearner.regr.penalized.ridge = function(.learner, .task, .weights = NULL,  ...) {
   f = getTaskFormula(.task)
-  penalized::penalized(f, data = getTaskData(.task, .subset), fusedl = FALSE, ...)
+  penalized::penalized(f, data = getTaskData(.task), fusedl = FALSE, ...)
 }
 
 #' @export

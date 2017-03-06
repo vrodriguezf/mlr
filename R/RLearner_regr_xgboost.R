@@ -47,11 +47,11 @@ makeRLearner.regr.xgboost = function() {
 }
 
 #' @export
-trainLearner.regr.xgboost = function(.learner, .task, .subset, .weights = NULL,  ...) {
+trainLearner.regr.xgboost = function(.learner, .task, .weights = NULL,  ...) {
   parlist = list(...)
   
-  parlist$label = getTaskData(.task, .subset, target.extra = TRUE)$target
-  parlist$data = data.matrix(getTaskData(.task, .subset, target.extra = TRUE)$data)
+  parlist$label = getTaskData(.task, target.extra = TRUE)$target
+  parlist$data = data.matrix(getTaskData(.task, target.extra = TRUE)$data)
 
   if (is.null(parlist$objective))
     parlist$objective = "reg:linear"

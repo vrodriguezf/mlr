@@ -39,7 +39,7 @@ makeRLearner.classif.featureless = function() {
 }
 
 #' @export
-trainLearner.classif.featureless = function(.learner, .task, .subset, .weights = NULL,
+trainLearner.classif.featureless = function(.learner, .task, .weights = NULL,
   method = "majority", ...) {
   y = getTaskTargets(.task)[.subset]
   lvls = getTaskClassLevels(.task)

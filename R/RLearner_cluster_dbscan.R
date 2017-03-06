@@ -20,8 +20,8 @@ makeRLearner.cluster.dbscan = function() {
 }
 
 #' @export
-trainLearner.cluster.dbscan = function(.learner, .task, .subset, .weights = NULL, ...) {
-  data = getTaskData(.task, .subset)
+trainLearner.cluster.dbscan = function(.learner, .task, .weights = NULL, ...) {
+  data = getTaskData(.task)
   model = fpc::dbscan(data, ...)
   # dbscan needs this in the prediction phase
   model$data = data

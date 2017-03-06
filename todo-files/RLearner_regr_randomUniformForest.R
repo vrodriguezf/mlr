@@ -27,9 +27,9 @@ makeRLearner.regr.randomUniformForest = function() {
 }
 
 #' @export
-trainLearner.regr.randomUniformForest = function(.learner, .task, .subset, .weights = NULL, ...) {
+trainLearner.regr.randomUniformForest = function(.learner, .task, .weights = NULL, ...) {
   f = getTaskFormula(.task)
-  randomUniformForest::randomUniformForest(formula = f, data = getTaskData(.task, .subset), OOB = FALSE,
+  randomUniformForest::randomUniformForest(formula = f, data = getTaskData(.task), OOB = FALSE,
     importance = FALSE, unsupervised = FALSE, threads = 1L, ...)
 }
 

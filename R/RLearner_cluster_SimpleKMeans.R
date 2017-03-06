@@ -29,9 +29,9 @@ makeRLearner.cluster.SimpleKMeans = function() {
 }
 
 #' @export
-trainLearner.cluster.SimpleKMeans = function(.learner, .task, .subset, .weights = NULL,  ...) {
+trainLearner.cluster.SimpleKMeans = function(.learner, .task, .weights = NULL,  ...) {
   ctrl = RWeka::Weka_control(...)
-  RWeka::SimpleKMeans(getTaskData(.task, .subset), control = ctrl)
+  RWeka::SimpleKMeans(getTaskData(.task), control = ctrl)
 }
 
 #' @export

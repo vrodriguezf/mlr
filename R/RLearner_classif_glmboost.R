@@ -28,7 +28,7 @@ makeRLearner.classif.glmboost = function() {
 }
 
 #' @export
-trainLearner.classif.glmboost = function(.learner, .task, .subset, .weights = NULL, Binomial.link = "logit", custom.family.definition, mstop, nu, risk, stopintern, trace, family,  ...) {
+trainLearner.classif.glmboost = function(.learner, .task, .weights = NULL, Binomial.link = "logit", custom.family.definition, mstop, nu, risk, stopintern, trace, family,  ...) {
   ctrl = learnerArgsToControl(mboost::boost_control, mstop, nu, risk, stopintern, trace)
   family = switch(family,
     Binomial = mboost::Binomial(link = Binomial.link),
@@ -36,7 +36,7 @@ trainLearner.classif.glmboost = function(.learner, .task, .subset, .weights = NU
     AUC = mboost::AUC(),
     #PropOdds = mboost::PropOdds(nuirange = nuirange, offrange = offrange),
     custom.family = custom.family.definition)
-  d = getTaskData(.task, .subset)
+  d = getTaskData(.task)
   if (.learner$predict.type == "prob") {
     td = getTaskDescription(.task)
     levs = c(td$negative, td$positive)

@@ -24,9 +24,9 @@ makeRLearner.cluster.EM = function() {
 }
 
 #' @export
-trainLearner.cluster.EM = function(.learner, .task, .subset, .weights = NULL,  ...) {
+trainLearner.cluster.EM = function(.learner, .task, .weights = NULL,  ...) {
   ctrl = RWeka::Weka_control(...)
-  RWeka::make_Weka_clusterer("weka/clusterers/EM")(getTaskData(.task, .subset), control = ctrl)
+  RWeka::make_Weka_clusterer("weka/clusterers/EM")(getTaskData(.task), control = ctrl)
 }
 
 #' @export

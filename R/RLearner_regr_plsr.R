@@ -18,9 +18,9 @@ makeRLearner.regr.plsr = function() {
 }
 
 #' @export
-trainLearner.regr.plsr = function(.learner, .task, .subset, .weights, ...) {
+trainLearner.regr.plsr = function(.learner, .task, .weights, ...) {
   f = getTaskFormula(.task)
-  d = getTaskData(.task, .subset)
+  d = getTaskData(.task)
   pls::plsr(f, data = d, ...)
 }
 

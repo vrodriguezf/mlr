@@ -234,7 +234,7 @@ makeRLearner.regr.h2o.deeplearning = function() {
 }
 
 #' @export
-trainLearner.regr.h2o.deeplearning = function(.learner, .task, .subset, .weights = NULL, ...) {
+trainLearner.regr.h2o.deeplearning = function(.learner, .task, .weights = NULL, ...) {
   # check if h2o connection already exists, otherwise start one
   conn.up = tryCatch(h2o::h2o.getConnection(), error = function(err) return(FALSE))
   if (!inherits(conn.up, "H2OConnection")) {

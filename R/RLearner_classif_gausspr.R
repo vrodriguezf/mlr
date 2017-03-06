@@ -32,15 +32,15 @@ makeRLearner.classif.gausspr = function() {
 }
 
 #' @export
-trainLearner.classif.gausspr = function(.learner, .task, .subset, .weights = NULL,
+trainLearner.classif.gausspr = function(.learner, .task, .weights = NULL,
   degree, offset, scale, sigma, order, length, lambda, normalized,  ...) {
   kpar = learnerArgsToControl(list, degree, offset, scale, sigma, order, length, lambda, normalized)
   f = getTaskFormula(.task)
   pm = .learner$predict.type == "prob"
   if (base::length(kpar) > 0L)
-    kernlab::gausspr(f, data = getTaskData(.task, .subset), kpar = kpar, prob.model = pm, ...)
+    kernlab::gausspr(f, data = getTaskData(.task), kpar = kpar, prob.model = pm, ...)
   else
-    kernlab::gausspr(f, data = getTaskData(.task, .subset), prob.model = pm, ...)
+    kernlab::gausspr(f, data = getTaskData(.task), prob.model = pm, ...)
 }
 
 #' @export

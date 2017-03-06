@@ -21,8 +21,8 @@ makeRLearner.regr.nodeHarvest = function() {
 }
 
 #' @export
-trainLearner.regr.nodeHarvest = function(.learner, .task, .subset, .weights = NULL, ...) {
-  d = getTaskData(.task, .subset, target.extra = TRUE)
+trainLearner.regr.nodeHarvest = function(.learner, .task, .weights = NULL, ...) {
+  d = getTaskData(.task, target.extra = TRUE)
   nodeHarvest::nodeHarvest(X = d$data, Y = d$target, ...)
 }
 

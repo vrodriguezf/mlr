@@ -16,7 +16,7 @@ makeRLearner.regr.rsm = function() {
 }
 
 #' @export
-trainLearner.regr.rsm = function(.learner, .task, .subset, .weights = NULL,  ...) {
+trainLearner.regr.rsm = function(.learner, .task, .weights = NULL,  ...) {
   mf = list(...)$modelfun
   vs = stri_paste(getTaskFeatureNames(.task), collapse = ",", sep = " ")
   g = function(x) stri_paste(x, "(", vs, ")", sep = "")
@@ -27,7 +27,7 @@ trainLearner.regr.rsm = function(.learner, .task, .subset, .weights = NULL,  ...
     stop("Unknown modelfun: ", mf)
   )
   f = as.formula(stri_paste(getTaskTargetNames(.task), "~", mf, sep = " "))
-  myargs = list(f, getTaskData(.task, .subset))
+  myargs = list(f, getTaskData(.task))
   # strange behaviour in rsm forces us to use do.call...
   do.call(rsm::rsm, myargs)
 }

@@ -14,8 +14,8 @@ makeRLearner.classif.rotationForest = function() {
 }
 
 #' @export
-trainLearner.classif.rotationForest = function(.learner, .task, .subset, .weights = NULL, ...) {
-  df = getTaskData(.task, .subset, target.extra = TRUE)
+trainLearner.classif.rotationForest = function(.learner, .task, .weights = NULL, ...) {
+  df = getTaskData(.task, target.extra = TRUE)
   features = df$data
   #rotationForest needs 0-1 coding
   target = as.factor(ifelse(df$target == .task$task.desc$positive, 1L, 0L))

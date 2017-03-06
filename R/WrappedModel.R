@@ -3,8 +3,7 @@
 #' @description
 #' Result from \code{\link{train}}.
 #'
-#' It internally stores the underlying fitted model,
-#' the subset used for training, features used for training, levels of factors in the
+#' It internally stores the underlying fitted model, features used for training, levels of factors in the
 #' data set and computation time that was spent for training.
 #'
 #' Object members: See arguments.
@@ -15,8 +14,6 @@
 #' @param learner.model [any]\cr
 #'   Underlying model.
 #' @template arg_taskdesc
-#' @param subset [\code{integer}]\cr
-#'   Subset used for training.
 #' @param features [\code{character}]\cr
 #'   Features used for training.
 #' @param factor.levels [named \code{list} of \code{character}]\cr
@@ -27,12 +24,12 @@
 #' @template ret_wmodel
 #' @export
 #' @aliases WrappedModel
-makeWrappedModel = function(learner, learner.model, task.desc, subset, features, factor.levels, time) {
+makeWrappedModel = function(learner, learner.model, task.desc, features, factor.levels, time) {
   UseMethod("makeWrappedModel")
 }
 
 #' @export
-makeWrappedModel.Learner = function(learner, learner.model, task.desc, subset, features, factor.levels, time) {
+makeWrappedModel.Learner = function(learner, learner.model, task.desc, features, factor.levels, time) {
   if (is.error(learner.model)) {
     learner.model = as.character(learner.model)
     time = NA_real_
@@ -44,7 +41,6 @@ makeWrappedModel.Learner = function(learner, learner.model, task.desc, subset, f
     learner = learner,
     learner.model = learner.model,
     task.desc = task.desc,
-    subset = subset,
     features = features,
     factor.levels = factor.levels,
     time = time
@@ -56,7 +52,7 @@ print.WrappedModel = function(x, ...) {
   cat(
     "Model for learner.id=", x$learner$id, "; learner.class=", getClass1(x$learner), "\n",
     sprintf("Trained on: task.id = %s; obs = %i; features = %i",
-      x$task.desc$id, length(x$subset), length(x$features)), "\n",
+      x$task.desc$id, x$task.desc$size, length(x$features)), "\n",
     "Hyperparameters: ", getHyperParsString(x$learner, show.missing.values = TRUE), "\n",
     sep = ""
   )

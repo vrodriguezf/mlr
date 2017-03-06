@@ -25,7 +25,7 @@ makeRLearner.surv.cv.CoxBoost = function() {
 }
 
 #' @export
-trainLearner.surv.cv.CoxBoost = function(.learner, .task, .subset, .weights = NULL, penalty = NULL, unpen.index = NULL, ...) {
+trainLearner.surv.cv.CoxBoost = function(.learner, .task, .weights = NULL, penalty = NULL, unpen.index = NULL, ...) {
   data = getTaskData(.task, subset = .subset, target.extra = TRUE, recode.target = "rcens")
   info = getFixDataInfo(data$data, factors.to.dummies = TRUE, ordered.to.int = TRUE)
 

@@ -19,9 +19,9 @@ makeRLearner.classif.parallelForest = function() {
 }
 
 #' @export
-trainLearner.classif.parallelForest = function(.learner, .task, .subset, .weights = NULL, ...) {
+trainLearner.classif.parallelForest = function(.learner, .task, .weights = NULL, ...) {
   f = getTaskFormula(.task)
-  df = getTaskData(.task, .subset)
+  df = getTaskData(.task)
   ParallelForest::grow.forest(formula = f, data = df, na.action = na.omit, 
     impurity.function = "gini", model = FALSE, x = FALSE, y = FALSE, ...)
 }

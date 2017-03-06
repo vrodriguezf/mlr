@@ -21,8 +21,8 @@ makeRLearner.classif.nodeHarvest = function() {
 }
 
 #' @export
-trainLearner.classif.nodeHarvest = function(.learner, .task, .subset, .weights = NULL, ...) {
-  d = getTaskData(.task, .subset, target.extra = TRUE, recode.target = "01")
+trainLearner.classif.nodeHarvest = function(.learner, .task, .weights = NULL, ...) {
+  d = getTaskData(.task, target.extra = TRUE, recode.target = "01")
   nodeHarvest::nodeHarvest(X = d$data, Y = d$target, ...)
 }
 

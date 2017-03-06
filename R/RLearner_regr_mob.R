@@ -23,7 +23,7 @@ makeRLearner.regr.mob = function() {
 }
 
 #' @export
-trainLearner.regr.mob = function(.learner, .task, .subset, .weights = NULL, alpha, bonferroni, minsplit,
+trainLearner.regr.mob = function(.learner, .task, .weights = NULL, alpha, bonferroni, minsplit,
   trim, breakties, verbose, part.feats, term.feats, ...) {
 
   cntrl = learnerArgsToControl(party::mob_control, alpha, bonferroni, minsplit, trim, breakties, verbose)
@@ -40,9 +40,9 @@ trainLearner.regr.mob = function(.learner, .task, .subset, .weights = NULL, alph
   f = as.formula(stri_paste(target, "~", collapse(term.feats, sep = " + "), "|", collapse(part.feats, sep = " + "), sep = " "))
 
   if (is.null(.weights)) {
-    model = party::mob(f, data = getTaskData(.task, .subset), control = cntrl, ...)
+    model = party::mob(f, data = getTaskData(.task), control = cntrl, ...)
   } else  {
-    model = party::mob(f, data = getTaskData(.task, .subset), control = cntrl, weights = .weights, ...)
+    model = party::mob(f, data = getTaskData(.task), control = cntrl, weights = .weights, ...)
   }
   # sometimes mob fails to fit a model but does not signal an exception.
   if (anyMissing(coef(model)))

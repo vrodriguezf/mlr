@@ -36,7 +36,7 @@ print.BaseWrapper = function(x, ...) {
 
 
 # trainLearner:
-# trainLearner.BaggingWrapper = function(.learner, .task, .subset, .weights = NULL, ...)
+# trainLearner.BaggingWrapper = function(.learner, .task, .weights = NULL, ...)
 # trainLearner is not implemented here, as no concrete code makes sense for this abstract base method.
 # One word wrt. hyper pars and the "..." varargs in inheriting methods:
 # train calls trainLearner, then passes ALL par.vals from all wrapped learner layers to "...".
@@ -57,7 +57,7 @@ predictLearner.BaseWrapper = function(.learner, .model, .newdata, ...) {
 }
 
 #' @export
-makeWrappedModel.BaseWrapper = function(learner, learner.model, task.desc, subset, features, factor.levels, time) {
+makeWrappedModel.BaseWrapper = function(learner, learner.model, task.desc, features, factor.levels, time) {
   x = NextMethod()
   addClasses(x, c(learner$model.subclass, "BaseWrapperModel"))
 }

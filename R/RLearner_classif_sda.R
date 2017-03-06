@@ -17,8 +17,8 @@ makeRLearner.classif.sda = function() {
 }
 
 #' @export
-trainLearner.classif.sda = function(.learner, .task, .subset,  ...) {
-  d = getTaskData(.task, .subset, target.extra = TRUE)
+trainLearner.classif.sda = function(.learner, .task,  ...) {
+  d = getTaskData(.task, target.extra = TRUE)
   sda::sda(Xtrain = as.matrix(d$data), L = d$target, ...)
 }
 

@@ -48,12 +48,12 @@ makeRLearner.classif.xgboost = function() {
 }
 
 #' @export
-trainLearner.classif.xgboost = function(.learner, .task, .subset, .weights = NULL,  ...) {
+trainLearner.classif.xgboost = function(.learner, .task, .weights = NULL,  ...) {
   
   td = getTaskDescription(.task)
   parlist = list(...)
-  parlist$data = data.matrix(getTaskData(.task, .subset, target.extra = TRUE)$data)
-  parlist$label = match(as.character(getTaskData(.task, .subset, target.extra = TRUE)$target), td$class.levels) - 1
+  parlist$data = data.matrix(getTaskData(.task, target.extra = TRUE)$data)
+  parlist$label = match(as.character(getTaskData(.task, target.extra = TRUE)$target), td$class.levels) - 1
   nc = length(td$class.levels)
   
   if (is.null(parlist$objective))

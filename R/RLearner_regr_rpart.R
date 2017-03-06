@@ -24,8 +24,8 @@ makeRLearner.regr.rpart = function() {
 }
 
 #' @export
-trainLearner.regr.rpart = function(.learner, .task, .subset, .weights = NULL,  ...) {
-  d = getTaskData(.task, .subset)
+trainLearner.regr.rpart = function(.learner, .task, .weights = NULL,  ...) {
+  d = getTaskData(.task)
   if (is.null(.weights)) {
     f = getTaskFormula(.task)
     rpart::rpart(f, data = d, ...)

@@ -30,9 +30,9 @@ makeRLearner.classif.randomUniformForest = function() {
 }
 
 #' @export
-trainLearner.classif.randomUniformForest = function(.learner, .task, .subset, .weights = NULL, ...) {
+trainLearner.classif.randomUniformForest = function(.learner, .task, .weights = NULL, ...) {
   f = getTaskFormula(.task)
-  randomUniformForest::randomUniformForest(formula = f, data = getTaskData(.task, .subset), OOB = FALSE,
+  randomUniformForest::randomUniformForest(formula = f, data = getTaskData(.task), OOB = FALSE,
     importance = FALSE, unsupervised = FALSE, threads = 1L, ...)
 }
 

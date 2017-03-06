@@ -28,7 +28,7 @@ makeRLearner.surv.glmboost = function() {
 }
 
 #' @export
-trainLearner.surv.glmboost = function(.learner, .task, .subset, .weights = NULL, nuirange = c(0, 100), family, custom.family.definition, mstop, nu, risk, stopintern, trace, use.formula, ...) {
+trainLearner.surv.glmboost = function(.learner, .task, .weights = NULL, nuirange = c(0, 100), family, custom.family.definition, mstop, nu, risk, stopintern, trace, use.formula, ...) {
   ctrl = learnerArgsToControl(mboost::boost_control, mstop, nu, risk, trace, stopintern)
   family = switch(family,
     CoxPH = mboost::CoxPH(),

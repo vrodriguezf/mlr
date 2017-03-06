@@ -41,9 +41,9 @@ makeRLearner.classif.earth = function() {
 }
 
 #' @export
-trainLearner.classif.earth = function(.learner, .task, .subset, .weights = NULL, link = "logit", maxit = 25L, ...) {
+trainLearner.classif.earth = function(.learner, .task, .weights = NULL, link = "logit", maxit = 25L, ...) {
   f = getTaskFormula(.task)
-  earth::earth(f, data = getTaskData(.task, .subset), weights = .weights, glm = list(family = binomial(link = link) , maxit = maxit), ...)
+  earth::earth(f, data = getTaskData(.task), weights = .weights, glm = list(family = binomial(link = link) , maxit = maxit), ...)
 }
 
 #' @export

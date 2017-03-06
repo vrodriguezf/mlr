@@ -16,8 +16,8 @@ makeRLearner.classif.plr = function() {
 }
 
 #' @export
-trainLearner.classif.plr = function(.learner, .task, .subset, .weights = NULL, cp.type, cp,  ...) {
-  d = getTaskData(.task, .subset, target.extra = TRUE, recode.target = "01")
+trainLearner.classif.plr = function(.learner, .task, .weights = NULL, cp.type, cp,  ...) {
+  d = getTaskData(.task, target.extra = TRUE, recode.target = "01")
   # cp.type has preference
   if (!missing(cp.type))
     cp2 = cp.type

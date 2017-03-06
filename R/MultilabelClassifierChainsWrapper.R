@@ -34,7 +34,7 @@ makeMultilabelClassifierChainsWrapper = function(learner, order = NULL) {
 }
 
 #' @export
-trainLearner.MultilabelClassifierChainsWrapper = function(.learner, .task, .subset, .weights = NULL, ...){
+trainLearner.MultilabelClassifierChainsWrapper = function(.learner, .task, .weights = NULL, ...){
   if (is.null(.learner$order)) {
     order = sample(getTaskTargetNames(.task)) #random order
   } else {
@@ -42,7 +42,6 @@ trainLearner.MultilabelClassifierChainsWrapper = function(.learner, .task, .subs
   }
   assertSetEqual(order, getTaskTargetNames(.task))
   targets = getTaskTargetNames(.task)
-  .task = subsetTask(.task, subset = .subset)
   data = getTaskData(.task)
   models = namedList(order)
   chained.targets = targets

@@ -31,9 +31,8 @@ makeMultilabelStackingWrapper = function(learner, cv.folds = 2) {
 }
 
 #' @export
-trainLearner.MultilabelStackingWrapper = function(.learner, .task, .subset, .weights = NULL, ...) {
+trainLearner.MultilabelStackingWrapper = function(.learner, .task, .weights = NULL, ...) {
   targets = getTaskTargetNames(.task)
-  .task = subsetTask(.task, subset = .subset)
   data = getTaskData(.task)
   # train level 1 learners
   models.lvl1 = getLearnerModel(train(makeMultilabelBinaryRelevanceWrapper(.learner$next.learner), .task, weights = .weights))

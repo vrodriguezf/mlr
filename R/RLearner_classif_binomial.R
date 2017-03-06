@@ -19,9 +19,9 @@ makeRLearner.classif.binomial = function() {
 }
 
 #' @export
-trainLearner.classif.binomial = function(.learner, .task, .subset, .weights = NULL, link = "logit", ...) {
+trainLearner.classif.binomial = function(.learner, .task, .weights = NULL, link = "logit", ...) {
   f = getTaskFormula(.task)
-  stats::glm(f, data = getTaskData(.task, .subset), family = binomial(link = link), weights = .weights, ...)
+  stats::glm(f, data = getTaskData(.task), family = binomial(link = link), weights = .weights, ...)
 }
 
 #' @export

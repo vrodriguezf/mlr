@@ -17,9 +17,9 @@ makeRLearner.classif.qda = function() {
 }
 
 #' @export
-trainLearner.classif.qda = function(.learner, .task, .subset, .weights = NULL,  ...) {
+trainLearner.classif.qda = function(.learner, .task, .weights = NULL,  ...) {
   f = getTaskFormula(.task)
-  MASS::qda(f, data = getTaskData(.task, .subset, recode.target = "drop.levels"), ...)
+  MASS::qda(f, data = getTaskData(.task, recode.target = "drop.levels"), ...)
 }
 
 #' @export

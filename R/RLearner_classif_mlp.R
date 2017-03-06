@@ -27,8 +27,8 @@ makeRLearner.classif.mlp = function() {
 }
 
 #' @export
-trainLearner.classif.mlp = function(.learner, .task, .subset, .weights = NULL,  ...) {
-  d = getTaskData(.task, .subset, target.extra = TRUE)
+trainLearner.classif.mlp = function(.learner, .task, .weights = NULL,  ...) {
+  d = getTaskData(.task, target.extra = TRUE)
   onehot = RSNNS::decodeClassLabels(d$target)
   RSNNS::mlp(x = d$data, y = onehot, ...)
 }

@@ -22,8 +22,8 @@ makeRLearner.classif.xyf = function() {
 }
 
 #' @export
-trainLearner.classif.xyf = function(.learner, .task, .subset, .weights = NULL, xdim, ydim, topo, ...) {
-  d = getTaskData(.task, .subset, target.extra = TRUE)
+trainLearner.classif.xyf = function(.learner, .task, .weights = NULL, xdim, ydim, topo, ...) {
+  d = getTaskData(.task, target.extra = TRUE)
   grid = learnerArgsToControl(class::somgrid, xdim, ydim, topo)
   kohonen::xyf(as.matrix(d$data), Y = d$target, grid = grid, keep.data = FALSE, ...)
 }

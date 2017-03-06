@@ -20,8 +20,8 @@ makeRLearner.classif.plsDA = function() {
 }
 
 #' @export
-trainLearner.classif.plsDA = function(.learner, .task, .subset, .weights = NULL,  ...) {
-  d = getTaskData(.task, .subset, target.extra = TRUE)
+trainLearner.classif.plsDA = function(.learner, .task, .weights = NULL,  ...) {
+  d = getTaskData(.task, target.extra = TRUE)
   DiscriMiner::plsDA(variables = d$data, group = d$target, ...)
 }
 

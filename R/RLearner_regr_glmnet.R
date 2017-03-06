@@ -45,8 +45,8 @@ makeRLearner.regr.glmnet = function() {
 }
 
 #' @export
-trainLearner.regr.glmnet = function(.learner, .task, .subset, .weights = NULL, ...) {
-  d = getTaskData(.task, .subset, target.extra = TRUE)
+trainLearner.regr.glmnet = function(.learner, .task, .weights = NULL, ...) {
+  d = getTaskData(.task, target.extra = TRUE)
   info = getFixDataInfo(d$data, factors.to.dummies = TRUE, ordered.to.int = TRUE)
   args = c(list(x = as.matrix(fixDataForLearner(d$data, info)), y = d$target), list(...))
   rm(d)

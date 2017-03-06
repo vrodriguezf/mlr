@@ -33,15 +33,15 @@ makeRLearner.regr.gausspr = function() {
 }
 
 #' @export
-trainLearner.regr.gausspr = function(.learner, .task, .subset, .weights = NULL,
+trainLearner.regr.gausspr = function(.learner, .task, .weights = NULL,
   degree, offset, scale, sigma, order, length, lambda, normalized,  ...) {
   kpar = learnerArgsToControl(list, degree, offset, scale, sigma, order, length, lambda, normalized)
   f = getTaskFormula(.task)
   vm = .learner$predict.type == "se"
   if (base::length(kpar) > 0L)
-    kernlab::gausspr(f, data = getTaskData(.task, .subset), kpar = kpar, variance.model = vm, type = "regression", ...)
+    kernlab::gausspr(f, data = getTaskData(.task), kpar = kpar, variance.model = vm, type = "regression", ...)
   else
-    kernlab::gausspr(f, data = getTaskData(.task, .subset), variance.model = vm, type = "regression", ...)
+    kernlab::gausspr(f, data = getTaskData(.task), variance.model = vm, type = "regression", ...)
 }
 
 #' @export

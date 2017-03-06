@@ -14,8 +14,8 @@ makeRLearner.multilabel.rFerns = function() {
 }
 
 #' @export
-trainLearner.multilabel.rFerns = function(.learner, .task, .subset, .weights = NULL, ...) {
-  d = getTaskData(.task, .subset, target.extra = TRUE)
+trainLearner.multilabel.rFerns = function(.learner, .task, .weights = NULL, ...) {
+  d = getTaskData(.task, target.extra = TRUE)
   rFerns::rFerns(x = d$data, y = as.matrix(d$target), ...)
 }
 

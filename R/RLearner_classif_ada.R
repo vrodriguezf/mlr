@@ -34,7 +34,7 @@ makeRLearner.classif.ada = function() {
 }
 
 #' @export
-trainLearner.classif.ada = function(.learner, .task, .subset, .weights = NULL,  ...) {
+trainLearner.classif.ada = function(.learner, .task, .weights = NULL,  ...) {
   f = getTaskFormula(.task)
   dots = list(...)
   # get names of rpart.control args
@@ -45,7 +45,7 @@ trainLearner.classif.ada = function(.learner, .task, .subset, .weights = NULL,  
   # execute ada with proper args
   ada.args = c(dots, control = list(ctrl.args))
   ada.fun = function(...) {
-    ada::ada(f, getTaskData(.task, .subset), ...)
+    ada::ada(f, getTaskData(.task), ...)
   }
   do.call(ada.fun, ada.args)
 }

@@ -71,8 +71,7 @@ makeOversampleWrapper = function(learner, osw.rate = 1, osw.cl = NULL) {
 }
 
 #' @export
-trainLearner.UndersampleWrapper = function(.learner, .task, .subset, .weights = NULL, usw.rate = 1, usw.cl = NULL, ...) {
-  .task = subsetTask(.task, .subset)
+trainLearner.UndersampleWrapper = function(.learner, .task, .weights = NULL, usw.rate = 1, usw.cl = NULL, ...) {
   .task = undersample(.task, rate = usw.rate, cl = usw.cl)
   m = train(.learner$next.learner, .task, weights = .weights)
   m$train.task = .task
@@ -80,8 +79,7 @@ trainLearner.UndersampleWrapper = function(.learner, .task, .subset, .weights = 
 }
 
 #' @export
-trainLearner.OversampleWrapper = function(.learner, .task, .subset, .weights = NULL, osw.rate = 1, osw.cl = NULL, ...) {
-  .task = subsetTask(.task, .subset)
+trainLearner.OversampleWrapper = function(.learner, .task, .weights = NULL, osw.rate = 1, osw.cl = NULL, ...) {
   .task = oversample(.task, rate = osw.rate, cl = osw.cl)
   m = train(.learner$next.learner, .task, weights = .weights)
   m$train.task = .task

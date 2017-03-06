@@ -27,8 +27,8 @@ makeRLearner.classif.dcSVM = function() {
 }
 
 #' @export
-trainLearner.classif.dcSVM = function(.learner, .task, .subset, .weights = NULL, ...) {
-  d = getTaskData(.task, .subset, target.extra = TRUE)
+trainLearner.classif.dcSVM = function(.learner, .task, .weights = NULL, ...) {
+  d = getTaskData(.task, target.extra = TRUE)
   pars = list(...)
   m.flag = FALSE
   max.levels.flag = FALSE
@@ -60,7 +60,7 @@ trainLearner.classif.dcSVM = function(.learner, .task, .subset, .weights = NULL,
       kernel = c("radial")
     }
     pars$kernel = kernel
-    result = do.call(e1071::svm, c(f, list(data = getTaskData(.task, .subset), probability = FALSE), pars))
+    result = do.call(e1071::svm, c(f, list(data = getTaskData(.task), probability = FALSE), pars))
     return(result)
   }
 

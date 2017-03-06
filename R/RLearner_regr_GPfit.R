@@ -27,8 +27,8 @@ makeRLearner.regr.GPfit = function(){
   )
 }
 #' @export
-trainLearner.regr.GPfit = function(.learner, .task, .subset, .weights = NULL, scale, type, matern_nu_k, power, ...) {
-  d = getTaskData(.task, .subset, target.extra = TRUE)
+trainLearner.regr.GPfit = function(.learner, .task, .weights = NULL, scale, type, matern_nu_k, power, ...) {
+  d = getTaskData(.task, target.extra = TRUE)
   low = apply(d$data, 2, min)
   high = apply(d$data, 2, max)
   not.const = colnames(d$data)[high != low]

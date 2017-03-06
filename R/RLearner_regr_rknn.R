@@ -19,8 +19,8 @@ makeRLearner.regr.rknn = function(){
 }
 
 #' @export
-trainLearner.regr.rknn = function(.learner, .task, .subset, .weights = NULL,  ...){
-  z = getTaskData(.task, .subset, target.extra = TRUE)
+trainLearner.regr.rknn = function(.learner, .task, .weights = NULL,  ...){
+  z = getTaskData(.task, target.extra = TRUE)
   c(list(data = z$data, y = z$target ), list(...))
 }
 

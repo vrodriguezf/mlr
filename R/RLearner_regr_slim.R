@@ -27,8 +27,8 @@ makeRLearner.regr.slim = function() {
 }
 
 #' @export
-trainLearner.regr.slim = function(.learner, .task, .subset, .weights = NULL, ...) {
-  d = getTaskData(.task, .subset, target.extra = TRUE)
+trainLearner.regr.slim = function(.learner, .task, .weights = NULL, ...) {
+  d = getTaskData(.task, target.extra = TRUE)
   flare::slim(X = as.matrix(d$data), Y = d$target, ...)
 }
 

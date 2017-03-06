@@ -20,8 +20,8 @@ makeRLearner.regr.kknn = function() {
 }
 
 #' @export
-trainLearner.regr.kknn = function(.learner, .task, .subset, .weights = NULL,  ...) {
-  list(td = getTaskDescription(.task), data = getTaskData(.task, .subset), parset = list(...))
+trainLearner.regr.kknn = function(.learner, .task, .weights = NULL,  ...) {
+  list(td = getTaskDescription(.task), data = getTaskData(.task), parset = list(...))
 }
 
 #' @export

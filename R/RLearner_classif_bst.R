@@ -37,10 +37,10 @@ makeRLearner.classif.bst = function() {
 }
 
 #' @export
-trainLearner.classif.bst = function(.learner, .task, .subset, .weights = NULL, mstop, nu, twinboost,
+trainLearner.classif.bst = function(.learner, .task, .weights = NULL, mstop, nu, twinboost,
   f.init, xselect.init, center, trace, numsample, df, minsplit, minbucket, cp, maxsurrogate,
   usesurrogate, surrogatestyle, maxdepth, xval, Learner, ...) {
-  d = getTaskData(.task, .subset, target.extra = TRUE, recode.target = "-1+1")
+  d = getTaskData(.task, target.extra = TRUE, recode.target = "-1+1")
   ctrl = learnerArgsToControl(bst::bst_control, mstop, nu, twinboost, f.init, xselect.init, center, trace, numsample, df)
   control.tree = learnerArgsToControl(list,  minsplit, minbucket, cp, maxsurrogate, usesurrogate, surrogatestyle, maxdepth, xval)
   bst::bst(x = d$data, y = d$target, ctrl = ctrl, control.tree = control.tree, learner = Learner, ...)

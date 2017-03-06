@@ -25,8 +25,8 @@ makeRLearner.classif.rpart = function() {
 }
 
 #' @export
-trainLearner.classif.rpart = function(.learner, .task, .subset, .weights = NULL, ...) {
-  d = getTaskData(.task, .subset)
+trainLearner.classif.rpart = function(.learner, .task, .weights = NULL, ...) {
+  d = getTaskData(.task)
   if (is.null(.weights)) {
     f = getTaskFormula(.task)
     rpart::rpart(f, data = d, ...)

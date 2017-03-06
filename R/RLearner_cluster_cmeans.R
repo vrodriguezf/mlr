@@ -23,9 +23,9 @@ makeRLearner.cluster.cmeans = function() {
 }
 
 #' @export
-trainLearner.cluster.cmeans = function(.learner, .task, .subset, .weights = NULL, reltol, ...) {
+trainLearner.cluster.cmeans = function(.learner, .task, .weights = NULL, reltol, ...) {
   ctrl = learnerArgsToControl(list, reltol)
-  e1071::cmeans(getTaskData(.task, .subset), control = ctrl, ...)
+  e1071::cmeans(getTaskData(.task), control = ctrl, ...)
 }
 
 #' @export

@@ -35,9 +35,9 @@ makeRLearner.regr.ranger = function() {
 }
 
 #' @export
-trainLearner.regr.ranger = function(.learner, .task, .subset, .weights, ...) {
+trainLearner.regr.ranger = function(.learner, .task, .weights, ...) {
   tn = getTaskTargetNames(.task)
-  ranger::ranger(formula = NULL, dependent.variable = tn, data = getTaskData(.task, .subset), ...)
+  ranger::ranger(formula = NULL, dependent.variable = tn, data = getTaskData(.task), ...)
 }
 
 #' @export

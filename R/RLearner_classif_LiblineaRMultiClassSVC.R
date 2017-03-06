@@ -19,8 +19,8 @@ makeRLearner.classif.LiblineaRMultiClassSVC = function() {
 }
 
 #' @export
-trainLearner.classif.LiblineaRMultiClassSVC = function(.learner, .task, .subset, .weights = NULL, ...) {
-  d = getTaskData(.task, .subset, target.extra = TRUE)
+trainLearner.classif.LiblineaRMultiClassSVC = function(.learner, .task, .weights = NULL, ...) {
+  d = getTaskData(.task, target.extra = TRUE)
   LiblineaR::LiblineaR(data = d$data, target = d$target, type = 4L, ...)
 }
 

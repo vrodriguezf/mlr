@@ -20,10 +20,10 @@ makeRLearner.regr.cubist = function() {
 }
 
 #' @export
-trainLearner.regr.cubist = function(.learner, .task, .subset, .weights = NULL, unbiased, rules,
+trainLearner.regr.cubist = function(.learner, .task, .weights = NULL, unbiased, rules,
   extrapolation, sample, seed, label, ...) {
   ctrl = learnerArgsToControl(Cubist::cubistControl, unbiased, rules, extrapolation, sample, seed, label)
-  d = getTaskData(.task, .subset, target.extra = TRUE)
+  d = getTaskData(.task, target.extra = TRUE)
   Cubist::cubist(x = d$data, y = d$target, control = ctrl, ...)
 }
 

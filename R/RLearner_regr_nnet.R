@@ -30,13 +30,13 @@ makeRLearner.regr.nnet = function() {
 }
 
 #' @export
-trainLearner.regr.nnet = function(.learner, .task, .subset, .weights = NULL,  ...) {
+trainLearner.regr.nnet = function(.learner, .task, .weights = NULL,  ...) {
   if (is.null(.weights)) {
     f = getTaskFormula(.task)
-    nnet::nnet(f, data = getTaskData(.task, .subset), linout = TRUE, ...)
+    nnet::nnet(f, data = getTaskData(.task), linout = TRUE, ...)
   } else  {
     f = getTaskFormula(.task)
-    nnet::nnet(f, data = getTaskData(.task, .subset), linout = TRUE, weights = .weights, ...)
+    nnet::nnet(f, data = getTaskData(.task), linout = TRUE, weights = .weights, ...)
   }
 }
 

@@ -24,8 +24,8 @@ makeRLearner.surv.gbm = function() {
 }
 
 #' @export
-trainLearner.surv.gbm = function(.learner, .task, .subset, .weights = NULL,  ...) {
-  d = getTaskData(.task, .subset)
+trainLearner.surv.gbm = function(.learner, .task, .weights = NULL,  ...) {
+  d = getTaskData(.task)
   f = getTaskFormula(.task)
 
   if (is.null(.weights)) {

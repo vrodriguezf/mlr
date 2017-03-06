@@ -59,9 +59,9 @@ makeRLearner.regr.randomForestSRCSyn = function() {
 }
 
 #' @export
-trainLearner.regr.randomForestSRCSyn = function(.learner, .task, .subset, .weights = NULL, ...) {
+trainLearner.regr.randomForestSRCSyn = function(.learner, .task, .weights = NULL, ...) {
   f = getTaskFormula(.task)
-  randomForestSRC::rfsrcSyn(formula = f, data = getTaskData(.task, .subset), case.wt = .weights, ...)
+  randomForestSRC::rfsrcSyn(formula = f, data = getTaskData(.task), case.wt = .weights, ...)
 }
 
 #' @export

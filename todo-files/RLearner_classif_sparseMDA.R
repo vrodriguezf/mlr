@@ -17,8 +17,8 @@ makeRLearner.classif.sparseMDA = function() {
 }
 
 #' @export
-trainLearner.classif.sparseMDA = function(.learner, .task, .subset, .weights = NULL,  ...) {
-  d = getTaskData(.task, .subset, target.extra = TRUE)
+trainLearner.classif.sparseMDA = function(.learner, .task, .weights = NULL,  ...) {
+  d = getTaskData(.task, target.extra = TRUE)
   y = d$target
   lvls = levels(y)
   y = sapply(lvls, function(lvl) as.integer(as.character(y) == lvl))

@@ -31,8 +31,8 @@ makeRLearner.regr.bgp = function() {
 }
 
 #' @export
-trainLearner.regr.bgp = function(.learner, .task, .subset, .weights = NULL, ...) {
-  d = getTaskData(.task, .subset, target.extra = TRUE)
+trainLearner.regr.bgp = function(.learner, .task, .weights = NULL, ...) {
+  d = getTaskData(.task, target.extra = TRUE)
   tgp::bgp(X = d$data, Z = d$target, pred.n = FALSE, ...)
 }
 
