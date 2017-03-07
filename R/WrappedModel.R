@@ -24,12 +24,12 @@
 #' @template ret_wmodel
 #' @export
 #' @aliases WrappedModel
-makeWrappedModel = function(learner, learner.model, task.desc, features, factor.levels, time) {
+makeWrappedModel = function(learner, learner.model, task.desc, subset, features, factor.levels, time) {
   UseMethod("makeWrappedModel")
 }
 
 #' @export
-makeWrappedModel.Learner = function(learner, learner.model, task.desc, features, factor.levels, time) {
+makeWrappedModel.Learner = function(learner, learner.model, task.desc, subset, features, factor.levels, time) {
   if (is.error(learner.model)) {
     learner.model = as.character(learner.model)
     time = NA_real_
@@ -41,6 +41,7 @@ makeWrappedModel.Learner = function(learner, learner.model, task.desc, features,
     learner = learner,
     learner.model = learner.model,
     task.desc = task.desc,
+    subset = subset,
     features = features,
     factor.levels = factor.levels,
     time = time

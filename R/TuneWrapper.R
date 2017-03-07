@@ -78,7 +78,7 @@ predictLearner.TuneWrapper = function(.learner, .model, .newdata, ...) {
 }
 
 #' @export
-makeWrappedModel.TuneWrapper = function(learner, learner.model, task.desc, features, factor.levels, time) {
+makeWrappedModel.TuneWrapper = function(learner, learner.model, task.desc, subset, features, factor.levels, time) {
   # set threshold in learner so it is used in predict calls from here on
   if (learner$control$tune.threshold)
     learner = setPredictThreshold(learner, learner.model$opt.result$threshold)
