@@ -1,21 +1,21 @@
 #' @export
 #' @rdname Task
 makeAnomalyDetectionTask = function(id = deparse(substitute(data)), data, target, 
-                              weights = NULL, blocking = NULL, 
-                              positive = NA_character_, fixup.data = "warn", 
-                              check.data = TRUE) {
+  weights = NULL, blocking = NULL, 
+  positive = NA_character_, fixup.data = "warn", 
+  check.data = TRUE) {
   assertString(id)
   assertDataFrame(data)
   #% assertString(target)
   # some code on cran passed stuff like positive=1, we can live with the convert here
- 
+  
   ###% Delete, only need in binary classification
-   #% if (isScalarNumeric(positive))
-   #%  positive = as.character(positive)
+  #% if (isScalarNumeric(positive))
+  #%  positive = as.character(positive)
   assertString(positive, na.ok = TRUE)
   assertChoice(fixup.data, choices = c("no", "quiet", "warn"))
   assertFlag(check.data)
-
+  
   
   ###% delete if-fct about "fixedup.data" , as there is no target variable in unsupervised
   #% if (fixup.data != "no") {
@@ -31,15 +31,15 @@ makeAnomalyDetectionTask = function(id = deparse(substitute(data)), data, target
   ###% are weights possible for one class? I think yes
   ###% delete "target" as input variable
   task = mlr:::makeUnsupervisedTask("anomalydetection", data, weights, blocking, 
-                                    fixup.data = fixup.data, check.data = check.data)
-
+    fixup.data = fixup.data, check.data = check.data)
+  
   ###% delete if-fct, , as there is no target variable in unsupervised
   #% if (check.data) {
   #%   assertFactor(data[[target]], any.missing = FALSE, empty.levels.ok = FALSE, .var.name = target)
   #% }
-
+  addClasses(task, "AnomalyDetectionTask") 
   task$task.desc = makeTaskDesc.AnomalyDetectionTask(task, id)
-  addClasses(task, "AnomalyDetectionTask")
+ 
 }
 
 makeTaskDesc.AnomalyDetectionTask = function(task, id) {
@@ -71,7 +71,7 @@ makeTaskDesc.AnomalyDetectionTask = function(task, id) {
   #%   td$negative = stri_paste("not_", positive)
   #% else if (length(td$class.levels) == 2L)
   #%   td$negative = setdiff(td$class.levels, positive)
-   
+  
   return(addClasses(td, c("TaskDescAnomalyDetection", "TaskDescUnsupervised")))
 }
 

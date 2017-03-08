@@ -1,12 +1,12 @@
 #' @export
 makeRLearner.anomalydetection.svm = function() {
-  makeRLearnerAnomalyDetection(
+  makeAnomalyDetectionTask(
     cl = "anomalydetection.svm",
     package = "e1071",
     par.set = makeParamSet(
       ##% add type "one-classification", already implemented in svm package
       ##% andere values unnoetig??
-      makeDiscreteLearnerParam(id = "type", default = "one-classification", values = c("C-classification", "nu-classification", "one-classification")),
+      makeDiscreteLearnerParam(id = "type", default = "C-classification", values = c("C-classification", "nu-classification", "one-classification")),
       makeNumericLearnerParam(id = "cost",  default = 1, lower = 0, requires = quote(type=="C-classification")),
       makeNumericLearnerParam(id = "nu", default = 0.5, requires = quote(type=="nu-classification")),
       makeNumericVectorLearnerParam("class.weights", len = NA_integer_, lower = 0),
@@ -21,8 +21,11 @@ makeRLearner.anomalydetection.svm = function() {
       makeLogicalLearnerParam(id = "fitted", default = TRUE, tunable = FALSE),
       makeLogicalVectorLearnerParam(id = "scale", default = c(TRUE), tunable = TRUE)
     ),
+    
+    ##% change default of type to one-classification
+    par.vals = list(type = "one-classification"),
     ##% add properties "oneclass", sind andere noch noetig?
-    properties = c("oneclass","twoclass", "multiclass", "numerics", "factors", "prob", "class.weights"),
+    properties = c("oneclass"),
     
     ##%no class weights for anomaly detection, as there is only one class
     #%class.weights.param = "class.weights",

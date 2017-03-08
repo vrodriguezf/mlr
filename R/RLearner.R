@@ -111,27 +111,27 @@ makeRLearnerClassif = function(cl, package, par.set, par.vals = list(), properti
 }
 
 
-#' @export
-#' @rdname RLearner
-makeRLearnerAnomalyDetection = function(cl, package, par.set, par.vals = list(), properties = character(0L),
-                                        name = cl, short.name = cl, note = "") {##% only one classes, no weights-> delete class.weights.param = NULL) {
-  
-  lrn = addClasses(
-    makeRLearnerInternal(cl, "anomalydetection", package, par.set, par.vals, properties, name, short.name, note),
-    c(cl, "RLearnerAnomalyDetection")
-  )
-  
-  ##% only one classes, no weights
-  #% # include the class.weights.param
-  #% if ("class.weights" %in% getLearnerProperties(lrn)) {
-  #%   assertString(class.weights.param)
-  #%   if (!is.null(par.set$pars[[class.weights.param]]))
-  #%     lrn$class.weights.param = class.weights.param
-  #%   else
-  #%     stopf("'%s' needs to be defined in the parameter set as well.", class.weights.param)
-  #% }
-  return(lrn)
-}
+#' #' @export
+#' #' @rdname RLearner
+#' makeRLearnerAnomalyDetection = function(cl, package, par.set, par.vals = list(), properties = character(0L),
+#'                                         name = cl, short.name = cl, note = "") {##% only one classes, no weights-> delete class.weights.param = NULL) {
+#'   
+#'   lrn = addClasses(
+#'     makeRLearnerInternal(cl, "anomalydetection", package, par.set, par.vals, properties, name, short.name, note),
+#'     c(cl, "RLearnerAnomalyDetection")
+#'   )
+#'   
+#'   ##% only one classes, no weights
+#'   #% # include the class.weights.param
+#'   #% if ("class.weights" %in% getLearnerProperties(lrn)) {
+#'   #%   assertString(class.weights.param)
+#'   #%   if (!is.null(par.set$pars[[class.weights.param]]))
+#'   #%     lrn$class.weights.param = class.weights.param
+#'   #%   else
+#'   #%     stopf("'%s' needs to be defined in the parameter set as well.", class.weights.param)
+#'   #% }
+#'   return(lrn)
+#' }
 
 
 #' @export
