@@ -40,7 +40,7 @@ trainLearner.CostSensClassifWrapper = function(.learner, .task, ...) {
   # if all equal, predict one class, stupid fringe case
   if (length(unique(newy)) == 1) {
     m = makeS3Obj("CostSensClassifModelConstant", y = newy[1L])
-    model = makeWrappedModel.Learner(.learner, m, getTaskDescription(.task), subset = NULL, getTaskFeatureNames(.task),
+    model = makeWrappedModel.Learner(.learner, m, getTaskDescription(.task), subset = .subset, getTaskFeatureNames(.task),
       getTaskFactorLevels(.task), 0)
   } else {
     data = cbind(feats, ..y.. = newy)
