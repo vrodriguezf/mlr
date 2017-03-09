@@ -1327,15 +1327,14 @@ db = makeMeasure(id = "db", minimize = TRUE, best = 0, worst = Inf,
 #' @export oneclassnaive
 #' @rdname measures
 #' @format none
-oneclassnaive = makeMeasure(id = "db", minimize = TRUE, best = 0, worst = Inf,
+oneclassnaive = makeMeasure(id = "oneclassnaive", minimize = TRUE, best = 0, worst = 1,
   properties = c("oneclass"),
-  name = "Davies-Bouldin cluster separation measure",
-  note = "Ratio of the within cluster scatter, to the between cluster separation, averaged over the clusters. See `?clusterSim::index.DB`.",
+  name = "oneclassnaive error",
+  note = "Defined as: mean(response != truth)",
   fun = function(task, model, pred, feats, extra.args) {
     0
   }
 )
-
 
 #' @export dunn
 #' @rdname measures
