@@ -56,14 +56,23 @@ trainLearner.oneclass.ksvm = function(.learner, .task, .subset, .weights = NULL,
   
   #$ ksvm only support prob.model for C-svc, nu-svc and  C-bsvc not for one class
   #%pm = .learner$predict.type == "prob"
-  if (base::length(kpar) > 0L)
-    kernlab::ksvm(x = getTaskData(.task, .subset), y = NULL, kpar = kpar, ...)
-  else
-    kernlab::ksvm(x = getTaskData(.task, .subset), y = NULL, ...)
+  if (base::length(kpar) > 0L){
+    k = as.kernelMatrix(crossprod(t(getTaskData(.task, .subset))))  
+    m = kernlab::ksvm(x = k, y = NULL, kpar = kpar, ...) 
+    sv = getTaskData(.task, .subset)[SVindex(m),]
+    list(model = m, sv = sv)
+  }
+  else {
+    k = as.kernelMatrix(crossprod(t(getTaskData(.task, .subset)))) 
+    m = kernlab::ksvm(x = k, y = NULL, ...)
+    sv = getTaskData(.task, .subset)[SVindex(m),]
+    list(model = m, sv = sv)
+  }
 }
 
 #' @export
-predictLearner.oneclass.ksvm = function(.learner, .model, .newdata, ...) {
+predictLearner.oneclass.ksvm = function(.learner, .model, .newdata,  ...) {
   type = switch(.learner$predict.type, prob = "response")
-  kernlab::predict(.model$learner.model, newdata = .newdata, type = type, ...)
+  Ktest = as.kernelMatrix(crossprod(t(.newdata), t(.model$learner.model$sv)))
+  kernlab::predict(.model$learner.model$model, newdata = Ktest, type = type, ...)
 }
