@@ -60,7 +60,7 @@ propVectorToMatrix = function(p, levs) {
 #' @return [\code{character}].
 #' @export
 listTaskTypes = function() {
-  c("classif", "regr", "surv", "costsens", "cluster", "multilabel")
+  c("classif", "regr", "surv", "costsens", "cluster", "multilabel", "anomalydetection")
 }
 
 # Maybe move to BBmisc at some point

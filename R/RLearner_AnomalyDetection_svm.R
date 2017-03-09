@@ -1,6 +1,6 @@
 #' @export
 makeRLearner.anomalydetection.svm = function() {
-  makeAnomalyDetectionTask(
+  makeRLearnerAnomalyDetection(
     cl = "anomalydetection.svm",
     package = "e1071",
     par.set = makeParamSet(

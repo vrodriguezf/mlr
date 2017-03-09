@@ -1,9 +1,8 @@
 #' @export
 #' @rdname Task
-makeAnomalyDetectionTask = function(id = deparse(substitute(data)), data, target, 
-  weights = NULL, blocking = NULL, 
-  positive = NA_character_, fixup.data = "warn", 
-  check.data = TRUE) {
+##% delete input target, positive
+makeAnomalyDetectionTask = function(id = deparse(substitute(data)), data, 
+  weights = NULL, blocking = NULL, fixup.data = "warn", check.data = TRUE) {
   assertString(id)
   assertDataFrame(data)
   #% assertString(target)
@@ -12,7 +11,7 @@ makeAnomalyDetectionTask = function(id = deparse(substitute(data)), data, target
   ###% Delete, only need in binary classification
   #% if (isScalarNumeric(positive))
   #%  positive = as.character(positive)
-  assertString(positive, na.ok = TRUE)
+  #% assertString(positive, na.ok = TRUE)
   assertChoice(fixup.data, choices = c("no", "quiet", "warn"))
   assertFlag(check.data)
   
@@ -30,16 +29,21 @@ makeAnomalyDetectionTask = function(id = deparse(substitute(data)), data, target
   
   ###% are weights possible for one class? I think yes
   ###% delete "target" as input variable
-  task = mlr:::makeUnsupervisedTask("anomalydetection", data, weights, blocking, 
+  task = makeUnsupervisedTask("anomalydetection", data, weights, blocking, 
     fixup.data = fixup.data, check.data = check.data)
   
   ###% delete if-fct, , as there is no target variable in unsupervised
   #% if (check.data) {
   #%   assertFactor(data[[target]], any.missing = FALSE, empty.levels.ok = FALSE, .var.name = target)
   #% }
-  addClasses(task, "AnomalyDetectionTask") 
   task$task.desc = makeTaskDesc.AnomalyDetectionTask(task, id)
+  addClasses(task, "AnomalyDetectionTask") 
  
+  
+  ##% oder
+  #%task$task.desc = makeTaskDesc.ClassifTask(task, id, target, positive)
+  #%task$task.desc = addClasses(task$task.desc, "TaskDescAnomalyDetection")
+  #%addClasses(task, "AnomalyDetectionTask")[Class - subclass]
 }
 
 makeTaskDesc.AnomalyDetectionTask = function(task, id) {
@@ -61,7 +65,7 @@ makeTaskDesc.AnomalyDetectionTask = function(task, id) {
   #%   assertChoice(positive, choices = levs)
   #% }
   
-  td = mlr:::makeTaskDescInternal(task, "anomalydetection", id, target)
+  td = makeTaskDescInternal(task, "anomalydetection", id, target)
   
   ##% no addtional description
   #% td$class.levels = levs
@@ -77,5 +81,5 @@ makeTaskDesc.AnomalyDetectionTask = function(task, id) {
 
 #' @export
 print.AnomalieDetectionTask = function(x, ...) {
-  mlr:::print.UnsupervisedTask(x)
+  print.UnsupervisedTask(x)
 }
