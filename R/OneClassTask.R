@@ -1,11 +1,11 @@
 #' @export
 #' @rdname Task
 ##% delete input target, positive
-makeAnomalyDetectionTask = function(id = deparse(substitute(data)), data, 
+makeOneClassTask = function(id = deparse(substitute(data)), data, target,
   weights = NULL, blocking = NULL, fixup.data = "warn", check.data = TRUE) {
   assertString(id)
   assertDataFrame(data)
-  #% assertString(target)
+  #assertString(target)
   # some code on cran passed stuff like positive=1, we can live with the convert here
   
   ###% Delete, only need in binary classification
@@ -29,15 +29,15 @@ makeAnomalyDetectionTask = function(id = deparse(substitute(data)), data,
   
   ###% are weights possible for one class? I think yes
   ###% delete "target" as input variable
-  task = makeUnsupervisedTask("anomalydetection", data, weights, blocking, 
+  task = makeUnsupervisedTask("oneclass", data, weights, blocking, 
     fixup.data = fixup.data, check.data = check.data)
   
   ###% delete if-fct, , as there is no target variable in unsupervised
   #% if (check.data) {
   #%   assertFactor(data[[target]], any.missing = FALSE, empty.levels.ok = FALSE, .var.name = target)
   #% }
-  task$task.desc = makeTaskDesc.AnomalyDetectionTask(task, id)
-  addClasses(task, "AnomalyDetectionTask") 
+  task$task.desc = makeTaskDesc.OneClassTask(task, id)
+  addClasses(task, "OneClassTask") 
  
   
   ##% oder
@@ -46,7 +46,7 @@ makeAnomalyDetectionTask = function(id = deparse(substitute(data)), data,
   #%addClasses(task, "AnomalyDetectionTask")[Class - subclass]
 }
 
-makeTaskDesc.AnomalyDetectionTask = function(task, id) {
+makeTaskDesc.OneClassTask = function(task, id) {
   
   ###% no target variable in one class classification, set to character(OL)
   target = character(0L)
@@ -65,7 +65,7 @@ makeTaskDesc.AnomalyDetectionTask = function(task, id) {
   #%   assertChoice(positive, choices = levs)
   #% }
   
-  td = makeTaskDescInternal(task, "anomalydetection", id, target)
+  td = makeTaskDescInternal(task, "oneclass", id, target)
   
   ##% no addtional description
   #% td$class.levels = levs
@@ -76,10 +76,10 @@ makeTaskDesc.AnomalyDetectionTask = function(task, id) {
   #% else if (length(td$class.levels) == 2L)
   #%   td$negative = setdiff(td$class.levels, positive)
   
-  return(addClasses(td, c("TaskDescAnomalyDetection", "TaskDescUnsupervised")))
+  return(addClasses(td, c("TaskDescOneClass", "TaskDescUnsupervised")))
 }
 
 #' @export
-print.AnomalieDetectionTask = function(x, ...) {
+print.OneClassTask = function(x, ...) {
   print.UnsupervisedTask(x)
 }

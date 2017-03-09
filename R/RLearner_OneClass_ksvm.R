@@ -1,13 +1,13 @@
 #' @export
-makeRLearner.classif.ksvm = function() {
-  makeRLearnerClassif(
-    cl = "anomalydetection.ksvm",
+makeRLearner.oneclass.ksvm = function() {
+  makeRLearnerOneClass(
+    cl = "oneclass.ksvm",
     package = "kernlab",
     # FIXME: stringdot pars and check order, scale and offset limits
     par.set = makeParamSet(
       makeLogicalLearnerParam(id = "scaled", default = TRUE),
       ##% add type "one-svc", delete rest?
-      makeDiscreteLearnerParam(id = "type", default = "one-svc"),
+      makeDiscreteLearnerParam(id = "type", default = "one-svc", values = c("one-svc")),
       makeDiscreteLearnerParam(id = "kernel", default = "rbfdot",
         values = c("vanilladot", "polydot", "rbfdot", "tanhdot", "laplacedot", "besseldot", "anovadot", "splinedot")),
       makeNumericLearnerParam(id = "C",
@@ -32,8 +32,8 @@ makeRLearner.classif.ksvm = function() {
       makeLogicalLearnerParam(id = "fit", default = TRUE, tunable = FALSE),
       makeIntegerLearnerParam(id = "cache", default = 40L, lower = 1L)
     ),
-    par.vals = list(fit = FALSE),
-    properties = c("oneclass","twoclass", "multiclass", "numerics", "factors", "prob", "class.weights"),
+    par.vals = list(type = "one-svc", fit = FALSE),
+    properties = c("oneclass", "numerics", "factors"),
     ##% delete? as we only have one class
     ##%class.weights.param = "class.weights",
     name = "one-class Support Vector Machines",
@@ -43,7 +43,7 @@ makeRLearner.classif.ksvm = function() {
 }
 
 #' @export
-trainLearner.classif.ksvm = function(.learner, .task, .subset, .weights = NULL, degree, offset, scale, sigma, order, length, lambda, normalized,  ...) {
+trainLearner.oneclass.ksvm = function(.learner, .task, .subset, .weights = NULL, degree, offset, scale, sigma, order, length, lambda, normalized,  ...) {
 
   # FIXME: custom kernel. freezes? check mailing list
   # FIXME: unify cla + regr, test all sigma stuff
@@ -53,16 +53,17 @@ trainLearner.classif.ksvm = function(.learner, .task, .subset, .weights = NULL, 
 #       args$kernel = do.call(args$kernel, kpar)
 #     }
   kpar = learnerArgsToControl(list, degree, offset, scale, sigma, order, length, lambda, normalized)
-  f = getTaskFormula(.task)
-  pm = .learner$predict.type == "prob"
+  
+  #$ ksvm only support prob.model for C-svc, nu-svc and  C-bsvc not for one class
+  #%pm = .learner$predict.type == "prob"
   if (base::length(kpar) > 0L)
-    kernlab::ksvm(f, data = getTaskData(.task, .subset), kpar = kpar, prob.model = pm, ...)
+    kernlab::ksvm(x = getTaskData(.task, .subset), y = NULL, kpar = kpar, ...)
   else
-    kernlab::ksvm(f, data = getTaskData(.task, .subset), prob.model = pm, ...)
+    kernlab::ksvm(x = getTaskData(.task, .subset), y = NULL, ...)
 }
 
 #' @export
-predictLearner.classif.ksvm = function(.learner, .model, .newdata, ...) {
-  type = switch(.learner$predict.type, prob = "probabilities", "response")
+predictLearner.oneclass.ksvm = function(.learner, .model, .newdata, ...) {
+  type = switch(.learner$predict.type, prob = "response")
   kernlab::predict(.model$learner.model, newdata = .newdata, type = type, ...)
 }

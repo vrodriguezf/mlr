@@ -147,6 +147,7 @@ getDefaultMeasure = function(x) {
   else
     x
   switch(type,
+    oneclass = oneclassnaive,
     classif = mmce,
     cluster = db,
     regr = mse,

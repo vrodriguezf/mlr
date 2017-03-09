@@ -4,7 +4,7 @@ makeRLearner.classif.svm = function() {
     cl = "classif.svm",
     package = "e1071",
     par.set = makeParamSet(
-      makeDiscreteLearnerParam(id = "type", default = "C-classification", values = c("C-classification", "nu-classification", "one-classification")),
+      makeDiscreteLearnerParam(id = "type", default = "C-classification", values = c("C-classification", "nu-classification")),
       makeNumericLearnerParam(id = "cost",  default = 1, lower = 0, requires = quote(type=="C-classification")),
       makeNumericLearnerParam(id = "nu", default = 0.5, requires = quote(type=="nu-classification")),
       makeNumericVectorLearnerParam("class.weights", len = NA_integer_, lower = 0),
@@ -19,7 +19,7 @@ makeRLearner.classif.svm = function() {
       makeLogicalLearnerParam(id = "fitted", default = TRUE, tunable = FALSE),
       makeLogicalVectorLearnerParam(id = "scale", default = c(TRUE), tunable = TRUE)
     ),
-    properties = c("oneclass", "twoclass", "multiclass", "numerics", "factors", "prob", "class.weights"),
+    properties = c("twoclass", "multiclass", "numerics", "factors", "prob", "class.weights"),
     class.weights.param = "class.weights",
     name = "Support Vector Machines (libsvm)",
     short.name = "svm"
@@ -28,8 +28,9 @@ makeRLearner.classif.svm = function() {
 
 #' @export
 trainLearner.classif.svm = function(.learner, .task, .subset, .weights = NULL,  ...) {
-  f = getTaskFormula(.task)
-  e1071::svm(f, data = getTaskData(.task, .subset), probability = .learner$predict.type == "prob", ...)
+    f = getTaskFormula(.task)
+    e1071::svm(f, data = getTaskData(.task, .subset), probability = .learner$predict.type == "prob", ...)
+
 }
 
 #' @export

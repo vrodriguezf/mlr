@@ -65,7 +65,7 @@ makeRLearnerInternal = function(id, type, package, par.set, par.vals, properties
   assertString(id)
   
   ##% ad choices "anomaly detection"
-  assertChoice(type, choices = c("classif", "regr", "multilabel", "surv", "cluster", "costsens", "anomalydetection"))
+  assertChoice(type, choices = c("oneclass", "classif", "regr", "multilabel", "surv", "cluster", "costsens"))
   assertSubset(properties, listLearnerProperties(type))
   assertClass(par.set, classes = "ParamSet")
   checkListElementClass(par.set$pars, "LearnerParam")
@@ -115,12 +115,12 @@ makeRLearnerClassif = function(cl, package, par.set, par.vals = list(), properti
 
 #' @export
 #' @rdname RLearner
-makeRLearnerAnomalyDetection = function(cl, package, par.set, par.vals = list(), properties = character(0L),
+makeRLearnerOneClass = function(cl, package, par.set, par.vals = list(), properties = character(0L),
                                         name = cl, short.name = cl, note = "") {##% only one classes, no weights-> delete class.weights.param = NULL) {
 
   lrn = addClasses(
-    makeRLearnerInternal(cl, "anomalydetection", package, par.set, par.vals, properties, name, short.name, note),
-    c(cl, "RLearnerAnomalyDetection")
+    makeRLearnerInternal(cl, "oneclass", package, par.set, par.vals, properties, name, short.name, note),
+    c(cl, "RLearnerOneClass")
   )
 
   ##% only one classes, no weights

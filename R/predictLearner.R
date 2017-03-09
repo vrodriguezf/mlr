@@ -65,8 +65,23 @@ predictLearner2 = function(.learner, .model, .newdata, ...) {
 
 checkPredictLearnerOutput = function(learner, model, p) {
   cl = class(p)[1L]
+  
+  if (learner$type == "oneclass") {
+    return(p)
+    
+    ##% add if-else for anomaly detection/one class
+    #% if (is.null(levs) && cl == "logical") {
+    #%  # task has no levels, so it is probably one-class
+    #%   return(p)
+    #% } else if (is.null(levs)) {
+    #%   stopf("Task without levels should have prediction TRUE/FALSE.")
+    #% }
+  }
+ 
   if (learner$type == "classif") {
     levs = model$task.desc$class.levels
+
+    
     if (learner$predict.type == "response") {
       # the levels of the predicted classes might not be complete....
       # be sure to add the levels at the end, otherwise data gets changed!!!

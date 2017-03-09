@@ -1,12 +1,12 @@
 #' @export
-makeRLearner.anomalydetection.svm = function() {
-  makeRLearnerAnomalyDetection(
-    cl = "anomalydetection.svm",
+makeRLearner.oneclass.svm = function() {
+  makeRLearnerOneClass(
+    cl = "oneclass.svm",
     package = "e1071",
     par.set = makeParamSet(
       ##% add type "one-classification", already implemented in svm package
-      ##% andere values unnoetig??
-      makeDiscreteLearnerParam(id = "type", default = "C-classification", values = c("C-classification", "nu-classification", "one-classification")),
+      ##% values needed, can't delete otherwise error:  Error in checkValuesForDiscreteParam(id, values) : argument "values" is missing, with no default 
+      makeDiscreteLearnerParam(id = "type", default = "one-classification", values = c("one-classification")),
       makeNumericLearnerParam(id = "cost",  default = 1, lower = 0, requires = quote(type=="C-classification")),
       makeNumericLearnerParam(id = "nu", default = 0.5, requires = quote(type=="nu-classification")),
       makeNumericVectorLearnerParam("class.weights", len = NA_integer_, lower = 0),
@@ -25,7 +25,7 @@ makeRLearner.anomalydetection.svm = function() {
     ##% change default of type to one-classification
     par.vals = list(type = "one-classification"),
     ##% add properties "oneclass", sind andere noch noetig?
-    properties = c("oneclass"),
+    properties =  c("oneclass", "numerics", "factors"),
     
     ##%no class weights for anomaly detection, as there is only one class
     #%class.weights.param = "class.weights",
@@ -36,18 +36,19 @@ makeRLearner.anomalydetection.svm = function() {
 }
 
 #' @export
-trainLearner.anomalydetection.svm = function(.learner, .task, .subset, .weights = NULL,  ...) {
-  f = getTaskFormula(.task)
-  pm = .learner$predict.type == "prob"
-  e1071::svm(f, data = getTaskData(.task, .subset), probability = pm, ...)
+trainLearner.oneclass.svm = function(.learner, .task, .subset, .weights = NULL,  ...) {
+  ##%kein prob fuer oneclass
+    e1071::svm(getTaskData(.task, .subset), y = NULL, probability = .learner$predict.type == "prob", ...)
 }
 
 #' @export
-predictLearner.anomalydetection.svm = function(.learner, .model, .newdata, ...) {
-  ##% ifelse behalten, da svm mit prob oder ohne gefittet werden kann
-  if (.learner$predict.type == "response") { 
+predictLearner.oneclass.svm = function(.learner, .model, .newdata, ...) {
+  ##% ifelse loeschen da one class nicht prob predicten kann
+ #% if (.learner$predict.type == "response") { 
     predict(.model$learner.model, newdata = .newdata, ...)
-   } else {
-    attr(predict(.model$learner.model, newdata = .newdata, probability = TRUE, ...), "probabilities")
-  }
+  #% } else {
+#%    attr(predict(.model$learner.model, newdata = .newdata, probability = TRUE, ...), "probabilities")
+  #%}
 }
+
+

@@ -98,6 +98,29 @@ makePrediction.TaskDescClassif = function(task.desc, row.names, id, truth, predi
   return(p)
 }
 
+
+#' @export
+makePrediction.TaskDescOneClass = function(task.desc, row.names, id, truth, predict.type, predict.threshold = NULL, y, time, error = NA_character_) {
+  data = namedList(c("id", "response"))
+  data$id = id
+
+  if (predict.type == "response") {
+    data$response = y
+    data = as.data.frame(filterNull(data))
+  } 
+  
+  p = makeS3Obj(c("PredictionOneClass", "Prediction"),
+    predict.type = predict.type,
+    data = setRowNames(data, row.names),
+    threshold = NA_real_,
+    task.desc = task.desc,
+    time = time,
+    error = error
+  )
+  return(p)
+}
+
+
 #' @export
 makePrediction.TaskDescMultilabel = function(task.desc, row.names, id, truth, predict.type, predict.threshold = NULL, y, time, error = NA_character_) {
   data = namedList(c("id", "truth", "response", "prob"))
