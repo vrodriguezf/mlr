@@ -70,6 +70,7 @@ plotLearnerPrediction = function(learner, task, features = NULL, measures, cv = 
 
   learner = checkLearner(learner)
   assert(
+    checkClass(task, "OneClassTask"),
     checkClass(task, "ClassifTask"),
     checkClass(task, "RegrTask"),
     checkClass(task, "ClusterTask")

@@ -44,7 +44,7 @@ getPredictionProbabilities = function(pred, cl) {
       stopf("You can only ask for probs of all classes currently in clustering!")
     else
       assertCharacter(cl, any.missing = FALSE)
-  }
+  } 
   if (pred$predict.type != "prob")
     stop("Probabilities not present in Prediction object!")
   cns = colnames(pred$data)
