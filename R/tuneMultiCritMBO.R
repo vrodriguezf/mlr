@@ -9,8 +9,9 @@ tuneMultiCritMBO = function(learner, task, resampling, measures, par.set, contro
 
   # put all required info into the function env
   force(learner); force(task); force(resampling); force(measures); force(par.set); force(control); force(opt.path); force(show.info)
-  tff = tunerSmoofFun(learner = learner, task = task, resampling = resampling, measures = measures,
-    par.set = par.set, ctrl = control, opt.path = opt.path, show.info = show.info,
+  n.objectives = mbo.control$n.objectives
+  tff = tunerMultiCritSmoofFun(learner = learner, task = task, resampling = resampling, measures = measures,
+    par.set = par.set, ctrl = control, n.objectives = n.objectives, opt.path = opt.path, show.info = show.info,
     convertx = convertXIdentity, remove.nas = TRUE)
 
   state = mbo.control$save.file.path
@@ -25,12 +26,19 @@ tuneMultiCritMBO = function(learner, task, resampling, measures, par.set, contro
     or = mbofun(tff, design = control$mbo.design, learner = control$learner, control = mbo.control, show.info = FALSE)
   }
 
-  x = trafoValue(par.set, or$x)
-  y = setNames(or$y, opt.path$y.names[1L])
+  j = getOptPathParetoFront(opt.path, index = TRUE)
+  els = lapply(j, getOptPathEl, op = opt.path)
+  xs = extractSubList(els, "x", simplify = FALSE)
+  xs = lapply(xs, trafoValue, par = par.set)
+  xs = lapply(xs, removeMissingValues)
+  ys = extractSubList(els, "y", simplify = "rows")
+  colnames(ys) = opt.path$y.names
+
   # we take the point that mbo proposes and its estimated y
   # FIXME: threshold
   if (!control$mbo.keep.result)
     or = NULL
-  res = makeTuneMultiCritResult(learner, control, removeMissingValues(x), y, NULL, opt.path, mbo.result = or)
+  res = makeTuneMultiCritResult(learner, j, xs, ys, control, opt.path, measures)
   res
+
 }
