@@ -104,10 +104,10 @@ makePrediction.TaskDescOneClass = function(task.desc, row.names, id, truth, pred
   data = namedList(c("id", "response"))
   data$id = id
 
-  if (predict.type == "response") {
+  #if (predict.type == "response") {
     data$response = y
     data = as.data.frame(filterNull(data))
-  } 
+  #} 
   
   p = makeS3Obj(c("PredictionOneClass", "Prediction"),
     predict.type = predict.type,

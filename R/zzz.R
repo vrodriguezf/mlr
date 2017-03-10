@@ -21,7 +21,7 @@ mlr = new.env(parent = emptyenv())
 
 ### Learner properties
 mlr$learner.properties = list(
-  oneclass   = c("numerics", "factors", "ordered", "missings", "weights", "oneclass"),
+  oneclass   = c("numerics", "factors", "ordered", "missings", "weights", "oneclass", "prob"),
   classif    = c("numerics", "factors", "ordered", "missings", "weights", "prob", "oneclass", "twoclass", "multiclass", "class.weights", "featimp", "oobpreds"),
   multilabel = c("numerics", "factors", "ordered", "missings", "weights", "prob", "oneclass", "twoclass", "multiclass"),
   regr       = c("numerics", "factors", "ordered", "missings", "weights", "se", "featimp", "oobpreds"),

@@ -148,6 +148,7 @@
 # ...
 # extra parameters to pass onto functions (not implemented)
 
+###% take code from regr_h2deeplearning
 
 # Details: https://leanpub.com/deeplearning/read
 
@@ -225,9 +226,10 @@ makeRLearner.oneclass.h2o.autoencoder = function() {
       makeLogicalLearnerParam("average_activation", tunable = FALSE),
       #makeLogicalLearnerParam("sparsity_beta", tunable = FALSE),
       makeLogicalLearnerParam("reproducible", default = FALSE, tunable = FALSE),
-      makeLogicalLearnerParam("export_weights_and_biases", default = FALSE, tunable = FALSE)
+      makeLogicalLearnerParam("export_weights_and_biases", default = FALSE, tunable = FALSE),
+      makeNumericLearnerParam("oneclass.threshold", default = 0.5, lower = 0, when = "predict")
     ),
-    properties = c("oneclass", "numerics", "factors", "weights"),
+    properties = c("oneclass", "numerics", "factors", "weights", "prob"),
     name = "h2o.autoencoder",
     short.name = "h2o.ae"
   )
@@ -256,11 +258,21 @@ trainLearner.oneclass.h2o.autoencoder = function(.learner, .task, .subset, .weig
 }
 
 #' @export
-predictLearner.oneclass.h2o.autoencoder = function(.learner, .model, .newdata, ...) {
+predictLearner.oneclass.h2o.autoencoder = function(.learner, .model, .newdata, oneclass.threshold = 0.5, ...) {
   m = .model$learner.model
   h2of = h2o::as.h2o(.newdata)
-  p = h2o::h2o.predict(m, newdata = h2of, ...)
-  p.df = as.data.frame(p)
-  return(p.df$predict) 
+  #p = h2o::h2o.predict(m, newdata = h2of, ...)
+  p = h2o::h2o.anomaly(m, data = h2of, per_feature=FALSE)
+  # p.df = as.data.frame(p)
+  #predict < threshold
+  p = as.data.frame(p)
+  if (.learner$predict.type == "response") {
+    p = p[,1] < oneclass.threshold
+    return(p)
+  } else {
+    # in case of predict.type = "prob" not the probability is returned but the Reconstruction error
+    p = p[,1]
+    return(p)
+  }
 }
 
