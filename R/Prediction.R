@@ -101,13 +101,16 @@ makePrediction.TaskDescClassif = function(task.desc, row.names, id, truth, predi
 
 #' @export
 makePrediction.TaskDescOneClass = function(task.desc, row.names, id, truth, predict.type, predict.threshold = NULL, y, time, error = NA_character_) {
-  data = namedList(c("id", "response"))
+  data = namedList(c("id", "response", "prob"))
   data$id = id
 
-  #if (predict.type == "response") {
+  if (predict.type == "response") {
     data$response = y
     data = as.data.frame(filterNull(data))
-  #} 
+  } else {
+      data$prob = y
+      data = as.data.frame(filterNull(data))
+    }
   
   p = makeS3Obj(c("PredictionOneClass", "Prediction"),
     predict.type = predict.type,
