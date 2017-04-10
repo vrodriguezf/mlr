@@ -1,5 +1,6 @@
 library(data.table)
 library(BBmisc)
+library(devtools)
 # see also https://diffuseprior.wordpress.com/2012/04/23/probitlogit-marginal-effects-in-r-2/
 
 load_all()
@@ -25,34 +26,59 @@ margins(mod)
 # use case 2: in a lm with interactions
 ################################################################################
 library("margins")
-f = mpg ~ cyl + hp + (cyl + hp):am
+f = mpg ~ cyl + hp + (cyl + hp):carb
 mod = lm(f, data = mtcars)
 coefficients(mod)
-margins(mod, type = "terms")
-par(mfrow=c(1,3))
+margins(mod, type = "response")
+par(mfrow = c(2,2))
 cplot(mod, x = "cyl")
 cplot(mod, x = "hp")
 cplot(mod, x = "carb")
 
-# FIXME: partialDependencePlot just predicts on unique(#values) and not on all data points
 mt.task$formula = f
 m = train(lrn, subsetTask(mt.task, features = c("cyl", "hp", "carb")))
-pdat = generatePartialDependenceData(m, mt.task, c("cyl", "hp", "carb"))
+pdat = generatePartialDependenceData(m, mt.task, c("cyl", "hp", "carb"), method = "simple")
 plotPartialDependence(pdat)
 ame = computeAverageMarginalEffects(m, mt.task, gridsize = 100, features = c("cyl", "hp", "carb"))
-lapply(ame, function(x) x$effects)
+vnapply(ame, function(x) x$effects)
 coefficients(m$learner.model)[-1]
 
+par(mfrow = c(2,2))
+cplot(mod, x = c("cyl"))
+lines(pdat$data$cyl, pdat$data$mpg, col = "red")
+cplot(mod, x = c("hp"))
+lines(pdat$data$hp, pdat$data$mpg, col = "red")
+cplot(mod, x = c("carb"))
+lines(pdat$data$carb, pdat$data$mpg, col = "red")
+# FIXME: findout why intercept differs!
+
+
+################################################################################
+# use case 3: in a lm with quadratic effects
+################################################################################
+library("margins")
+f = mpg ~ cyl + I(cyl^2) + hp
+mod = lm(f, data = mtcars)
+coefficients(mod)
+margins(mod, type = "response")
+par(mfrow = c(1,2))
+cplot(mod, x = "cyl")
+cplot(mod, x = "hp")
+
+mt.task$formula = f
+m = train(lrn, subsetTask(mt.task, features = c("cyl", "hp")))
+pdat = generatePartialDependenceData(m, mt.task, c("cyl", "hp"), method = "simple")
+plotPartialDependence(pdat)
+ame = computeAverageMarginalEffects(m, mt.task, gridsize = 100, features = c("cyl", "hp"))
+vnapply(ame, function(x) x$effects) # not equal to margins(mod, type = "response")
+# FIXME: partialDependencePlot just predicts on unique(#values) and not on all data points
+
 pdat.deriv = generatePartialDependenceData(m, mt.task, c("cyl", "hp"),
-  gridsize = getTaskSize(mt.task), derivative = TRUE)
+  gridsize = getTaskSize(mt.task), derivative = TRUE, method = "simple")
 weighted.mean(pdat.deriv$data[!is.na(pdat.deriv$data$cyl),"mpg"], table(getTaskData(mt.task)$cyl))
 
 
-cplot(mod, x = c("cyl"))
-lines(pdat$data$cyl, pdat$data$mpg, col ="red")
-cplot(mod, x = c("hp"))
-lines(pdat$data$hp, pdat$data$mpg, col ="red")
-
+## testing stuff
 # method 1:
 derivative = function(model, data, variable, change = "dydx", eps = 1e-8){
   d0 <- d1 <- data
@@ -109,14 +135,13 @@ f = function(x, model, data, features) {
   newdata[features] = x
   mean(prediction(model = model, data = newdata, type = "response")[["fitted"]])
 }
-mean(vnapply(mtcars$cyl, function(x) grad(func = f, x, model =  mod, data = mtcars, features = "cyl")))
-mean(vnapply(unique(mtcars$cyl), function(x) grad(func = f, x, model =  mod, data = mtcars, features = "cyl")))
-
+mean(vnapply(mtcars$cyl, function(x) numDeriv::grad(func = f, x, model =  mod, data = mtcars, features = "cyl")))
+mean(vnapply(unique(mtcars$cyl), function(x) numDeriv::grad(func = f, x, model =  mod, data = mtcars, features = "cyl")))
 
 # method 3: here we assume that the cyl values 4,6 and 8 occur with equal frequency in method 1-2 this is not assumed!
 lrn = makeLearner("regr.rsm", modelfun = "SO")
 m = train(lrn, subsetTask(mt.task, features = c("cyl", "hp")))
-pdat = generatePartialDependenceData(m, mt.task, getTaskFeatureNames(mt.task),
+pdat = generatePartialDependenceData(m, mt.task, c("cyl", "hp"),
   gridsize = getTaskSize(mt.task), unique.values = TRUE, derivative = TRUE)
 head(pdat$data)
 mean(pdat$data$mpg[!is.na(pdat$data$cyl)])
@@ -140,7 +165,7 @@ summary(margins(mod))
 x = getTaskData(pid.task, target.extra = TRUE)$data
 x = append(list("(Intercept)" = rep(1, 10)), lapply(x, function(x) unique(x)))
 # x list of unique features
-maBina2 = function (w, x, rev.dum = TRUE, digits = 3, subset.name = NULL,
+maBina2 = function(w, x, rev.dum = TRUE, digits = 3, subset.name = NULL,
   subset.value)
 {
   if (!inherits(w, "glm")) {
