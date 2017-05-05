@@ -12,8 +12,8 @@ test_that("learnerArgsToControl with list returns the input", {
   expect_equal(list(arg1 = arg1, arg2 = arg2), test1)
 
   # test missing values
-  arg1 = quote(expr = )
-  arg2 = quote(expr = )
+  arg1 = quote(expr =)
+  arg2 = quote(expr =)
   test2 = checkLearnerArgsToControl(arg1, arg2)
   expect_equal(list(), test2)
 
