@@ -26,8 +26,8 @@ Number of digits the measures are rounded to.}
 Currently not used.}
 }
 \value{
-[\code{ROCMeasures}]. 
-   A list containing two elements \code{confusion.matrix} which is 
+[\code{ROCMeasures}].
+   A list containing two elements \code{confusion.matrix} which is
    the 2 times 2 confusion matrix of relative frequencies and \code{measures}, a list of the above mentioned measures.
 }
 \description{
@@ -59,6 +59,7 @@ The element for the false omission rate in the resulting object is not called \c
 \itemize{
 \item \code{print}: 
 }}
+
 \examples{
 lrn = makeLearner("classif.rpart", predict.type = "prob")
 fit = train(lrn, sonar.task)
@@ -67,6 +68,9 @@ calculateROCMeasures(pred)
 
 }
 \seealso{
+Other roc: \code{\link{asROCRPrediction}},
+  \code{\link{plotViperCharts}}
+
 Other performance: \code{\link{ConfusionMatrix}},
   \code{\link{calculateConfusionMatrix}},
   \code{\link{estimateRelativeOverfitting}},
@@ -74,8 +78,4 @@ Other performance: \code{\link{ConfusionMatrix}},
   \code{\link{makeCustomResampledMeasure}},
   \code{\link{makeMeasure}}, \code{\link{measures}},
   \code{\link{performance}}
-
-Other roc: \code{\link{asROCRPrediction}},
-  \code{\link{plotViperCharts}}
 }
-

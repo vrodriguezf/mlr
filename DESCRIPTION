@@ -27,7 +27,12 @@ Authors@R: c(
     person("Philipp", "Probst", email = "philipp_probst@gmx.de", role = "ctb"),
     person("Xudong", "Sun", email = "xudong.sun@stat.uni-muenchen.de", role = "ctb"),
     person("Janek", "Thomas", email = "janek.thomas@stat.uni-muenchen.de", role = "ctb"),
-    person("Bruno", "Vieira", email = "bruno.hebling.vieira@usp.br", role = "ctb"))
+    person("Bruno", "Vieira", email = "bruno.hebling.vieira@usp.br", role = "ctb"),
+    person("Laura", "Beggel", email = "laura.beggel@web.de", role = "ctb"),
+    person("Quay", "Au", email = "quay.au@stat.uni-muenchen.de", role = "ctb"),
+    person("Martin", "Binder", email = "ma.binder@campus.lmu.de", role = "ctb"),
+    person("Florian", "Pfisterer", email = "pfistererf@googlemail.com", role = "ctb"),
+    person("Stefan", "Coors", email = "stefan.coors@gmx.net", role = "ctb"))
 URL: https://github.com/mlr-org/mlr
 BugReports: https://github.com/mlr-org/mlr/issues
 License: BSD_2_clause + file LICENSE
@@ -35,23 +40,25 @@ Encoding: UTF-8
 Roxygen: list(wrap = FALSE)
 Depends:
     R (>= 3.0.2),
-    ParamHelpers (>= 1.8),
+    ParamHelpers (>= 1.10)
 Imports:
-    BBmisc (>= 1.10),
+    BBmisc (>= 1.11),
     backports,
     ggplot2,
     stats,
     stringi,
-    checkmate (>= 1.8.1),
+    checkmate (>= 1.8.2),
     data.table,
     methods,
     parallelMap (>= 1.3),
     survival,
-    utils
+    utils,
+    XML
 Suggests:
     ada,
     adabag,
     bartMachine,
+    batchtools,
     brnn,
     bst,
     C50,
@@ -96,15 +103,17 @@ Suggests:
     kknn,
     klaR,
     knitr,
-    kohonen,
     laGP,
     LiblineaR,
+    lintr (>= 1.0.0.9001),
     lqa,
     MASS,
     mboost,
     mco,
     mda,
     mlbench,
+    mldr,
+    mlrMBO,
     modeltools,
     mRMRe,
     nnet,
@@ -121,6 +130,7 @@ Suggests:
     randomForestSRC (>= 2.2.0),
     ranger (>= 0.6.0),
     RCurl,
+    rex,
     Rfast,
     rFerns,
     rjson,
@@ -147,9 +157,8 @@ Suggests:
     tgp,
     TH.data,
     xgboost (>= 0.6-2),
-    XML
 LazyData: yes
 ByteCompile: yes
-Version: 2.10
+Version: 2.12
 VignetteBuilder: knitr
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1

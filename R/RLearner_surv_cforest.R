@@ -8,7 +8,8 @@ makeRLearner.surv.cforest = function() {
       makeIntegerLearnerParam(id = "mtry", lower = 1L, default = 5L),
       makeLogicalLearnerParam(id = "replace", default = FALSE),
       makeLogicalLearnerParam(id = "trace", default = FALSE, tunable = FALSE),
-      makeNumericLearnerParam(id = "fraction", lower = 0, upper = 1, default = 0.632),
+      makeNumericLearnerParam(id = "fraction", lower = 0, upper = 1, default = 0.632,
+        requires = quote(replace == FALSE)),
       makeDiscreteLearnerParam(id = "teststat", values = c("quad", "max"), default = "quad"),
       makeDiscreteLearnerParam(id = "testtype", default = "Univariate",
         values = c("Bonferroni", "MonteCarlo", "Univariate", "Teststatistic")),
@@ -25,7 +26,8 @@ makeRLearner.surv.cforest = function() {
     par.vals = list(),
     name = "Random Forest based on Conditional Inference Trees",
     short.name = "crf",
-    note = "See `?ctree_control` for possible breakage for nominal features with missingness."
+    note = "See `?ctree_control` for possible breakage for nominal features with missingness.",
+    callees = c("cforest", "cforest_control", "ctree_control")
   )
 }
 

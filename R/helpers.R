@@ -48,11 +48,18 @@ propVectorToMatrix = function(p, levs) {
   y = matrix(0, ncol = 2L, nrow = length(p))
   colnames(y) = levs
   y[, 2L] = p
-  y[, 1L] = 1-p
+  y[, 1L] = 1 - p
   y
 }
 
-getSupportedTaskTypes = function() {
+#' @title List the supported task types in mlr
+#'
+#' @description
+#' Returns a character vector with each of the supported task types in mlr.
+#'
+#' @return [\code{character}].
+#' @export
+listTaskTypes = function() {
   c("classif", "regr", "surv", "costsens", "cluster", "multilabel")
 }
 
@@ -77,4 +84,17 @@ replaceDupeMeasureNames = function(measures, x = "id") {
     new.names = sapply(measures[dupes], function(x) measureAggrPrettyName(x))
   meas.names[dupes] = new.names
   unlist(meas.names)
+}
+
+# suppresses a warning iff the warning message contains the
+# substring `str`.
+suppressWarning = function(expr, str) {
+  withCallingHandlers(expr, warning = function(w) {
+    if (stri_detect_fixed(stri_flatten(w$message), str))
+      invokeRestart("muffleWarning")
+  })
+}
+
+hasEmptyLevels = function(x) {
+  !all(levels(x) %chin% as.character(unique(x)))
 }
