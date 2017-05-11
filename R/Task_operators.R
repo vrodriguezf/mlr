@@ -177,7 +177,8 @@ getTaskFormula = function(x, target = getTaskTargetNames(x), explicit.features =
   if (!is.null(x$formula)) {
     return(x$formula)
   } else {
-    td = getTaskDescription(x)    type = td$type
+    td = getTaskDesc(x)
+    type = td$type
     if (type == "surv") {
       lookup = setNames(c("left", "right", "interval2"), c("lcens", "rcens", "icens"))
       target = sprintf("Surv(%s, %s, type = \"%s\")", target[1L], target[2L], lookup[td$censoring])

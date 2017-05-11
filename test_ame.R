@@ -1,82 +1,87 @@
 library(data.table)
 library(BBmisc)
 library(devtools)
+library(margins)
 # see also https://diffuseprior.wordpress.com/2012/04/23/probitlogit-marginal-effects-in-r-2/
 
 load_all()
-#mtcars$carb = as.factor(mtcars$carb)
+mtcars$cyl = as.factor(mtcars$cyl)
 mt.task = makeRegrTask(data = mtcars, target = "mpg")
 
 ################################################################################
 # use case 1: in a lm without interactions, the ame should equate to the coefficients!
 ################################################################################
 lrn = makeLearner("regr.lm")
-m = train(lrn, mt.task)
-ame = computeAverageMarginalEffects(m, mt.task, gridsize = getTaskSize(mt.task))
-vnapply(ame, function(x) x$effects)
-coefficients(m$learner.model)[-1]
+mt.task.small = subsetTask(mt.task, features = c("cyl", "hp", "carb"))
+m = train(lrn, mt.task.small)
+mod = getLearnerModel(m)
 
 # compare with margins github package https://github.com/leeper/margins
-library("margins")
-mod = lm(mpg ~., data = mtcars)
-colMeans(marginal_effects(mod, change = "dydx"))
-margins(mod)
+ame = summary(margins(mod, data = mtcars))$AME
+#colMeans(marginal_effects(mod, data = mtcars, change = "dydx"))
+ame.mlr = computeAverageMarginalEffects(m, mt.task.small,
+  gridsize = getTaskSize(mt.task.small))
+
+# ame and coef of lm are the same
+sort(ame)
+sort(effects(ame.mlr)[-1])
+sort(coefficients(mod)[-1])
 
 ################################################################################
 # use case 2: in a lm with interactions
 ################################################################################
-library("margins")
 f = mpg ~ cyl + hp + (cyl + hp):carb
-mod = lm(f, data = mtcars)
-coefficients(mod)
-margins(mod, type = "response")
-par(mfrow = c(2,2))
-cplot(mod, x = "cyl")
-cplot(mod, x = "hp")
-cplot(mod, x = "carb")
-
 mt.task$formula = f
-m = train(lrn, subsetTask(mt.task, features = c("cyl", "hp", "carb")))
-pdat = generatePartialDependenceData(m, mt.task, c("cyl", "hp", "carb"), method = "simple")
+m = train(lrn, mt.task)
+mod = getLearnerModel(m)
+
+pdat = generatePartialDependenceData(m, mt.task, gridsize = NULL,
+  uniform = TRUE, features = c("cyl", "hp", "carb"), method = "simple")
 plotPartialDependence(pdat)
-ame = computeAverageMarginalEffects(m, mt.task, gridsize = 100, features = c("cyl", "hp", "carb"))
-vnapply(ame, function(x) x$effects)
-coefficients(m$learner.model)[-1]
 
-par(mfrow = c(2,2))
-cplot(mod, x = c("cyl"))
-lines(pdat$data$cyl, pdat$data$mpg, col = "red")
-cplot(mod, x = c("hp"))
-lines(pdat$data$hp, pdat$data$mpg, col = "red")
-cplot(mod, x = c("carb"))
-lines(pdat$data$carb, pdat$data$mpg, col = "red")
-# FIXME: findout why intercept differs!
+ame = summary(margins(mod, data = mtcars))$AME
+ame.mlr = computeAverageMarginalEffects(m, mt.task, gridsize = NULL,
+  uniform = TRUE, features = c("cyl", "hp", "carb"))
 
+sort(ame)
+sort(effects(ame.mlr)[-1])
+sort(coefficients(mod)[-1])
 
 ################################################################################
 # use case 3: in a lm with quadratic effects
 ################################################################################
-library("margins")
-f = mpg ~ cyl + I(cyl^2) + hp
-mod = lm(f, data = mtcars)
-coefficients(mod)
-margins(mod, type = "response")
-par(mfrow = c(1,2))
-cplot(mod, x = "cyl")
-cplot(mod, x = "hp")
-
+f = mpg ~ cyl + I(hp^2) + hp
 mt.task$formula = f
+
 m = train(lrn, subsetTask(mt.task, features = c("cyl", "hp")))
-pdat = generatePartialDependenceData(m, mt.task, c("cyl", "hp"), method = "simple")
-plotPartialDependence(pdat)
-ame = computeAverageMarginalEffects(m, mt.task, gridsize = 100, features = c("cyl", "hp"))
-vnapply(ame, function(x) x$effects) # not equal to margins(mod, type = "response")
-# FIXME: partialDependencePlot just predicts on unique(#values) and not on all data points
+mod = getLearnerModel(m)
 
-pdat.deriv = generatePartialDependenceData(m, mt.task, c("cyl", "hp"),
+ame = summary(margins(mod, data = mtcars))$AME
+# use uniform grid => ame will not be the same due to the non-linear effect
+ame.mlr.grid = computeAverageMarginalEffects(m, mt.task, gridsize = NULL,
+  uniform = TRUE, features = c("cyl", "hp"))
+# we can fix this by NOT using a uniform grid
+ame.mlr.data = computeAverageMarginalEffects(m, mt.task, gridsize = NULL,
+  uniform = FALSE, features = c("cyl", "hp"))
+# fitting a linear model to curve is not the same as averaging tangets at each point
+ame.lm.weights = computeAME(m, mt.task, gridsize = NULL,
+  uniform = TRUE, features = c("cyl", "hp"), weights = TRUE)
+ame.lm = computeAME(m, mt.task, gridsize = NULL,
+  uniform = TRUE, features = c("cyl", "hp"), weights = FALSE)
+
+#
+sort(ame)
+sort(effects(ame.mlr))
+sort(effects(ame.mlr2))
+sort(effects(ame.lm.weights)) # don't know if this makes sense
+sort(effects(ame.lm)) # don't know if this makes sense
+
+# FIXME: partialDependencePlot just predicts on unique(#values) and not on all training data points
+
+pdat.deriv = generatePartialDependenceData(m, mt.task, c("cyl", "hp"), uniform = FALSE,
   gridsize = getTaskSize(mt.task), derivative = TRUE, method = "simple")
-weighted.mean(pdat.deriv$data[!is.na(pdat.deriv$data$cyl),"mpg"], table(getTaskData(mt.task)$cyl))
-
+mean(pdat.deriv$data[!is.na(pdat.deriv$data$hp),"mpg"])
+weighted.mean(pdat.deriv$data[!is.na(pdat.deriv$data$hp),"mpg"], table(getTaskData(mt.task)$hp))
 
 ## testing stuff
 # method 1:
@@ -118,7 +123,7 @@ derivative = function(model, data, variable, change = "dydx", eps = 1e-8){
   if (change == "dydx") {
     out <- (P1 - P0) / (d1[[variable]] - d0[[variable]])
   } else {
-    out <- (P1 - P0)#/ (d1[[variable]] - d0[[variable]])
+    out <- (P1 - P0)
   }
 }
 numDerivative = function(f, x, eps = .Machine$double.eps) {
@@ -126,7 +131,7 @@ numDerivative = function(f, x, eps = .Machine$double.eps) {
   x1 = x + delta
   (f(x1) - f(x))/(x1 - x)
 }
-a = derivative(mod, mtcars, c("cyl"))
+a = derivative(mod, mtcars, c("hp"))
 mean(a)
 
 # method 2:
@@ -135,8 +140,8 @@ f = function(x, model, data, features) {
   newdata[features] = x
   mean(prediction(model = model, data = newdata, type = "response")[["fitted"]])
 }
-mean(vnapply(mtcars$cyl, function(x) numDeriv::grad(func = f, x, model =  mod, data = mtcars, features = "cyl")))
-mean(vnapply(unique(mtcars$cyl), function(x) numDeriv::grad(func = f, x, model =  mod, data = mtcars, features = "cyl")))
+mean(vnapply(mtcars$hp, function(x) numDeriv::grad(func = f, x, model =  mod, data = mtcars, features = "hp")))
+mean(vnapply(unique(mtcars$hp), function(x) numDeriv::grad(func = f, x, model =  mod, data = mtcars, features = "hp")))
 
 # method 3: here we assume that the cyl values 4,6 and 8 occur with equal frequency in method 1-2 this is not assumed!
 lrn = makeLearner("regr.rsm", modelfun = "SO")

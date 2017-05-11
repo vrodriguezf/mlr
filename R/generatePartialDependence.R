@@ -166,7 +166,7 @@
 generatePartialDependenceData = function(obj, input, features,
   interaction = FALSE, derivative = FALSE, individual = FALSE, center = NULL,
   fun = mean, bounds = c(qnorm(.025), qnorm(.975)),
-  resample = "none", fmin, fmax, gridsize = 10L, ...) {
+  resample = "none", fmin, fmax, gridsize = 10L, uniform = TRUE, ...) {
 
   assertClass(obj, "WrappedModel")
   if (obj$learner$predict.type == "se" & individual)
@@ -228,9 +228,9 @@ generatePartialDependenceData = function(obj, input, features,
   assertList(fmax, len = length(features))
   if (!all(names(fmax) %in% features))
     stop("fmax must be a named list with an NA or value corresponding to each feature.")
-  assertCount(gridsize, positive = TRUE)
+  assertCount(gridsize, positive = TRUE, null.ok = TRUE)
 
-  rng = generateFeatureGrid(features, data, resample, gridsize, fmin, fmax)
+  rng = generateFeatureGrid(features, data, resample, gridsize, fmin, fmax, uniform = uniform)
   if (length(features) > 1L & interaction)
     rng = expand.grid(rng)
 

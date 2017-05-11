@@ -1,40 +1,102 @@
 computeAverageMarginalEffects = function(model, task,
-  features = getTaskFeatureNames(task), gridsize = 10L) {
+  features = getTaskFeatureNames(task), gridsize = NULL,
+  uniform = FALSE, deriv.method = "simple") {
 
   data = getTaskData(task)
   tt = getTaskType(task)
   target = if (tt == "classif") "Probability" else getTaskTargetNames(task)
   res = namedList(features)
-  pdat = generatePartialDependenceData(model, task, features = features, gridsize = gridsize)$data
+  cat.feat = intersect(features, names(getTaskFactorLevels(task)))
+  num.feat = setdiff(features, names(getTaskFactorLevels(task)))
+
+  pdat = generatePartialDependenceData(obj = model, input = task, features = cat.feat,
+    gridsize = gridsize, uniform = uniform)$data
+  # FIXME: possible speedup if we use uniform = FALSE and the derivative function below
+  deriv = generatePartialDependenceData(obj = model, input = task, features = num.feat,
+    gridsize = gridsize, uniform = uniform, derivative = TRUE, method = deriv.method)$data
 
   # calculate AMEs for all features
   for (f in features) {
-    vals = pdat[, f]
-    valsok = !is.na(vals)
-    vals = vals[valsok]
-    nvals = length(vals)
-    y = pdat[, target]
-    y = y[valsok]
-
-    r = namedList(c("type", "values", "preds", "effects", "reflev"))
-    r$preds = y
+    r = namedList(c("type", "values", "effects", "reflev"))
 
     if (is.factor(data[, f])) { # handle factors
-      # FIXME: user wants to select reflev from outside
-      reflev = vals[1L]
+      vals = pdat[, f]
+      valsok = !is.na(vals)
+      vals = vals[valsok]
+      y = pdat[, target]
+      y = y[valsok]
+
       r$type = "factor"
-      r$values = as.character(vals)
+      r$values = levels(vals)
+      #r$preds = y
+      # FIXME: user wants to select reflev from outside
+      reflev = levels(vals)[1L]
       r$reflev = as.character(reflev)
+      y = setNames(y, vals)
       r$effects = y - y[reflev]
+      r$effects = r$effects[!duplicated(r$effects)][levels(vals)]
       r$effects[reflev] = NA_real_
     }
 
     if (is.numeric(data[, f])) { # handle numeric features
+      vals = deriv[, f]
+      valsok = !is.na(vals)
+      vals = vals[valsok]
+      y = deriv[, target]
+      y = y[valsok]
+
       r$type = "numeric"
       r$values = vals
-      # FIXME: the ame effect should be interpretable as what happens if x increases by one,
-      #        i.e. using only mean(diff(y)) can be wrong as this does not take into account the "grid-step-size" of the x-values
-      r$effects = mean(diff(y)/diff(vals))
+      r$effects = mean(y)
+    }
+    res[[f]] = r
+  }
+  res = addClasses(res, "AverageMarginalEffects")
+  return(res)
+}
+
+computeAME = function(model, task,
+  features = getTaskFeatureNames(task), gridsize = NULL,
+  uniform = FALSE, weights = TRUE) {
+
+  data = getTaskData(task)
+  tt = getTaskType(task)
+  target = if (tt == "classif") "Probability" else getTaskTargetNames(task)
+  res = namedList(features)
+
+  pdat = generatePartialDependenceData(obj = model, input = task, features = features,
+    gridsize = gridsize, uniform = uniform)$data
+
+  # calculate AMEs for all features
+  for (f in features) {
+    r = namedList(c("type", "values", "effects", "reflev"))
+    vals = pdat[, f]
+    valsok = !is.na(vals)
+    vals = vals[valsok]
+    y = pdat[, target]
+    y = y[valsok]
+
+    if (is.factor(data[, f])) { # handle factors
+      r$type = "factor"
+      r$values = as.character(vals)
+      #r$preds = y
+      # FIXME: user wants to select reflev from outside
+      reflev = levels(vals)[1L]
+      r$reflev = as.character(reflev)
+      y = setNames(y, vals)
+      r$effects = y - y[reflev]
+      r$effects = r$effects[!duplicated(r$effects)][levels(vals)]
+      r$effects[reflev] = NA_real_
+    }
+
+    if (is.numeric(data[, f])) { # handle numeric features
+      # FIXME: this is not the same as averaging tangents...
+      if (weights) w = sum(vals)/vals else w = rep(1, length(vals))
+      slope = lm.wfit(x = as.matrix(cbind(mean(y), vals)), y = y, w = w)$coefficients[2]
+
+      r$type = "numeric"
+      r$values = vals
+      r$effects = unname(slope)
     }
     res[[f]] = r
   }
@@ -111,4 +173,29 @@ print.AverageMarginalEffectsResampled = function(x, ...) {
   print(d)
   # print(eff.mats)
   # e = rbind(x$)
+}
+
+effects.AverageMarginalEffects = function(x) {
+  unlist(lapply(x, function(l) l$effects))
+}
+
+derivative = function(model, task, feature, eps = 1e-8){
+  setstep = function(x) {
+    x + (max(abs(x), 1, na.rm = TRUE) * sqrt(eps)) - x
+    #sqrt(eps)*x
+  }
+  data = getTaskData(task)
+  feature.vals = data[[feature]]
+  tt = getTaskType(task)
+  getPred = if (tt == "regr") getPredictionResponse else getPredictionProbabilities
+  # calculate numerical derivative
+  feat0 = feature.vals - setstep(feature.vals)
+  feat1 = feature.vals + setstep(feature.vals)
+  # FIXME: should also work with multiclass
+  pred0 = getPred(predict(model,
+    newdata = replace(data, list = which(colnames(data) == feature), values = feat0)))
+  pred1 = getPred(predict(model,
+    newdata = replace(data, list = which(colnames(data) == feature), values = feat1)))
+  out = (pred1 - pred0) / (feat1 - feat0)
+  return(out)
 }
