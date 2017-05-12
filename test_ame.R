@@ -7,11 +7,11 @@ library(margins)
 load_all()
 mtcars$cyl = as.factor(mtcars$cyl)
 mt.task = makeRegrTask(data = mtcars, target = "mpg")
+lrn = makeLearner("regr.lm")
 
 ################################################################################
 # use case 1: in a lm without interactions, the ame should equate to the coefficients!
 ################################################################################
-lrn = makeLearner("regr.lm")
 mt.task.small = subsetTask(mt.task, features = c("cyl", "hp", "carb"))
 m = train(lrn, mt.task.small)
 mod = getLearnerModel(m)
@@ -56,6 +56,17 @@ mt.task$formula = f
 m = train(lrn, subsetTask(mt.task, features = c("cyl", "hp")))
 mod = getLearnerModel(m)
 
+pdat = generatePartialDependenceData(m, mt.task, gridsize = NULL,
+  uniform = FALSE, features = c("hp"), method = "simple")
+
+deriv = generatePartialDependenceData(m, mt.task, gridsize = NULL,
+  uniform = FALSE, features = c("hp"), derivative = TRUE,
+  method = "simple")
+
+plot(pdat$data$hp, pdat$data$mpg, type = "p")
+abline(v = treesplit(x = deriv$data$hp,
+  y = deriv$data$mpg, max.splits = 2))
+
 ame = summary(margins(mod, data = mtcars))$AME
 # use uniform grid => ame will not be the same due to the non-linear effect
 ame.mlr.grid = computeAverageMarginalEffects(m, mt.task, gridsize = NULL,
@@ -75,6 +86,29 @@ sort(effects(ame.mlr))
 sort(effects(ame.mlr2))
 sort(effects(ame.lm.weights)) # don't know if this makes sense
 sort(effects(ame.lm)) # don't know if this makes sense
+
+################################################################################
+# use case 4: logreg
+################################################################################
+lrn = makeLearner("classif.logreg", predict.type = "prob")
+task = pid.task
+f = diabetes ~ pregnant + glucose
+task$formula = f
+
+m = train(lrn, task)
+mod = getLearnerModel(m)
+mod = glm(f, data = getTaskData(task), family = binomial(), x = TRUE)
+erer::maBina(w = glm(f, data = getTaskData(task), family = binomial(), x = TRUE),
+  x.mean = TRUE, rev.dum = TRUE)
+mfx::logitmfx(diabetes ~ ., data = getTaskData(task))
+
+ame = summary(margins(mod, data = getTaskData(task)))$AME
+# we can fix this by NOT using a uniform grid
+ame.mlr.data = computeAverageMarginalEffects(m, task, gridsize = NULL,
+  uniform = FALSE, features = c("pregnant", "glucose"))
+
+ame[c("pregnant", "glucose")]
+effects(ame.mlr.data)
 
 # FIXME: partialDependencePlot just predicts on unique(#values) and not on all training data points
 

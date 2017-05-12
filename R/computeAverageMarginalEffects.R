@@ -9,11 +9,14 @@ computeAverageMarginalEffects = function(model, task,
   cat.feat = intersect(features, names(getTaskFactorLevels(task)))
   num.feat = setdiff(features, names(getTaskFactorLevels(task)))
 
-  pdat = generatePartialDependenceData(obj = model, input = task, features = cat.feat,
-    gridsize = gridsize, uniform = uniform)$data
+  if (length(cat.feat) != 0)
+    pdat = generatePartialDependenceData(obj = model, input = task, features = cat.feat,
+      gridsize = gridsize, uniform = uniform)$data
   # FIXME: possible speedup if we use uniform = FALSE and the derivative function below
-  deriv = generatePartialDependenceData(obj = model, input = task, features = num.feat,
-    gridsize = gridsize, uniform = uniform, derivative = TRUE, method = deriv.method)$data
+
+  if (length(num.feat) != 0)
+    deriv = generatePartialDependenceData(obj = model, input = task, features = num.feat,
+      gridsize = gridsize, uniform = uniform, derivative = TRUE, method = deriv.method)$data
 
   # calculate AMEs for all features
   for (f in features) {
@@ -55,7 +58,16 @@ computeAverageMarginalEffects = function(model, task,
   return(res)
 }
 
-computeAME = function(model, task,
+splitPD = function(x, y, max.splits) {
+  # FIXME: How to solve http://stackoverflow.com/questions/27862280/tree-sizes-given-by-cp-table-in-rpart
+  mod = rpart::rpart(y ~ x, cp = 0, maxcompete = 0,
+    minsplit = 1, minbucket = 1, xval = 0, maxsurrogate = 0)
+  cp.ind = max(which(mod$cptable[,"nsplit"] <= max.splits))
+  mod = rpart::prune(mod, cp = mod$cptable[cp.ind, "CP"])
+  unname(mod$splits[,"index"])
+}
+
+computeAMEwithLM = function(model, task,
   features = getTaskFeatureNames(task), gridsize = NULL,
   uniform = FALSE, weights = TRUE) {
 
