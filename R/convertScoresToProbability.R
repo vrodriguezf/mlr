@@ -1,6 +1,22 @@
-library(trustOptim)
-library(e1071)
-
+#' @title Convert anomaly scores to probability estimates.
+#'
+#' @description Convert anomaly scores to probability estimates. The higher the probability estimate the more likely the observation belongs to the normal class.
+#'
+#' @param anomaly.score a numeric vector of anomaly scores.
+#' @param parainit a vector of starting values for the optimizer
+#' @param method  valid argument are \code{sigmoid} or \code{mixture-model}
+#' @return [\code{vector}] with probabilities as entries.
+#' @export
+#' @references Gao, Jing, and Pang-Ning Tan. "Converting output scores from outlier detection algorithms into probability estimates." Data Mining, 2006. ICDM'06. Sixth International Conference on. IEEE, 2006.
+#' @examples
+#'
+#' # Data = data[, 1:4] # find better dataset later
+#' svm.model <- svm(Data, y = NULL, type = 'one-classification', kernel = "radial", nu = 0.05)
+#  svm.pred <- predict(svm.model, Data)
+#' dv = svm.model$decision.values
+#' prop = convertingScoresToProbability(dv, parainit = c(0, 1), method = "sigmoid")
+#' plot(1:length(prop$probability), prop$probability, ylim = c(0, 1))
+#'
 convertingScoresToProbability = function(anomaly.score, parainit, method = "mixture-model"){
   match(method, c("sigmoid", "mixture-model", "mixture-model2"))
   f = anomaly.score
@@ -128,48 +144,3 @@ convertingScoresToProbability = function(anomaly.score, parainit, method = "mixt
   return(list)
 }
 
-
-#### sanity check - sigmoid
-data = readRDS("/Users/Minh/Documents/TestData/data_anomaly.rds")
-svm.model <- svm(data[,1:4], y = NULL, type='one-classification', kernel="radial", nu =0.05)
-svm.pred <- predict(svm.model, data[,1:4])
-table(data[,5]) # TRUE  = normal (hat keine Einfluss auf das Model)
-table(svm.pred) # SVM setzt automatisch TRUE = normal
-
-# decision values
-dv = svm.model$decision.values
-plot(1:1050, dv)
-o1 = order(dv) #Index der sortierten decision values von klein nach groß
-head(dv[o1])
-#Die ersten 50 beobachtungen sind Anomalien, prüfe ob die niedrigsten 50 decision values zu den anomalen Beobachtungen gehören
-setdiff(1:50, o1[1:50]) # bis auf drei anomalien, gehören die restlichen anomalien zu den niedrigsten decision values.
-#-> es scheint kleine values sprechen für Anomalien
-
-
-# check: converting to probability
-p = c(1,0) # initial parameter (vorschlag aus paper, finde paper wieder)
-# NOTE Sigmoid: nach paper http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.448.3178&rep=rep1&type=pdf
-# gilt t= 1 = Anomaly unt t=0=Normal (formel (9))
-# Nach dem implementierne habe ich gemerkt, dass kleine Wahrscheinlichkeiten für eine Anomaly sprechen
-# im Sinne von "Die Wskeit für "normal" ist klein, daher ist die Beobachtung eher nicht normal (=anomaly)"
-# Deckt sich mit den decision values vom SVM; kleine decision boundary -> eher anomaly
-# Wenn man eine umgekehrte Interpretation (kleine prob -> keine anomaly,große prop -> anomaly)
-# will dann muss man t = 0 = anomaly und t = 1 = normal in Formel (9) setzen (das habe ich hier gemacht))
-prop = convertingScoresToProbability(dv, parainit = p, method = "sigmoid")
-plot(1:1050, prop$probability, ylim = c(0,1)) # ersten 50 Beobachtungen sind anomalien -> kleine prop -> wskeit für normal ist gering ->
-o = rev(order(prop$probability)) #große prob zuerst
-head(prop$probability[o], 50)
-setdiff(1:50, o[1:50]) #in data sind die ersten 50 Beobachtungen anomalien, daher sollten die auch die höchsten Probabilities haben
-
-
-#### sanity check - mixture-model
-p = c(0.5,0.5,0.5,0.5)
-p = c(1,0.5,1,0.5)
-prop = convertingScoresToProbability(dv, p, method = "mixture-model2")
-plot(1:1050, prop$probability, ylim = c(0,1))
-length(which(prop$probability == 0))
-o = order(prop$probability)
-head(prop$probability)
-head(prop$probability[o])
-#https://www.researchgate.net/profile/John_Platt/publication/2594015_Probabilistic_Outputs_for_Support_Vector_Machines_and_Comparisons_to_Regularized_Likelihood_Methods/links/004635154cff5262d6000000.pdf
-setdiff(1:50, o[1:50])
