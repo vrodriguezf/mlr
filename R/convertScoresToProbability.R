@@ -17,7 +17,7 @@
 #' prop = convertingScoresToProbability(dv, parainit = c(0, 1), method = "sigmoid")
 #' plot(1:length(prop$probability), prop$probability, ylim = c(0, 1))
 #'
-convertingScoresToProbability = function(anomaly.score, parainit, method = "mixture-model"){
+convertingScoresToProbability = function(anomaly.score, parainit, method = "sigmoid"){
   match(method, c("sigmoid", "mixture-model", "mixture-model2"))
   f = anomaly.score
   p = parainit
