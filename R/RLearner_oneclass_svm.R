@@ -18,7 +18,7 @@ makeRLearner.oneclass.svm = function() {
       makeLogicalVectorLearnerParam(id = "scale", default = TRUE, tunable = TRUE)
     ),
     par.vals = list(type = "one-classification"),
-    properties =  c("oneclass", "numerics", "factors", "weights"),
+    properties =  c("oneclass", "numerics", "factors", "weights", "prob"),
     name = "one-class Support Vector Machines (libsvm)",
     short.name = "one-class svm",
     callees = "svm"
@@ -35,11 +35,14 @@ trainLearner.oneclass.svm = function(.learner, .task, .subset, .weights = NULL, 
 #' @export
 predictLearner.oneclass.svm = function(.learner, .model, .newdata, ...) {
   # svm currently can't predict probabilities only response
-   p = predict(.model$learner.model, newdata = .newdata, ...)
-   if (.learner$predict.type == "response") {
-     p = as.factor(p)
-     levels(p) = c(levels(p), setdiff(c(TRUE,FALSE), levels(p)))
-   }
+  if (.learner$predict.type == "response") {
+    p = predict(.model$learner.model, newdata = .newdata, ...)
+    p = as.factor(p)
+  } else {
+    p = predict(.model$learner.model, newdata = .newdata, decision.values = TRUE, ...)
+    p = convertingScoresToProbability(attr(p, "decision.values"), parainit = .parainit, method = "sigmoid")$probability
+    colnames(p) = .model$task.desc$positive
+  }
   return(p)
 }
 
