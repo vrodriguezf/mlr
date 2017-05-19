@@ -53,8 +53,10 @@ setThreshold = function(pred, threshold) {
     stop("Threshold names must correspond to classes!")
   }
   p = getPredictionProbabilities(pred, cl = levs)
-  # resort so we have same order in threshold and p
-  threshold = threshold[levs]
+   if (pred$task.desc$type != "oneclass" ) {
+    # resort so we have same order in threshold and p
+    threshold = threshold[levs]
+   }
   if (ttype == "classif") {
     # divide all rows by threshold then get max el
     p = sweep(as.matrix(p), MARGIN = 2, FUN = "/", threshold)
