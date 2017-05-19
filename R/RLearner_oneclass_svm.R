@@ -26,14 +26,14 @@ makeRLearner.oneclass.svm = function() {
 }
 
 #' @export
-trainLearner.oneclass.svm = function(.learner, .task, .subset, .weights = NULL,  ...) {
+trainLearner.oneclass.svm = function(.learner, .task, .subset, .weights = NULL, ...) {
   x = getTaskFeatureNames(.task)
   d = getTaskData(.task, .subset)[, x]
     e1071::svm(d, y = NULL, ...)
 }
 
 #' @export
-predictLearner.oneclass.svm = function(.learner, .model, .newdata, ...) {
+predictLearner.oneclass.svm = function(.learner, .model, .newdata, .parainit = NULL, ...) {
   # svm currently can't predict probabilities only response
   if (.learner$predict.type == "response") {
     p = predict(.model$learner.model, newdata = .newdata, ...)
