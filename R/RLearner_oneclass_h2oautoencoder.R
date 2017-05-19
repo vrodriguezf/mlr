@@ -256,7 +256,7 @@ predictLearner.oneclass.h2o.autoencoder = function(.learner, .model, .newdata, p
   p.df = as.matrix(p)
   colnames(p.df) = .model$task.desc$positive
   if(.learner$predict.type == "response"){
-    # set default threshold to the 80% quantile of the mse reconstruction error
+    # set default threshold to the 95% quantile of the mse reconstruction error
     if (is.null(predict.threshold)) {
       indices.threshold = order(p.df)[round(length(p.df)*0.95)]  #mse reconstruction error in [0,inf[
       predict.threshold = p.df[indices.threshold]

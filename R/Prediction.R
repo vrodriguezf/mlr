@@ -194,10 +194,9 @@ makePrediction.OneClassTaskDesc = function(task.desc, row.names, id, truth, pred
     data$prob = y
     data = as.data.frame(filterNull(data))
     # fix columnnames for prob if strange chars are in factor levels
-    indices = stri_detect_fixed(names(data), "prob.")
+    # indices = stri_detect_fixed(names(data), "prob.")
 
     # HACK need to create colnames with prob.<positive class> for one class
-    # otherwise getPredictionProbabilities() will throw an error
     # otherwise getPredictionProbabilities() will throw an error:
     # "Trying to get probabilities for nonexistant classes: %s", collapse(cl) (line 56)
     indices = stri_detect_fixed(names(data), colnames(y))
