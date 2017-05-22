@@ -181,11 +181,9 @@ makePrediction.ClusterTaskDesc = function(task.desc, row.names, id, truth, predi
 makePrediction.OneClassTaskDesc = function(task.desc, row.names, id, truth, predict.type, predict.threshold = NULL, y, time, error = NA_character_, dump = NULL, ...) {
   data = namedList(c("id", "truth", "response", "prob"))
   data$id = id
-  if (!missing(truth)) {
+  if (!is.null(truth)) {
+    levels(truth) = union(levels(truth), task.desc$class.levels)
     data$truth = truth
-    if (length(levels(data$truth)) == 1){
-      levels(data$truth) = union(levels(data$truth), task.desc$class.levels)
-    }
   }
   if (predict.type == "response") {
     data$response = y
@@ -196,8 +194,8 @@ makePrediction.OneClassTaskDesc = function(task.desc, row.names, id, truth, pred
     # fix columnnames for prob if strange chars are in factor levels
     # indices = stri_detect_fixed(names(data), "prob.")
 
-    # HACK need to create colnames with prob.<positive class> for one class
-    # otherwise getPredictionProbabilities() will throw an error:
+    # HACK need to create colnames with prob.TRUE for the normal class
+    # otherwise getPredictionProbabilities() will throw an error
     # "Trying to get probabilities for nonexistant classes: %s", collapse(cl) (line 56)
     indices = stri_detect_fixed(names(data), colnames(y))
     if (sum(indices) > 0) #?

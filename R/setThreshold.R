@@ -49,7 +49,7 @@ setThreshold = function(pred, threshold) {
     }
   }
 
-  if ((pred$task.desc$type != "oneclass") && length(threshold > 1L) && !setequal(levs, names(threshold))) {
+  if ((pred$task.desc$type != "oneclass") && length(threshold) > 1L && !setequal(levs, names(threshold))) {
     stop("Threshold names must correspond to classes!")
   }
   p = getPredictionProbabilities(pred, cl = levs)

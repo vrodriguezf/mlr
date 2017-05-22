@@ -38,6 +38,7 @@ predictLearner.oneclass.svm = function(.learner, .model, .newdata, .parainit = N
   if (.learner$predict.type == "response") {
     p = predict(.model$learner.model, newdata = .newdata, ...)
     p = as.factor(p)
+    levels(p) = union(levels(p), .model$task.desc$class.levels)
   } else {
     p = predict(.model$learner.model, newdata = .newdata, decision.values = TRUE, ...)
     p = convertingScoresToProbability(attr(p, "decision.values"), parainit = .parainit, method = "sigmoid")$probability
