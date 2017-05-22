@@ -71,7 +71,7 @@ setThreshold = function(pred, threshold) {
     pred$data[, i] = p > 0
   } else if (ttype == "oneclass") {
     p[is.nan(p)] = Inf
-    pred$data$response = p < threshold
+    pred$data$response = p > threshold
   }
   pred$threshold = threshold
   return(pred)
