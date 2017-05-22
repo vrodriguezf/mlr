@@ -213,11 +213,9 @@ makePrediction.OneClassTaskDesc = function(task.desc, row.names, id, truth, pred
     error = error
   )
   if (predict.type == "prob") {
-    # set default threshold to the 95% quantile of the mse reconstruction error
+    # set default threshold to the 5% quantile
     if (is.null(predict.threshold)) {
-        indices.threshold = order(y)[round(length(y)*0.95)]  #mse reconstruction error in [0,inf[
-
-      predict.threshold = y[indices.threshold]
+      predict.threshold = quantile(y, probs = 0.05)
       names(predict.threshold) = task.desc$positive
     }
     p = setThreshold(p, predict.threshold)
