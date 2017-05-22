@@ -35,7 +35,7 @@ convertingScoresToProbability = function(anomaly.score, parainit, method = "sigm
     }
 
     while (loop) {
-      t = ifelse(p[1] * f + p[2] > 0, 0, 1)
+      t = ifelse(p[1] * f + p[2] > 0, 1, 0)
       # LL and its derivatives
       LL = function(p) { t((1-t)) %*% (p[1] * f + p[2]) + sum.help %*% log(1 + exp(-p[1] * f - p[2])) }
       gA = function(p) { t(f) %*% ( (1-t) - (1 / exp(p[1] * f + p[2]))) }
