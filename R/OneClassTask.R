@@ -24,9 +24,6 @@ makeOneClassTask = function(id = deparse(substitute(data)), data, target,
     x = data[[target]]
     if (is.character(x) || is.logical(x) || is.integer(x)) {
       data[[target]] = as.factor(x)
-    } else if (is.factor(x) && fixup.data == "warn" && hasEmptyLevels(x)) {
-      warningf("Target column '%s' contains empty factor levels", target)
-      data[[target]] = droplevels(x)
     }
   }
 
@@ -34,7 +31,7 @@ makeOneClassTask = function(id = deparse(substitute(data)), data, target,
     fixup.data = fixup.data, check.data = check.data)
 
   if (check.data) {
-    assertFactor(data[[target]], any.missing = FALSE, empty.levels.ok = FALSE, .var.name = target)
+    assertFactor(data[[target]], any.missing = FALSE, empty.levels.ok = TRUE, .var.name = target)
     if (length(levels(data[[target]])) > 2)
       stopf("Target column '%s' contains more than two factor levels")
   }

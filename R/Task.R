@@ -100,7 +100,8 @@ makeTask = function(type, data, weights = NULL, blocking = NULL, fixup.data = "w
     } else if (fixup.data == "warn") {
       # the next lines look a bit complicated, we calculate the warning info message
       dropped = logical(ncol(data))
-      for (i in seq_col(data)) {
+      seq = ifelse(type == "oneclass", seq_col(data)[-length(seq_col(data))], seq_col(data))
+      for (i in seq) {
         x = data[[i]]
         if (is.factor(x) && hasEmptyLevels(x)) {
           dropped[i] = TRUE
