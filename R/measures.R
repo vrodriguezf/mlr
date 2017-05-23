@@ -865,8 +865,14 @@ bac = makeMeasure(id = "bac", minimize = FALSE, best = 1, worst = 0,
     denom.positive = sum(pred$data$truth == pred$task.desc$positive)
     denom.negative = sum(pred$data$truth == pred$task.desc$negative)
 
-    summand.positive = ifelse(denom.positive == 0, 0, tp$fun(pred = pred) / denom.positive)
-    summand.negative = ifelse(denom.negative == 0, 0, tn$fun(pred = pred) / denom.negative)
+    if (denom.positive == 0) {
+      messagef("There are no TRUE values in the truth column. True positve rate is set to 1.")
+    } else if (denom.negative == 0) {
+      messagef("There are no FALSE values in the truth column. True negative rate is set to 1.")
+    }
+
+    summand.positive = ifelse(denom.positive == 0, 1, tp$fun(pred = pred) / denom.positive)
+    summand.negative = ifelse(denom.negative == 0, 1, tn$fun(pred = pred) / denom.negative)
 
     mean(c(summand.positive, summand.negative))
   }
@@ -880,8 +886,14 @@ measureBAC = function(truth, response, negative, positive) {
   denom.positive = sum(truth == positive)
   denom.negative = sum(truth == negative)
 
-  summand.positive = ifelse(denom.positive == 0, 0, measureTP(truth, response, positive) / denom.positive)
-  summand.negative = ifelse(denom.negative == 0, 0, measureTN(truth, response, negative) / denom.negative)
+  if (denom.positive == 0) {
+    messagef("There are no TRUE values in the truth column. True positve rate is set to 1.")
+  } else if (denom.negative == 0) {
+    messagef("There are no FALSE values in the truth column. True negative rate is set to 1.")
+  }
+
+  summand.positive = ifelse(denom.positive == 0, 1, measureTP(truth, response, positive) / denom.positive)
+  summand.negative = ifelse(denom.negative == 0, 1, measureTN(truth, response, negative) / denom.negative)
 
   mean(c(summand.positive, summand.negative))
 
@@ -908,10 +920,16 @@ wac = makeMeasure(id = "wac", minimize = FALSE, best = 1, worst = 0,
       denom.positive = sum(pred$data$truth == pred$task.desc$positive)
       denom.negative = sum(pred$data$truth == pred$task.desc$negative)
 
-      summand.positive = ifelse(denom.positive == 0, 0,  weight.positive * tp$fun(pred = pred) / denom.positive)
-      summand.negative = ifelse(denom.negative == 0, 0,  weight.negative * tn$fun(pred = pred) / denom.negative)
+      if (denom.positive == 0) {
+        messagef("There are no TRUE values in the truth column. True positve rate is set to 1.")
+      } else if (denom.negative == 0) {
+        messagef("There are no FALSE values in the truth column. True negative rate is set to 1.")
+      }
 
-      sum(c(summand.positive, summand.negative))
+      summand.positive = ifelse(denom.positive == 0, 1, tp$fun(pred = pred) / denom.positive)
+      summand.negative = ifelse(denom.negative == 0, 1, tn$fun(pred = pred) / denom.negative)
+
+      sum(c(weight.positive * summand.positive, weight.negative * summand.negative))
   }
 )
 
@@ -926,10 +944,16 @@ measureWAC = function(truth, response, negative, positive, weight.positive = 0.5
     denom.positive = sum(truth == positive)
     denom.negative = sum(truth == negative)
 
-    summand.positive = ifelse(denom.positive == 0, 0,  weight.positive * measureTP(truth, response, positive) / denom.positive)
-    summand.negative = ifelse(denom.negative == 0, 0,  weight.negative * measureTN(truth, response, negative) / denom.negative)
+    if (denom.positive == 0) {
+      messagef("There are no TRUE values in the truth column. True positve rate is set to 1.")
+    } else if (denom.negative == 0) {
+      messagef("There are no FALSE values in the truth column. True negative rate is set to 1.")
+    }
 
-    sum(c(summand.positive, summand.negative))
+    summand.positive = ifelse(denom.positive == 0, 1, measureTP(truth, response, positive) / denom.positive)
+    summand.negative = ifelse(denom.negative == 0, 1, measureTN(truth, response, negative) / denom.negative)
+
+    sum(c(weight.positive * summand.positive,  weight.negative * summand.negative))
 }
 
 #' @export tp
