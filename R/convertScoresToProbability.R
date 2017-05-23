@@ -4,6 +4,7 @@
 #'
 #' @param anomaly.score a numeric vector of anomaly scores.
 #' @param parainit a vector of starting values for the optimizer
+#' @param max.iter Maximum number of iterations. Defaults to 100
 #' @param method  valid argument are \code{sigmoid} or \code{mixture-model}
 #' @return [\code{vector}] with probabilities as entries.
 #' @export
@@ -17,7 +18,7 @@
 #' prop = convertingScoresToProbability(dv, parainit = c(0, 1), method = "sigmoid")
 #' plot(1:length(prop$probability), prop$probability, ylim = c(0, 1))
 #'
-convertingScoresToProbability = function(anomaly.score, parainit, method = "sigmoid"){
+convertingScoresToProbability = function(anomaly.score, parainit, max.iter = 100, method = "sigmoid"){
   match(method, c("sigmoid", "mixture-model", "mixture-model2"))
   f = anomaly.score
   p = parainit
@@ -50,7 +51,7 @@ convertingScoresToProbability = function(anomaly.score, parainit, method = "sigm
         as(matrix(c(hAA(p), hAB(p),hAB(p), hBB(p)), 2, 2), "dgCMatrix")
       }
 
-      optim = trust.optim(p, fn = LL, gr = g,  method = "BFGS", control = list(report.level = 0))
+      optim = trust.optim(p, fn = LL, gr = g,  method = "BFGS", control = list(report.level = 0, maxit = max.iter))
       pnew = optim$solution
       diff = sum(abs(pnew - p))
 
