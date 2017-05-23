@@ -28,14 +28,14 @@ generateThreshVsPerfData = function(obj, measures, gridsize = 100L, aggregate = 
 #' @export
 generateThreshVsPerfData.Prediction = function(obj, measures, gridsize = 100L, aggregate = TRUE,
                                                task.id = NULL) {
-  checkPrediction(obj, task.type = "classif", binary = TRUE, predict.type = "prob")
+  checkPrediction(obj, task.type = c("oneclass", "classif"), binary = TRUE, predict.type = "prob")
   generateThreshVsPerfData.list(namedList("prediction", obj), measures, gridsize, aggregate, task.id)
 }
 #' @export
 generateThreshVsPerfData.ResampleResult = function(obj, measures, gridsize = 100L, aggregate = TRUE,
                                                    task.id = NULL) {
   obj = getRRPredictions(obj)
-  checkPrediction(obj, task.type = "classif", binary = TRUE, predict.type = "prob")
+  checkPrediction(obj, task.type = c("oneclass", "classif"), binary = TRUE, predict.type = "prob")
   generateThreshVsPerfData.Prediction(obj, measures, gridsize, aggregate)
 }
 #' @export
@@ -49,7 +49,7 @@ generateThreshVsPerfData.BenchmarkResult = function(obj, measures, gridsize = 10
   obj = getBMRPredictions(obj, task.ids = task.id, as.df = FALSE)[[1L]]
 
   for (x in obj)
-    checkPrediction(x, task.type = "classif", binary = TRUE, predict.type = "prob")
+    checkPrediction(x, task.type = c("oneclass", "classif"), binary = TRUE, predict.type = "prob")
   generateThreshVsPerfData.list(obj, measures, gridsize, aggregate, task.id)
 }
 #' @export
