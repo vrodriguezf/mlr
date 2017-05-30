@@ -958,7 +958,7 @@ measureFN = function(truth, response, negative) {
 tpr = makeMeasure(id = "tpr", minimize = FALSE, best = 1, worst = 0,
   properties = c("oneclass", "classif", "req.pred", "req.truth"),
   name = "True positive rate",
-  note = "Percentage of correctly classified observations in the positive class. Also called hit rate, recall or sensitivity.",
+  note = "Percentage of correctly classified observations in the positive class. Also called hit rate or recall.",
   fun = function(task, model, pred, feats, extra.args) {
     measureTPR(pred$data$truth, pred$data$response, pred$task.desc$positive)
   }
@@ -1108,7 +1108,7 @@ measureFDR = function(truth, response, positive) {
 mcc = makeMeasure(id = "mcc", minimize = FALSE,
   properties = c("oneclass", "classif", "req.pred", "req.truth"), best = 1, worst = -1,
   name = "Matthews correlation coefficient",
-  note = "Defined as  (tp * tn - fp * fn) / sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn)), denominator set to 1 if 0",
+  note = "Defined as sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn)), denominator set to 1 if 0",
   fun = function(task, model, pred, feats, extra.args) {
     measureMCC(pred$data$truth, pred$data$response, pred$task.desc$negative, pred$task.desc$positive)
   }
@@ -1390,7 +1390,7 @@ mcp = makeMeasure(id = "mcp", minimize = TRUE, best = 0, worst = Inf,
 #' @rdname measures
 #' @format none
 db = makeMeasure(id = "db", minimize = TRUE, best = 0, worst = Inf,
-  properties = c("oneclass", "cluster", "req.pred", "req.feats"),
+  properties = c("cluster", "req.pred", "req.feats"),
   name = "Davies-Bouldin cluster separation measure",
   note = "Ratio of the within cluster scatter, to the between cluster separation, averaged over the clusters. See `?clusterSim::index.DB`.",
   fun = function(task, model, pred, feats, extra.args) {
@@ -1408,7 +1408,7 @@ db = makeMeasure(id = "db", minimize = TRUE, best = 0, worst = Inf,
 #' @rdname measures
 #' @format none
 dunn = makeMeasure(id = "dunn", minimize = FALSE, best = Inf, worst = 0,
-  properties = c("oneclass", "cluster", "req.pred", "req.feats"),
+  properties = c("cluster", "req.pred", "req.feats"),
   name = "Dunn index",
   note = "Defined as the ratio of the smallest distance between observations not in the same cluster to the largest intra-cluster distance. See `?clValid::dunn`.",
   fun = function(task, model, pred, feats, extra.args) {
@@ -1423,7 +1423,7 @@ dunn = makeMeasure(id = "dunn", minimize = FALSE, best = Inf, worst = 0,
 #' @rdname measures
 #' @format none
 G1 = makeMeasure(id = "G1", minimize = FALSE, best = Inf, worst = 0,  # nolint
-  properties = c("oneclass", "cluster", "req.pred", "req.feats"),
+  properties = c("cluster", "req.pred", "req.feats"),
   name = "Calinski-Harabasz pseudo F statistic",
   note = "Defined as ratio of between-cluster variance to within cluster variance. See `?clusterSim::index.G1`.",
   fun = function(task, model, pred, feats, extra.args) {
@@ -1436,8 +1436,8 @@ G1 = makeMeasure(id = "G1", minimize = FALSE, best = Inf, worst = 0,  # nolint
 #' @export G2
 #' @rdname measures
 #' @format none
-G2 = makeMeasure(id = "G2", minimize = FALSE, best = Inf, worst = 0, # nolint
-  properties = c("oneclass", "cluster", "req.pred", "req.feats"),
+G2 = makeMeasure(id = "G2", minimize = FALSE, best = Inf, worst = 0,  # nolint
+  properties = c("cluster", "req.pred", "req.feats"),
   name = "Baker and Hubert adaptation of Goodman-Kruskal's gamma statistic",
   note = "Defined as: (number of concordant comparisons - number of discordant comparisons) / (number of concordant comparisons + number of discordant comparisons). See `?clusterSim::index.G2`.",
   fun = function(task, model, pred, feats, extra.args) {
@@ -1451,7 +1451,7 @@ G2 = makeMeasure(id = "G2", minimize = FALSE, best = Inf, worst = 0, # nolint
 #' @rdname measures
 #' @format none
 silhouette = makeMeasure(id = "silhouette", minimize = FALSE, best = Inf, worst = 0,
-  properties = c("oneclass", "cluster", "req.pred", "req.feats"),
+  properties = c("cluster", "req.pred", "req.feats"),
   name = "Rousseeuw's silhouette internal cluster quality index",
   note = "Silhouette value of an observation is a measure of how similar an object is to its own cluster compared to other clusters. The measure is calculated as the average of all silhouette values. See `?clusterSim::index.S`.",
   fun = function(task, model, pred, feats, extra.args) {

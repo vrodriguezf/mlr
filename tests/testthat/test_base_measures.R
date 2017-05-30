@@ -189,10 +189,10 @@ test_that("check measure calculations", {
   pred.cluster = predict(mod.cluster, task.cluster)
   pred.cluster$data$response = pred.art.cluster
   #for oneclass
-  tar.oneclass = c(FALSE, FALSE, FALSE, FALSE)
-  pred.art.oneclass =  c(FALSE, FALSE, FALSE, TRUE)
+  tar.oneclass = c(TRUE, TRUE, TRUE, TRUE)
+  pred.art.oneclass =  c(FALSE, TRUE, TRUE, TRUE)
   data.oneclass = data.frame(var1, var2, tar.oneclass)
-  task.oneclass = makeOneClassTask(data = data.oneclass, target = "tar.oneclass")
+  task.oneclass = makeOneClassTask(data = data.oneclass, target = "tar.oneclass", positive = "TRUE", negative = "FALSE")
   lrn.oneclass = makeLearner("oneclass.svm")
   mod.oneclass = train(lrn.oneclass, task.oneclass)
   pred.oneclass = predict(mod.oneclass, task.oneclass)
@@ -348,7 +348,7 @@ test_that("check measure calculations", {
   #test multiclass measures
 
   #mmce
-  mmce.test = mean(c(1L != 1L, 2L != 1L, 0L != 0L, 1L != 2L))
+  mmce.test = mean(c(1L != 1L, 2L != 0L, 0L != 0L, 1L != 2L))
   mmce.perf = performance(pred.classif, measures = mmce, model = mod.classif)
   expect_equal(mmce.test, mmce$fun(pred = pred.classif))
   expect_equal(mmce.test, as.numeric(mmce.perf))
@@ -830,131 +830,64 @@ test_that("check measure calculations", {
 
   expect_equal(lsr.perf, -1 * logloss.perf, check.names = FALSE)
 
-  # test one class (same measurement for cluster)
-
-  #db
-  c2 = c(3, 1)
-  c1 = c((1 + 2 + 4) / 3, (3 + 4 + 2) / 3)
-  s1 = sqrt((sum((data.oneclass[1, -3 ] - c1)^2) + sum((data.oneclass[2, -3] - c1)^2) +
-      sum((data.oneclass[4, -3] - c1)^2)) / 3L)
-  M = sqrt(sum((c2 - c1)^2))
-  db.test = s1 / M
-  db.perf = performance(pred.oneclass, measures = db,
-    model = mod.oneclass, feats = data.oneclass[, -3])
-  expect_equal(db.test, db$fun(task = task.oneclass,
-    pred = pred.oneclass, feats = data.oneclass[, -3]))
-  expect_equal(db.test, as.numeric(db.perf))
-
-  #dunn
-  exdist = min(sqrt(sum((c(1, 3) - c(3, 1))^2)), sqrt(sum((c(2, 4) - c(3, 1))^2)),
-    sqrt(sum((c(4, 3) - c(3, 2))^2)))
-  indist = max(sqrt(sum((c(1, 3) - c(2, 4))^2)), sqrt(sum((c(1, 3) - c(4, 2))^2)),
-    sqrt(sum((c(2, 4) - c(4, 2))^2)))
-  dunn.test = exdist / indist
-  dunn.perf = performance(pred.oneclass, measures = dunn,
-    model = mod.oneclass, feats = data.oneclass[, -3])
-  expect_equal(dunn.test,
-    dunn$fun(pred = pred.oneclass, feats = data.oneclass[, -3]))
-  expect_equal(dunn.test, as.numeric(dunn.perf))
-  #g1 index
-  exsum = sqrt(sum((c(1, 3) - c(3, 1))^2)) + sqrt(sum((c(2, 4) - c(3, 1))^2)) +
-    sqrt(sum((c(4, 3) - c(3, 2))^2))
-  insum = sqrt(sum((c(1, 3) - c(2, 4))^2)) + sqrt(sum((c(1, 3) - c(4, 2))^2)) +
-    sqrt(sum((c(2, 4) - c(4, 2))^2))
-  g1.test = exsum / insum
-  g1.perf = performance(pred.oneclass, measures = G1,
-    model = mod.oneclass, feats = data.oneclass[, -3])
-  expect_equal(g1.test, G1$fun(pred = pred.oneclass, feats = data.oneclass[, -3]))
-  expect_equal(g1.test, as.numeric(g1.perf))
-  #g2 index
-  dists = as.matrix(dist(data.oneclass[, -3], method = "euclidian"))
-  c2.dists = as.vector(dists[, 3L])
-  c2.dists = c2.dists[c2.dists != 0L]
-  c1.dists = unique(as.vector(dists [-3L, -3L]))
-  c1.dists = c1.dists[c1.dists != 0L]
-  con.pairs = vapply(c1.dists, function(x) x < c2.dists,
-    logical(length = length(c2.dists)))
-  con.pairs = sum(rowSums(con.pairs))
-  dis.pairs = vapply(c2.dists, function(x) x < c1.dists,
-    logical(length = length(c1.dists)))
-  dis.pairs = sum(rowSums(dis.pairs))
-  g2.test = (con.pairs - dis.pairs) / (con.pairs + dis.pairs)
-  g2.perf = performance(pred.oneclass, measures = G2,
-    model = mod.oneclass, feats = data.oneclass[, -3])
-  expect_equal(g2.test, G2$fun(pred = pred.oneclass, feats = data.oneclass[, -3]))
-  expect_equal(g2.test, as.numeric(g2.perf))
-  #silhouette
-  dists = as.matrix(clusterSim::dist.GDM(data.oneclass[, -3]))
-  ais = replace(dists, dists == 0, NA)[-3L, -3L]
-  ais = apply(ais, MARGIN = 2L, mean, na.rm = TRUE)
-  bis = dists[-3L, 3L]
-  sil.data = data.frame(t(rbind(ais, bis)))
-  sils = (sil.data$bis - sil.data$ais) / pmax(sil.data$bis, sil.data$ais)
-  silhouette.test = sum(sils) / nrow(data.oneclass)
-  silhouette.perf = performance(pred.oneclass, measures = silhouette,
-    model = mod.oneclass, feats = data.oneclass[, -3])
-  expect_equal(silhouette.test, silhouette$fun(pred = pred.oneclass, feats = data.oneclass[, -3]))
-  expect_equal(object = silhouette.test, as.numeric(silhouette.perf))
-
   # test one class (same measurement for binary classif)
   #tp
-  tp.test = sum(tar.oneclass == pred.art.oneclass & pred.art.oneclass == "FALSE")
+  tp.test = sum(tar.oneclass == pred.art.oneclass & pred.art.oneclass == "TRUE")
   tp.perf = performance(pred.oneclass, measures = tp, model = mod.oneclass)
   expect_equal(tp.test, tp$fun(pred = pred.oneclass))
   expect_equal(tp.test, as.numeric(tp.perf))
   #tn
-  tn.test = sum(tar.oneclass == pred.art.oneclass & pred.art.oneclass == "TRUE")
+  tn.test = sum(tar.oneclass == pred.art.oneclass & pred.art.oneclass == "FALSE")
   tn.perf = performance(pred.oneclass, measures = tn, model = mod.oneclass)
   expect_equal(tn.test, tn$fun(pred = pred.oneclass))
   expect_equal(tn.test, as.numeric(tn.perf))
   #fp
-  fp.test = sum(tar.oneclass != pred.art.oneclass & pred.art.oneclass == "FALSE")
+  fp.test = sum(tar.oneclass != pred.art.oneclass & pred.art.oneclass == "TRUE")
   fp.perf = performance(pred.oneclass, measures = fp, model = mod.oneclass)
   expect_equal(fp.test, fp$fun(pred = pred.oneclass))
   expect_equal(fp.test, as.numeric(fp.perf))
   #fn
-  fn.test = sum(tar.oneclass != pred.art.oneclass & pred.art.oneclass == "TRUE")
+  fn.test = sum(tar.oneclass != pred.art.oneclass & pred.art.oneclass == "FALSE")
   fn.perf = performance(pred.oneclass, measures = fn, model = mod.oneclass)
   expect_equal(fn.test, fn$fun(pred = pred.oneclass))
   expect_equal(fn.test, as.numeric(fn.perf))
   #tpr
-  tpr.test = tp.test / sum(tar.oneclass == "FALSE")
+  tpr.test = tp.test / sum(tar.oneclass == "TRUE")
   tpr.perf = performance(pred.oneclass, measures = tpr, model = mod.oneclass)
   expect_equal(tpr.test, tpr$fun(pred = pred.oneclass))
   expect_equal(tpr.test, as.numeric(tpr.perf))
   #tnr #NaN as TRUE in target
-  tnr.test = tn.test / sum(tar.oneclass == "TRUE")
+  tnr.test = tn.test / sum(tar.oneclass == "FALSE")
   tnr.perf = performance(pred.oneclass, measures = tnr, model = mod.oneclass)
   expect_equal(tnr.test, tnr$fun(pred = pred.oneclass))
   expect_equal(tnr.test, as.numeric(tnr.perf))
   #fpr #NaN as TRUE in target
-  fpr.test = fp.test / sum(tar.oneclass != "FALSE")
+  fpr.test = fp.test / sum(tar.oneclass != "TRUE")
   fpr.perf = performance(pred.oneclass, measures = fpr, model = mod.oneclass)
   expect_equal(fpr.test, fpr$fun(pred = pred.oneclass))
   expect_equal(fpr.test, as.numeric(fpr.perf))
   #fnr
-  fnr.test = fn.test / sum(tar.oneclass != "TRUE")
+  fnr.test = fn.test / sum(tar.oneclass != "FALSE")
   fnr.perf = performance(pred.oneclass, measures = fnr, model = mod.oneclass)
   expect_equal(fnr.test, fnr$fun(pred = pred.oneclass))
   expect_equal(fnr.test, as.numeric(fnr.perf))
   #ppv
-  ppv.test = tp.test / sum(pred.art.oneclass == "FALSE")
+  ppv.test = tp.test / sum(pred.art.oneclass == "TRUE")
   ppv.perf = performance(pred.oneclass, measures = ppv, model = mod.oneclass)
   expect_equal(ppv.test, ppv$fun(pred = pred.oneclass))
   expect_equal(ppv.test, as.numeric(ppv.perf))
   #npv
-  npv.test = tn.test / sum(pred.art.oneclass == "TRUE")
+  npv.test = tn.test / sum(pred.art.oneclass == "FALSE")
   npv.perf = performance(pred.oneclass, measures = npv, model = mod.oneclass)
   expect_equal(npv.test, npv$fun(pred = pred.oneclass))
   expect_equal(npv.test, as.numeric(npv.perf))
   #fdr
-  fdr.test = fp.test / sum(pred.art.oneclass == "FALSE")
+  fdr.test = fp.test / sum(pred.art.oneclass == "TRUE")
   fdr.perf = performance(pred.oneclass, measures = fdr, model = mod.oneclass)
   expect_equal(fdr.test, fdr$fun(pred = pred.oneclass))
   expect_equal(fdr.test, as.numeric(fdr.perf))
   #bac #NaN as TRUE in target,  # need prediction type response (svm can't predict prob)
-  bac.test = 0.5 * (tpr.test / (tpr.test + fnr.test) + tnr.test /
-      (tnr.test + fpr.test))
+  bac.test = 0.5 * (tpr.test / (tpr.test + fnr.test) + tnr.test / (tnr.test + fpr.test))
   bac.perf = performance(pred.oneclass, measures = bac, model = mod.oneclass)
   expect_equal(bac.test, bac$fun(pred = pred.oneclass))
   expect_equal(bac.test, as.numeric(bac.perf))
@@ -976,7 +909,7 @@ test_that("check measure calculations", {
   expect_equal(mcc.test, mcc$fun(pred = pred.oneclass))
   expect_equal(mcc.test, as.numeric(mcc.perf))
   #f1
-  f1.test = 2 * tp.test / (sum(tar.oneclass == "FALSE") + sum(pred.art.oneclass == "FALSE"))
+  f1.test = 2 * tp.test / (sum(tar.oneclass == "TRUE") + sum(pred.art.oneclass == "TRUE"))
   f1.perf = performance(pred.oneclass, measures = f1, model = mod.oneclass)
   expect_equal(f1.test, f1$fun(pred = pred.oneclass))
   expect_equal(f1.test, as.numeric(f1.perf))
