@@ -69,7 +69,12 @@ plotViperCharts.list = function(obj, chart = "rocc", browse = TRUE, auth.key = N
       s = p$learner.id
       p = getRRPredictions(p)
     }
-    checkPrediction(p, task.type = "classif", binary = TRUE, predict.type = "prob", check.truth = TRUE)
+
+    if ( p$task.desc$type == "classif") {
+      checkPrediction(p, task.type = "classif", binary = TRUE, predict.type = "prob", check.truth = TRUE)
+    } else if (p$task.desc$type == "oneclass") {
+      checkPrediction(p, task.type = "oneclass", binary = TRUE, predict.type = "prob", check.truth = TRUE)
+    }
     a = p$data$truth
     a = as.numeric(a == p$task.desc$positive)
     list(name = s, actual = a, predicted = getPredictionProbabilities(p))

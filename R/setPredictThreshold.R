@@ -12,7 +12,11 @@
 #' @family learner
 #' @export
 setPredictThreshold = function(learner, predict.threshold) {
-  learner = checkLearner(learner, type = "classif")
+  if (learner$type == "classif") {
+    learner = checkLearner(learner, type = "classif")
+  } else if (learner$type == "oneclass") {
+    learner = checkLearner(learner, type = "oneclass")
+  }
   if (learner$predict.type != "prob")
     stopf("predict.type = 'prob' must hold to set a predict.threshold!")
   assertNumeric(predict.threshold, any.missing = FALSE)

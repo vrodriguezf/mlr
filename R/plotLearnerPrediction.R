@@ -129,6 +129,8 @@ plotLearnerPrediction = function(learner, task, features = NULL, measures, cv = 
     learner = setPredictType(learner, "se")
   if (td$type == "classif" && hasLearnerProperties(learner, "prob"))
     learner = setPredictType(learner, "prob")
+  if (td$type == "oneclass" && hasLearnerProperties(learner, "prob"))
+    learner = setPredictType(learner, "prob")
   mod = train(learner, task)
   pred.train = predict(mod, task)
   yhat = pred.train$data$response
