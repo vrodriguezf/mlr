@@ -1,7 +1,7 @@
 context("oneclass_ksvm")
 
 test_that("oneclass_ksvm", {
-  requirePackagesOrSkip("kernlab", default.method = "load")
+  #requirePackagesOrSkip("kernlab", default.method = "load")
 
   parset.list1 = list(
     list(fit = FALSE),
@@ -28,7 +28,7 @@ test_that("oneclass_ksvm", {
 
     set.seed(getOption("mlr.debug.seed"))
     m = do.call(kernlab::ksvm, pars)
-    old.predicts.list[[i]] =  kernlab::predict(m, oneclass.test[, -oneclass.col], type = "response")
+    old.predicts.list[[i]] =  !kernlab::predict(m, oneclass.test[, -oneclass.col], type = "response")
   }
 
   testSimpleParsets("oneclass.ksvm", oneclass.df, oneclass.target,
