@@ -33,10 +33,10 @@ trainLearner.oneclass.svm = function(.learner, .task, .subset, .weights = NULL, 
 #' @export
 predictLearner.oneclass.svm = function(.learner, .model, .newdata, ...) {
   td = getTaskDesc(.model)
-  labels = c(td$negative, td$positive)
+  label = c(td$positive, td$negative)
   if (.learner$predict.type == "response") {
     p = predict(.model$learner.model, newdata = .newdata, ...)
-    p = factor(p, levels = c("TRUE", "FALSE"), labels = labels)
+    p = factor(p, levels = c("FALSE", "TRUE"), labels = label)
   } else {
     p = predict(.model$learner.model, newdata = .newdata, decision.values = TRUE, ...)
     p = attr(p, "decision.values")
