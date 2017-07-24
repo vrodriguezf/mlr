@@ -58,18 +58,18 @@ test_that("Wrong methods yield informative errors", {
 
 test_that("extractFDAFeaturesDesc", {
   methods = list("UVVIS" = extractFDAMultiResFeatures(), "NIR" = extractFDAFourier())
-  t = extractFDAFeatures(fuelsubset.task, feat.methods = methods)
+  ext = extractFDAFeatures(fuelsubset.task, feat.methods = methods)
   # check desc
-  expect_is(t$desc, "extractFDAFeatDesc")
-  expect_subset(t$desc$coln, c(getTaskFeatureNames(fuelsubset.task),
+  expect_is(ext$desc, "extractFDAFeatDesc")
+  expect_subset(ext$desc$coln, c(getTaskFeatureNames(fuelsubset.task),
                                getTaskTargetNames(fuelsubset.task)))
-  expect_subset(t$desc$target, getTaskTargetNames(fuelsubset.task))
-  expect_subset(unique(t$desc$colclasses), choices = c("numeric", "matrix"))
-  expect_list(t$desc$extractFDAFeat)
-  expect_list(t$desc$extractFDAFeat$UVVIS$args)
-  expect_function(t$desc$extractFDAFeat$UVVIS$reextract)
-  expect_list(t$desc$extractFDAFeat$NIR$args)
-  expect_function(t$desc$extractFDAFeat$NIR$reextract)
+  expect_subset(ext$desc$target, getTaskTargetNames(fuelsubset.task))
+  expect_subset(unique(ext$desc$colclasses), choices = c("numeric", "matrix"))
+  expect_list(ext$desc$extractFDAFeat)
+  expect_list(ext$desc$extractFDAFeat$UVVIS$args)
+  expect_function(ext$desc$extractFDAFeat$UVVIS$reextract)
+  expect_list(ext$desc$extractFDAFeat$NIR$args)
+  expect_function(ext$desc$extractFDAFeat$NIR$reextract)
 })
 
 test_that("extractFDAFeatures task method equal data.frame", {
@@ -84,8 +84,8 @@ test_that("extractFDAFeatures task method equal data.frame", {
   expect_equal(t2$desc$extractFDAFeat$fd$arg$trafo.coeff, "amplitude")
 
   expect_error(extractFDAFeatures(gp.subset,
-                                  feat.methods = list("fd" = extractFDAFourier(), "fd2" = extractFDAMultiResFeatures())),
-               regexp = "Must be a subset of")
+    feat.methods = list("fd" = extractFDAFourier(), "fd2" = extractFDAMultiResFeatures())),
+    regexp = "Must be a subset of")
 })
 
 test_that("reextractFDAFeatures", {
