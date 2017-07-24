@@ -42,9 +42,8 @@ makeOneClassTask(id = deparse(substitute(data)), data, target,
 makeRegrTask(id = deparse(substitute(data)), data, target, weights = NULL,
   blocking = NULL, fixup.data = "warn", check.data = TRUE)
 
-makeSurvTask(id = deparse(substitute(data)), data, target,
-  censoring = "rcens", weights = NULL, blocking = NULL,
-  fixup.data = "warn", check.data = TRUE)
+makeSurvTask(id = deparse(substitute(data)), data, target, weights = NULL,
+  blocking = NULL, fixup.data = "warn", check.data = TRUE)
 }
 \arguments{
 \item{id}{[\code{character(1)}]\cr
@@ -100,7 +99,6 @@ The columns correspond to classes and their names are the class labels
 (if unnamed we use y1 to yk as labels).
 Each entry (i,j) of the matrix specifies the cost of predicting class j
 for observation i.}
-
 \item{negative}{[\code{character(1)}]\cr
 Negative class name, currently only used in oneclass, here it encodes the name
 of the \dQuote{normal} class.}
