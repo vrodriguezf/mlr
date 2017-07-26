@@ -99,15 +99,10 @@ The columns correspond to classes and their names are the class labels
 (if unnamed we use y1 to yk as labels).
 Each entry (i,j) of the matrix specifies the cost of predicting class j
 for observation i.}
+
 \item{negative}{[\code{character(1)}]\cr
 Negative class name, currently only used in oneclass, here it encodes the name
 of the \dQuote{normal} class.}
-
-\item{censoring}{[\code{character(1)}]\cr
-Censoring type. Allowed choices are \dQuote{rcens} for right censored data (default),
-\dQuote{lcens} for left censored and \dQuote{icens} for interval censored data using
-the \dQuote{interval2} format.
-See \code{\link[survival]{Surv}} for details.}
 }
 \value{
 [\code{\link{Task}}].
