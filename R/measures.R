@@ -1396,7 +1396,7 @@ cindex.uno = makeMeasure(id = "cindex.uno", minimize = FALSE, best = 1, worst = 
 #' @format none
 #' @references
 #' H. Uno et al.
-#' \emph{Evaluating Prediction Rules for T-Year Survivors with Censored Regression Models}
+#' \emph{Evaluating Prediction Rules for T-Year Survivors with Censored Regression Models}.
 #' Journal of the American Statistical Association 102, no. 478 (2007): 527-37. \url{http://www.jstor.org/stable/27639883}.
 iauc.uno = makeMeasure(id = "iauc.uno", minimize = FALSE, best = 1, worst = 0,
   properties = c("surv", "req.pred", "req.truth", "req.model", "req.task"),
@@ -1413,6 +1413,41 @@ iauc.uno = makeMeasure(id = "iauc.uno", minimize = FALSE, best = 1, worst = 0,
     survAUC::AUC.uno(Surv.rsp = surv.train, Surv.rsp.new = getPredictionTruth(pred), times = times, lpnew = y)$iauc
   },
   extra.args = list(max.time = NULL, resolution = 1000)
+)
+
+#' @export brier.ipcw
+#' @rdname measures
+#' @format none
+#' @references
+#' Gerds, T. A. and M. Schumacher (2006).
+#' \emph{Consistent estimation of the expected Brier score in general survival models with right-censored event times}.
+#' Biometrical Journal 48, 1029-1040.
+#' Schmid, M., T. Hielscher, T. Augustin, and O. Gefeller (2011).
+#' \emph{A robust alter- native to the Schemper-Henderson estimator of prediction error}.
+#' Biometrics 67, 524-535.
+brier.ipcw = makeMeasure(id = "brier.ipcw", minimize = TRUE, best = 0, worst = 1,
+  properties = c("surv", "req.pred", "req.truth", "req.model", "req.task"),
+  name = "Integrated Brier Score for right censored time-to-event data, normalized with Inverse-probability-of-censoring weights",
+  note = "Type can be set to 'brier' (default) or 'robust' and is passed to `survAUC::predErr()`.
+  The deviation between predicted and observed survival is calculated for each time point in the *task*.",
+  # FIXME: calculate on a grid, or on all observed time points?
+  fun = function(task, model, pred, feats, extra.args) {
+    requirePackages("_survAUC")
+    type = assertChoice(extra.args$type, c("brier", "robust"))
+    max.time = assertNumber(extra.args$max.time, null.ok = TRUE) %??% max(getTaskTargets(task)[, 1L])
+
+    surv = getTaskTargets(task, recode.target = "surv")
+    Surv.rsp = surv[model$subset]
+    Surv.rsp.new = surv[-model$subset]
+
+    pred.train = predict(model, task, subset = model$subset)
+    lp = getPredictionResponse(pred.train)
+    lpnew = getPredictionResponse(pred)
+
+    times = seq(from = 0, to = max.time, length.out = extra.args$resolution)
+    survAUC::predErr(Surv.rsp, Surv.rsp.new, lp, lpnew, times, type = type)$ierror
+  },
+  extra.args = list(type = "brier", max.time = NULL, resolution = 1000)
 )
 
 ###############################################################################
