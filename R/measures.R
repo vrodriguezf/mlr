@@ -1410,7 +1410,7 @@ iauc.uno = makeMeasure(id = "iauc.uno", minimize = FALSE, best = 1, worst = 0,
     y = getPredictionResponse(pred)
     if (anyMissing(y))
       return(NA_real_)
-    survAUC::AUC.uno(Surv.rsp = surv.train, Surv.rsp.new = getPredictionTruth(pred), times = times, lpnew = y)$iauc
+    survAUC::AUC.uno(Surv.rsp = surv.train, Surv.rsp.new = getPredictionTruth(pred), time = times, lpnew = y)$iauc
   },
   extra.args = list(max.time = NULL, resolution = 1000)
 )
