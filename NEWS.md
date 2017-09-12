@@ -13,6 +13,7 @@
   range of values for the partial dependencies
 * batchmark: allow resample instances and reduction of partial results
 * resample, performance: new flag "na.rm" to remove NAs during aggregation
+* listLearners: fixed default for check.packages
 
 ## functions - new
 * makeClassificationViaRegressionWrapper
