@@ -36,7 +36,7 @@ makeRLearner.classif.fdauscgkam = function() {
 }
 
 #' @export
-trainLearner.classif.fdauscgkam = function(.learner, .task, .subset, .weights = NULL, ...) {
+trainLearner.classif.fdauscgkam = function(.learner, .task, .subset, .weights = NULL,...) {
   
   # Get and transform functional data
   d = getTaskData(.task, subset = .subset, target.extra = TRUE, functionals.as = "matrix")
@@ -47,7 +47,7 @@ trainLearner.classif.fdauscgkam = function(.learner, .task, .subset, .weights = 
   dat = list(df = data.frame(d$target), x = data.fdclass)
   
   #FIXME: How to build control argument as control = list(maxit, epsilon, trace, inverse) ?
-  model = fda.usc::classif.gkam(d.target ~ x, data = dat, weights = .weights, ...)
+  model = fda.usc::classif.gkam(d.target ~ x, data = dat, weights = .weights,  ...)
     # Fix bug in package
   model$C[[1]] = quote(classif.gkam)
   return(model)
