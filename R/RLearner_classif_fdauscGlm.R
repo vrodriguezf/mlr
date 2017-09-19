@@ -9,7 +9,8 @@ makeRLearner.classif.fdauscglm = function() {
     cl = "classif.fdauscglm",
     package = "fda.usc",
     par.set = makeParamSet(
-      makeDiscreteLearnerParam(id = "family", default = "binomial()", values = list("binomial()", "gaussian()", "Gamma()", "inverse.gaussian()", "poisson()")),
+      makeDiscreteLearnerParam(id = "family", default = "binomial", values = list("binomial",
+        "gaussian", "Gamma", "inverse.gaussian", "poisson")),
       makeUntypedLearnerParam(id = "basis.x"),
       makeUntypedLearnerParam(id = "basis.b"),
       makeLogicalLearnerParam(id = "CV", default = FALSE)
@@ -32,7 +33,7 @@ trainLearner.classif.fdauscglm = function(.learner, .task, .subset, .weights = N
   # transform the data into fda.usc:fdata class type and save in a list
   dat = list(df = data.frame(d$target), x = data.fdclass)
 
-  model = fda.usc::classif.glm(d.target ~ x, data = dat)
+  model = fda.usc::classif.glm(d.target ~ x, data = dat, ...)
   # Fix bug in package
   model$C[[1]] = quote(classif.glm)
   return(model)

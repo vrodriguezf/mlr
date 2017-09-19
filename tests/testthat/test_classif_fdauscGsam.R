@@ -1,6 +1,6 @@
-context("RLearner_classif_fdausc.gsam")
+context("RLearner_classif_fdauscgsam")
 
-test_that("classif_fdausc.gsam behaves like original api", {
+test_that("classif_fdauscgsam behaves like original api", {
   requirePackagesOrSkip("fda.usc", default.method = "load")
 
   data(phoneme, package = "fda.usc")
@@ -16,7 +16,7 @@ test_that("classif_fdausc.gsam behaves like original api", {
   dat = list("df" = dataf, "x" = mlearn)
 
   # smoothing with GAM formulae smoothing splines
-  a1 = fda.usc::classif.gsam(glearn ~ s(x, k = 3), data = dat)
+  a1 = fda.usc::classif.gsam(glearn ~ s(x, k = 3), data = dat, family = "poisson")
   # this fixes bug in fda.usc. The C parameter needs to contain the classifier name
   a1$C[[1]] = quote(classif.gsam)
   # this strange code is necessary for fda.usc to predict from a gsam classifier
@@ -29,7 +29,7 @@ test_that("classif_fdausc.gsam behaves like original api", {
   phtst = as.data.frame(mtest$data)
   phtst[, "label"] = gtest
 
-  lrn = makeLearner("classif.fdauscgsam", basisargs = list(k = 3))
+  lrn = makeLearner("classif.fdauscgsam", basisargs = list(k = 3), family = "poisson")
   fdata = makeFunctionalData(ph, fd.features = NULL, exclude.cols = "label")
   ftest = makeFunctionalData(phtst, fd.features = NULL, exclude.cols = "label")
   task = makeClassifTask(data = fdata, target = "label")

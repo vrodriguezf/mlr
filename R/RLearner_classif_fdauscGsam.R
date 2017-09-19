@@ -4,7 +4,7 @@
 #' Learner for classification using Generalized Additive Models and basis 
 #' representation. If formula contains non-functional feature, standard glm is 
 #' fitted. As smoothing functions for the features smoothing splines (\code{s}) 
-#' and tensor product smoothing \code{te} are supported as in GAM formulae. The classification
+#' and tensor product smoothing \code{te} and \code{t2} are supported as in GAM formulae. The classification
 #' functionality calls the regression function \code{fregre.gasm}.
 #'
 #' @export
@@ -13,16 +13,16 @@ makeRLearner.classif.fdauscgsam = function() {
     cl = "classif.fdauscgsam",
     package = "fda.usc",
     par.set = makeParamSet(
-      makeDiscreteLearnerParam(id = "family", default = "binomial()", values = list("binomial()", 
-        "gaussian()", "Gamma()", "inverse.gaussian()", "poisson()", "quasi()", "quasibinomial()", 
-        "quasipoisson()")),
+      makeDiscreteLearnerParam(id = "family", default = "binomial", values = list("binomial", 
+        "gaussian", "Gamma", "inverse.gaussian", "poisson", "quasi", "quasibinomial", 
+        "quasipoisson")),
       makeUntypedLearnerParam(id = "basis.x"),
       makeUntypedLearnerParam(id = "basis.b"),
       makeLogicalLearnerParam(id = "CV", default = FALSE, tunable = FALSE),
       makeDiscreteLearnerParam(id = "basistype", default = "s", values = list("s", "te"), tunable = FALSE),
       makeUntypedLearnerParam(id = "basisargs", tunable = FALSE)
     ),
-    properties = c("twoclass", "multiclass", "prob", "functionals"),
+    properties = c("numerics", "twoclass", "multiclass", "prob", "functionals"),
     name = "Generalized Additive Models classification on FDA",
     short.name = "fdauscgsam",
     note = "model$C[[1]] is set to quote(classif.gsam); added parameters 'basistype' 
@@ -30,10 +30,7 @@ makeRLearner.classif.fdauscgsam = function() {
   )
 }
 
-# @param sm [\code{string}] \cr
-#   Defines wich smoothing is used in formula. Default \code{s}, see above.
-# Additional Params in \code{...} must be specified by the user for the smoothing
-# formula.
+
 #' @export
 trainLearner.classif.fdauscgsam = function(.learner, .task, .subset, .weights = NULL, ...) {
 
@@ -56,7 +53,7 @@ trainLearner.classif.fdauscgsam = function(.learner, .task, .subset, .weights = 
   } else {
     form = as.formula(sprintf("d.target~%s(x)", basis))
   }
-  model = fda.usc::classif.gsam(form, data = dat)
+  model = fda.usc::classif.gsam(form, data = dat, ...)
   # Fix bug in package
   model$C[[1]] = quote(classif.gsam)
   return(model)

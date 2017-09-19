@@ -30,7 +30,7 @@ trainLearner.classif.fdausctree = function(.learner, .task, .subset, .weights = 
   # transform the data into fda.usc:fdata class type and save in a list
   dat = list(df = data.frame(d$target), x = data.fdclass)
 
-  model = fda.usc::classif.tree(d.target ~ x, data = dat)
+  model = fda.usc::classif.tree(d.target ~ x, data = dat, ...)
   # Fix bug in package
   model$C[[1]] = quote(classif.tree)
   return(model)

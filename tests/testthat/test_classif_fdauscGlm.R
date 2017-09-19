@@ -15,7 +15,7 @@ test_that("classif_fdauscglm behaves like original api", {
   dataf = data.frame(glearn)
   dat = list("df" = dataf, "x" = mlearn)
   # glm sometimes does not converge, we dont want to see that
-  a1 = suppressWarnings(fda.usc::classif.glm(glearn ~ x, data = dat))
+  a1 = suppressWarnings(fda.usc::classif.glm(glearn ~ x, data = dat, family = "poisson"))
 
   # FIXME: code looks strange here? the quote?
   a1$C[[1]] = quote(classif.glm)
@@ -27,7 +27,7 @@ test_that("classif_fdauscglm behaves like original api", {
   phtst = as.data.frame(mtest$data)
   phtst[, "label"] = gtest
 
-  lrn = makeLearner("classif.fdauscglm")
+  lrn = makeLearner("classif.fdauscglm", family = "poisson")
   fdata = makeFunctionalData(ph, fd.features = NULL, exclude.cols = "label")
   ftest = makeFunctionalData(phtst, fd.features = NULL, exclude.cols = "label")
   task = makeClassifTask(data = fdata, target = "label")
