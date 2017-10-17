@@ -64,7 +64,7 @@ deriv = generatePartialDependenceData(m, mt.task, gridsize = NULL,
   method = "simple")
 
 plot(pdat$data$hp, pdat$data$mpg, type = "p")
-abline(v = treesplit(x = deriv$data$hp,
+abline(v = splitPD(x = deriv$data$hp,
   y = deriv$data$mpg, max.splits = 2))
 
 ame = summary(margins(mod, data = mtcars))$AME
@@ -72,20 +72,12 @@ ame = summary(margins(mod, data = mtcars))$AME
 ame.mlr.grid = computeAverageMarginalEffects(m, mt.task, gridsize = NULL,
   uniform = TRUE, features = c("cyl", "hp"))
 # we can fix this by NOT using a uniform grid
-ame.mlr.data = computeAverageMarginalEffects(m, mt.task, gridsize = NULL,
-  uniform = FALSE, features = c("cyl", "hp"))
-# fitting a linear model to curve is not the same as averaging tangets at each point
-ame.lm.weights = computeAME(m, mt.task, gridsize = NULL,
-  uniform = TRUE, features = c("cyl", "hp"), weights = TRUE)
-ame.lm = computeAME(m, mt.task, gridsize = NULL,
-  uniform = TRUE, features = c("cyl", "hp"), weights = FALSE)
+ame.mlr.data = computeAME(m, mt.task, gridsize = NULL, features = c("cyl", "hp"))
 
 #
 sort(ame)
-sort(effects(ame.mlr))
-sort(effects(ame.mlr2))
-sort(effects(ame.lm.weights)) # don't know if this makes sense
-sort(effects(ame.lm)) # don't know if this makes sense
+sort(effects(ame.mlr.grid))
+sort(effects(ame.mlr.data))
 
 ################################################################################
 # use case 4: logreg
@@ -100,15 +92,21 @@ mod = getLearnerModel(m)
 mod = glm(f, data = getTaskData(task), family = binomial(), x = TRUE)
 erer::maBina(w = glm(f, data = getTaskData(task), family = binomial(), x = TRUE),
   x.mean = TRUE, rev.dum = TRUE)
-mfx::logitmfx(diabetes ~ ., data = getTaskData(task))
+mfx::logitmfx(f, data = getTaskData(task))$mfxest
 
 ame = summary(margins(mod, data = getTaskData(task)))$AME
 # we can fix this by NOT using a uniform grid
 ame.mlr.data = computeAverageMarginalEffects(m, task, gridsize = NULL,
   uniform = FALSE, features = c("pregnant", "glucose"))
+ame.mlr.data2 = computeAME(m, task, gridsize = NULL, features = c("pregnant", "glucose"))
+
+pdat = generatePartialDependenceData(m, task, gridsize = NULL,
+  uniform = FALSE, features =  c("pregnant", "glucose"))
+plot(pdat$data$glucose, pdat$data$Probability, type = "p")
 
 ame[c("pregnant", "glucose")]
 effects(ame.mlr.data)
+effects(ame.mlr.data2)
 
 # FIXME: partialDependencePlot just predicts on unique(#values) and not on all training data points
 
