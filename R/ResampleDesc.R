@@ -49,10 +49,13 @@
 #'   \item{folds [\code{integer(1)}]}{Folds in the repeated CV for \code{RepCV}.
 #'     Here \code{iters = folds * reps}. Default is 10.}
 #'   \item{horizon [\code{integer(1)}]}{Number of observations to forecast for \code{GrowthCV}
-#'    and \code{FixedCV}. Default is 1}
+#'    and \code{FixedCV}. Default is 1.}
 #'   \item{initial.window [\code{numeric(1)}]}{Fraction of observations to start with
-#'    in \code{GrowthCV} and \code{FixedCV}. Default is 0.5}
-#'   \item{skip [\code{integer(1)}]}{ The number of windows to skip in \code{GrowingCV} and \code{FixedCV}. Default is horizon - 1}
+#'    in \code{GrowthCV} and \code{FixedCV}. Default is 0.5.}
+#'   \item{skip [\code{integer(1)}]}{ The number of windows to skip in \code{GrowingCV} and \code{FixedCV}.
+#'    Growing window and fixed window CV normally only move one step head, but this
+#'    argument is supplied as the by argument in \code{seq()} for thin the number of iterations.
+#'    The default of \dQuote{horizon} gives mutually exclusive windows.}
 #'   }
 #' @param stratify [\code{logical(1)}]\cr
 #'   Should stratification be done for the target variable?
@@ -158,7 +161,7 @@ makeResampleDescSpRepCV = function(reps = 10L, folds = 10L) {
   makeResampleDescInternal("repeated spatial cross-validation", iters = folds * reps, folds = folds, reps = reps)
 }
 
-makeResampleDescFixedCV = function(horizon = 1L, initial.window = .5, skip = horizon - 1) {
+makeResampleDescFixedCV = function(horizon = 1L, initial.window = .5, skip = horizon) {
   horizon = asInteger(horizon, lower = 1L, upper = Inf)
   assertNumeric(initial.window, lower = 0, upper = 1)
   skip = asInteger(skip, lower = 0L, upper = Inf)
@@ -166,7 +169,7 @@ makeResampleDescFixedCV = function(horizon = 1L, initial.window = .5, skip = hor
     initial.window = initial.window, skip = skip, stratify = FALSE)
 }
 
-makeResampleDescGrowingCV = function(horizon = 1L, initial.window = .5, skip = horizon - 1) {
+makeResampleDescGrowingCV = function(horizon = 1L, initial.window = .5, skip = horizon) {
   horizon = asInteger(horizon, lower = 1L, upper = Inf)
   assertNumeric(initial.window, lower = 0, upper = 1)
   skip = asInteger(skip, lower = 0L, upper = Inf)

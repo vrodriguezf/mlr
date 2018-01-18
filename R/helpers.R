@@ -122,3 +122,10 @@ suppressWarning = function(expr, str) {
 hasEmptyLevels = function(x) {
   !all(levels(x) %chin% as.character(unique(x)))
 }
+
+# thin out a sequence
+thin = function(x, skip) {
+  n = length(x)
+  x[seq(1, n, by = skip)]
+}
+
