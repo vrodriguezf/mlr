@@ -1,18 +1,21 @@
 #' @title Plot resampling objects.
 #'
-#' @description
-#  Visualize distribution of (spatial) partitioning in cross-validation.
+#' @description Visualize distribution of observations in (spatial) cross-validation.
 #' @import ggplot2
 #' @importFrom cowplot plot_grid save_plot
 #' @import sf
-#' @importFrom purrr map imap
+#' @importFrom purrr map imap is_list flatten map_int
 #' @import hrbrthemes
 #' @family plot
 #' @author Patrick Schratz
-#' @param task `Task`\cr
-#'   Task object
-#' @param resample `ResampleResult`\cr
-#'   As returned by `resample`.
+#' @param task [Task()] \cr
+#'   Task object.
+#' @param resample [ResampleResult()]\cr
+#'   As returned by [resample()].
+#' @param crs [integer()]\cr
+#'   Specify a custom coordinate reference system.
+#' @param repetitions [integer()]\cr
+#'   How many repetitions should be visualized?
 #' @examples
 #'
 #' data(spatial.task, package = "mlr", envir = environment())
@@ -36,41 +39,54 @@
 #' out = resample(wrapper.ksvm, spatial.task,
 #'                resampling = outer, show.info = TRUE, measures = list(auc))
 #'
-#' plot_partitions(spatial.task, out, 32630, repetitions = 4, filename = "~/Downloads/cowplot.png")
+#' plotPartitions(spatial.task, list(out, out), 32630, repetitions = 1, filename = "~/Downloads/cowplot.png")
 #' @export
-plotPartitions <- function (task = NULL, resample = NULL, crs = NULL,
-                             repetitions = NULL, filename = NULL) {
+plotPartitions <- function (task = NULL, resample = NULL, crs = 4326,
+                            repetitions = 1, filename = NULL) {
 
-  # bind coordinates to data
-  data <- cbind(task$env$data, task$coordinates)
-
-  # create 'sf' object
-  data <- st_as_sf(data, coords = names(task$coordinates), crs = crs)
-  # add ID column for subsetting of indices later
-  #data$id = seq(1:nrow(data))
+  # in case one suppliesonly one resample object
+  if (!class(resample)[1] == "list") {
+    resample = list(resample)
+  }
+  # how many resamp objects do we have?
+  n.resamp = length(resample)
 
   # create plot list with length = folds
-  nfolds = resample$pred$instance$desc$folds
-  plot_list = map(1:(nfolds*repetitions), ~ data)
+  nfolds = map_int(resample, ~ .x$pred$instance$desc$folds)[1]
 
-  plot_list <- imap(plot_list, ~ ggplot(.x) +
-                      geom_sf(data = subset(.x, as.integer(rownames(data)) %in%
-                                              resample$pred$instance[["train.inds"]][[.y]]),
-                              color = "#440154", size = 0.5, ) +
-                      geom_sf(data = subset(.x, as.integer(rownames(data)) %in%
-                                              resample$pred$instance[["test.inds"]][[.y]]),
-                              color = "#FDE725", size = 0.5, ) +
-                      theme_ipsum_rc() +
-                      theme(axis.text.x=element_text(size = 14),
-                            axis.text.y=element_text(size = 14),
-                            plot.margin = unit(c(0.5, 0.2, 0.2, 0.2), "cm"))
-  )
+  plot_list = map(resample, function(.r) {
 
-  if (!is.null(repetitions)) {
-    nrow = repetitions
-  } else {
-    nrow = 1
+    # bind coordinates to data
+    data <- cbind(task$env$data, task$coordinates)
+
+    # create 'sf' object
+    data <- st_as_sf(data, coords = names(task$coordinates), crs = crs)
+    # add ID column for subsetting of indices later
+    #data$id = seq(1:nrow(data))
+
+    # create plot list with length = folds
+    plot_list = map(1:(nfolds * repetitions), ~ data)
+
+    plot_list = imap(plot_list, ~ ggplot(.x) +
+                       geom_sf(data = subset(.x, as.integer(rownames(.x)) %in%
+                                               .r$pred$instance[["train.inds"]][[.y]]),
+                               color = "#440154", size = 0.5, ) +
+                       geom_sf(data = subset(.x,as.integer(rownames(.x)) %in%
+                                               .r$pred$instance[["test.inds"]][[.y]]),
+                               color = "#FDE725", size = 0.5, ) +
+                       theme_ipsum_rc() +
+                       theme(axis.text.x = element_text(size = 14),
+                             axis.text.y = element_text(size = 14),
+                             plot.margin = unit(c(0.5, 0.2, 0.2, 0.2), "cm"))
+    )
+  })
+
+  # if more than one element was supplied, flatten the resulting list
+  if (n.resamp > 1) {
+    plot_list = flatten(plot_list)
   }
+
+  nrow = repetitions
 
   # account for nfolds
   if (nfolds > 5) {
@@ -80,11 +96,7 @@ plotPartitions <- function (task = NULL, resample = NULL, crs = NULL,
     ncol = nfolds
   }
 
-  if (is.null(repetitions)) {
-    repetitions = 1
-  } else {
-    repetitions = repetitions
-  }
+
   if (repetitions > 1) {
     labels = c(length = nfolds * repetitions)
     nfolds_reps = rep(seq_along(1:nfolds), repetitions)
@@ -94,8 +106,21 @@ plotPartitions <- function (task = NULL, resample = NULL, crs = NULL,
     }
     labels = rep(sprintf("Fold %s (Rep %s)", nfolds_reps, reps_nfolds),
                  repetitions * nfolds)
+    # account for multiple resamp objects
+    if (n.resamp > 1) {
+      labels = rep(labels, n.resamp)
+    }
   } else {
     labels = sprintf("Fold %s", seq_along(1:nfolds))
+    # account for multiple resamp objects
+    if (n.resamp > 1) {
+      labels = rep(labels, n.resamp)
+    }
+  }
+
+  # are multiple tasks
+  if (n.resamp > 1) {
+    nrow = nrow * n.resamp
   }
 
   # create gridded plot
