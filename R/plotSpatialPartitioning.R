@@ -1,13 +1,18 @@
-#' @title title.
+#' @title Plot resampling objects.
 #'
 #' @description
-#' desc.
+#  Visualize distribution of (spatial) partitioning in cross-validation.
 #' @import ggplot2
 #' @importFrom cowplot plot_grid save_plot
 #' @import sf
 #' @importFrom purrr map imap
 #' @import hrbrthemes
 #' @family plot
+#' @author Patrick Schratz
+#' @param task `Task`\cr
+#'   Task object
+#' @param resample `ResampleResult`\cr
+#'   As returned by `resample`.
 #' @examples
 #'
 #' data(spatial.task, package = "mlr", envir = environment())
@@ -25,15 +30,15 @@
 #' wrapper.ksvm = makeTuneWrapper(lrn.ksvm, resampling = inner, par.set = ps,
 #'                                control = ctrl, show.info = FALSE, measures = list(auc))
 #'
-#' outer = makeResampleDesc("SpRepCV", folds = 5, reps = 2)
+#' outer = makeResampleDesc("SpRepCV", folds = 5, reps = 4)
 #'
 #' set.seed(12)
 #' out = resample(wrapper.ksvm, spatial.task,
 #'                resampling = outer, show.info = TRUE, measures = list(auc))
 #'
-#' plot_partitions(spatial.task, out, 32630, repetitions = 2, filename = "~/Downloads/cowplot.png")
+#' plot_partitions(spatial.task, out, 32630, repetitions = 4, filename = "~/Downloads/cowplot.png")
 #' @export
-plot_partitions <- function (task = NULL, resample = NULL, crs = NULL,
+plotPartitions <- function (task = NULL, resample = NULL, crs = NULL,
                              repetitions = NULL, filename = NULL) {
 
   # bind coordinates to data
@@ -87,7 +92,7 @@ plot_partitions <- function (task = NULL, resample = NULL, crs = NULL,
     for (i in seq_along(1:repetitions)) {
       reps_nfolds = c(reps_nfolds, rep(i, nfolds))
     }
-    labels = rep(sprintf("Fold %s (Rep.: %s)", nfolds_reps, reps_nfolds),
+    labels = rep(sprintf("Fold %s (Rep %s)", nfolds_reps, reps_nfolds),
                  repetitions * nfolds)
   } else {
     labels = sprintf("Fold %s", seq_along(1:nfolds))
@@ -101,5 +106,7 @@ plot_partitions <- function (task = NULL, resample = NULL, crs = NULL,
   # optionally save file
   if (!is.null(filename)) {
     save_plot(filename, grids, nrow = nrow, ncol = ncol)
+  } else {
+    return(grids)
   }
 }
