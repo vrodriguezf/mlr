@@ -16,6 +16,11 @@
 #'   Coordinate reference system (EPSG code number) for the supplied coordinates in the `Task`.
 #' @param repetitions [integer]\cr
 #'   Number of repetitions.
+#' @param color.train Color for train set.
+#' @param color.test Color for test set.
+#' @param point.size Point size.
+#' @param axis.text.size Font size of axis labels.
+#'
 #' @return [`plot_grid`] object.
 #'
 #' @details
@@ -45,13 +50,13 @@
 #' ## single unnamed resample input with 5 folds and 2 repetitions
 #' ##------------------------------------------------------------
 #'
-#' plotSpatialResampling(spatial.task, r, crs = 32630, repetitions = 2)
+#' plotSpatialResampling(spatial.task, r, crs = 32717, repetitions = 2)
 #'
 #' ##------------------------------------------------------------
 #' ## single named resample input with 5 folds and 1 repetition
 #' ##------------------------------------------------------------
 #'
-#' plotSpatialResampling(spatial.task, list("Resamp" = r), crs = 32630, repetitions = 1)
+#' plotSpatialResampling(spatial.task, list("Resamp" = r), crs = 32717, repetitions = 1)
 #'
 #' ##------------------------------------------------------------
 #' ## multiple named resample inputs with 5 folds and 2 repetitions
@@ -63,11 +68,12 @@
 #' r2 = resample(makeLearner("classif.qda"), spatial.task, rdesc2)
 #'
 #' plotSpatialResampling(spatial.task, list("SpRepCV" = r1, "RepCV" = r2),
-#'   crs = 32630, repetitions = 1)
+#'   crs = 32717, repetitions = 1)
 #'
 #' @export
-plotSpatialResampling <- function(task = NULL, resample = NULL, crs = NULL,
-                                  repetitions = 1, filename = NULL) {
+plotSpatialResampling = function(task = NULL, resample = NULL, crs = NULL,
+  repetitions = 1, filename = NULL, color.train = "#440154",
+  color.test = "#FDE725", point.size = 0.5, axis.text.size = 14) {
 
   if (is.null(crs))
     stopf("Please specify a crs that matches the coordinates of the Task.")
@@ -86,32 +92,32 @@ plotSpatialResampling <- function(task = NULL, resample = NULL, crs = NULL,
   # create plot list with length = folds
   nfolds = map_int(resample, ~ .x$pred$instance$desc$folds)[1]
 
-  plot_list = map(resample, function(.r) {
+  plot.list = map(resample, function(.r) {
 
     # bind coordinates to data
-    data <- cbind(task$env$data, task$coordinates)
+    data = cbind(task$env$data, task$coordinates)
 
     # create 'sf' object
-    data <- st_as_sf(data, coords = names(task$coordinates), crs = crs)
+    data = st_as_sf(data, coords = names(task$coordinates), crs = crs)
 
     # create plot list with length = folds
-    plot_list = map(1:(nfolds * repetitions), ~ data)
+    plot.list = map(1:(nfolds * repetitions), ~ data)
 
-    plot_list = imap(plot_list, ~ ggplot(.x) +
+    plot.list = imap(plot.list, ~ ggplot(.x) +
                        geom_sf(data = subset(.x, as.integer(rownames(.x)) %in%
                                                .r$pred$instance[["train.inds"]][[.y]]),
-                               color = "#440154", size = 0.5, ) +
+                               color = color.train, size = point.size, ) +
                        geom_sf(data = subset(.x,as.integer(rownames(.x)) %in%
                                                .r$pred$instance[["test.inds"]][[.y]]),
-                               color = "#FDE725", size = 0.5, ) +
+                               color = color.train, size = point.size) +
                        theme_ipsum_rc() +
-                       theme(axis.text.x = element_text(size = 14),
-                             axis.text.y = element_text(size = 14),
+                       theme(axis.text.x = element_text(size = axis.text.size),
+                             axis.text.y = element_text(size = axis.text.size),
                              plot.margin = unit(c(0.5, 0.2, 0.2, 0.2), "cm"))
     )
   })
 
-  plot_list = flatten(plot_list)
+  plot.list = flatten(plot.list)
 
   nrow = repetitions
 
@@ -172,7 +178,7 @@ plotSpatialResampling <- function(task = NULL, resample = NULL, crs = NULL,
   }
 
   # create gridded plot
-  grids <- plot_grid(plotlist = plot_list, nrow = nrow, ncol = ncol,
+  grids = plot_grid(plotlist = plot.list, nrow = nrow, ncol = ncol,
                      hjust= - 0.2, vjust = 2,
                      labels = labels)
 
