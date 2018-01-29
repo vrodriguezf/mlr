@@ -13,7 +13,7 @@
 #' @param resample [ResampleResult] or named `list` with (multiple) [ResampleResult]\cr
 #'   As returned by [resample].
 #' @param crs [integer]\cr
-#'   Coordinate reference system (EPSG code number).
+#'   Coordinate reference system (EPSG code number) for the supplied coordinates in the `Task`.
 #' @param repetitions [integer]\cr
 #'   Number of repetitions.
 #' @return [`plot_grid`] object.
@@ -30,27 +30,31 @@
 #'
 #' @section CRS:
 #'
-#' If the specified CRS does not match the CRS of your data + coordinates, the resulting grid will most likely not show coordinate information.
+#' The crs has to be suitable for the coordinates stored in the `Task`.
+#' For example, if the coordinates are UTM, `crs` should be set to a UTM projection.
+#' Due to a limited axis space in the resulting grid, the data will always be projected into a lat/lon projection, specifically EPSG 4326.
+#' If projection (`crs`) and coordinates do not match, axis labels will be empty.
 #'
+#' @md
 #' @examples
 #'
 #' rdesc = makeResampleDesc("SpRepCV", folds = 5, reps = 4)
 #' r = resample(makeLearner("classif.qda"), spatial.task, rdesc)
 #'
 #' ##------------------------------------------------------------
-#' ## single unnamed input with 5 folds and 2 repetitions
+#' ## single unnamed resample input with 5 folds and 2 repetitions
 #' ##------------------------------------------------------------
 #'
 #' plotSpatialResampling(spatial.task, r, crs = 32630, repetitions = 2)
 #'
 #' ##------------------------------------------------------------
-#' ## single named input with 5 folds and 1 repetition
+#' ## single named resample input with 5 folds and 1 repetition
 #' ##------------------------------------------------------------
 #'
 #' plotSpatialResampling(spatial.task, list("Resamp" = r), crs = 32630, repetitions = 1)
 #'
 #' ##------------------------------------------------------------
-#' ## multiple named inputs with 5 folds and 2 repetitions
+#' ## multiple named resample inputs with 5 folds and 2 repetitions
 #' ##------------------------------------------------------------
 #'
 #' rdesc1 = makeResampleDesc("SpRepCV", folds = 5, reps = 4)
@@ -62,8 +66,11 @@
 #'   crs = 32630, repetitions = 1)
 #'
 #' @export
-plotSpatialResampling <- function(task = NULL, resample = NULL, crs = 4326,
+plotSpatialResampling <- function(task = NULL, resample = NULL, crs = NULL,
                                   repetitions = 1, filename = NULL) {
+
+  if (is.null(crs))
+    stopf("Please specify a crs that matches the coordinates of the Task.")
 
   # in case one suppliesonly one resample object
   if (!class(resample)[1] == "list") {
