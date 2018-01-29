@@ -50,13 +50,15 @@
 #' ## single unnamed resample input with 5 folds and 2 repetitions
 #' ##------------------------------------------------------------
 #'
-#' plotSpatialResampling(spatial.task, r, crs = 32717, repetitions = 2)
+#' plotSpatialResampling(spatial.task, r, crs = 32717, repetitions = 2,
+#'   x.breaks = c(-79.055, -79.085), y.breaks = c(-3.965, -4))
 #'
 #' ##------------------------------------------------------------
 #' ## single named resample input with 5 folds and 1 repetition
 #' ##------------------------------------------------------------
 #'
-#' plotSpatialResampling(spatial.task, list("Resamp" = r), crs = 32717, repetitions = 1)
+#' plotSpatialResampling(spatial.task, list("Resamp" = r), crs = 32717,
+#'   repetitions = 1, x.breaks = c(-79.055, -79.085), y.breaks = c(-3.965, -4))
 #'
 #' ##------------------------------------------------------------
 #' ## multiple named resample inputs with 5 folds and 2 repetitions
@@ -68,12 +70,14 @@
 #' r2 = resample(makeLearner("classif.qda"), spatial.task, rdesc2)
 #'
 #' plotSpatialResampling(spatial.task, list("SpRepCV" = r1, "RepCV" = r2),
-#'   crs = 32717, repetitions = 1)
+#'   crs = 32717, repetitions = 1, x.breaks = c(-79.055, -79.085),
+#'   y.breaks = c(-3.965, -4))
 #'
 #' @export
 plotSpatialResampling = function(task = NULL, resample = NULL, crs = NULL,
   repetitions = 1, filename = NULL, color.train = "#440154",
-  color.test = "#FDE725", point.size = 0.5, axis.text.size = 14) {
+  color.test = "#FDE725", point.size = 0.5, axis.text.size = 14,
+  x.breaks = waiver(), y.breaks = waiver()) {
 
   if (is.null(crs))
     stopf("Please specify a crs that matches the coordinates of the Task.")
@@ -110,6 +114,8 @@ plotSpatialResampling = function(task = NULL, resample = NULL, crs = NULL,
                        geom_sf(data = subset(.x,as.integer(rownames(.x)) %in%
                                                .r$pred$instance[["test.inds"]][[.y]]),
                                color = color.test, size = point.size) +
+                       scale_x_continuous(breaks = x.breaks) +
+                       scale_y_continuous(breaks = y.breaks) +
                        theme_ipsum_rc() +
                        theme(axis.text.x = element_text(size = axis.text.size),
                              axis.text.y = element_text(size = axis.text.size),
