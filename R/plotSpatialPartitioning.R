@@ -1,6 +1,6 @@
-#' @title Plot resampling objects.
+#' @title Plot (spatial) resampling objects.
 #'
-#' @description Visualize distribution of observations in (spatial) cross-validation.
+#' @description Visualize partitioning of resample objects with spatial information.
 #' @import ggplot2
 #' @importFrom cowplot plot_grid save_plot
 #' @import sf
@@ -8,41 +8,62 @@
 #' @import hrbrthemes
 #' @family plot
 #' @author Patrick Schratz
-#' @param task [Task()] \cr
+#' @param task [Task] \cr
 #'   Task object.
-#' @param resample [ResampleResult()]\cr
-#'   As returned by [resample()].
-#' @param crs [integer()]\cr
-#'   Specify a custom coordinate reference system.
-#' @param repetitions [integer()]\cr
-#'   How many repetitions should be visualized?
+#' @param resample [ResampleResult] or named `list` with (multiple) [ResampleResult]\cr
+#'   As returned by [resample].
+#' @param crs [integer]\cr
+#'   Coordinate reference system (EPSG code number).
+#' @param repetitions [integer]\cr
+#'   Number of repetitions.
+#' @return [`plot_grid`] object.
+#'
+#' @details
+#' If a named list is given to `resample`, names will appear in the title of each fold.
+#' If multiple inputs are given to `resample`, these must be named.
+#'
+#' This function makes a hard cut at five columns of the resulting grid.
+#' This means if the `resample` object consists of `folds > 5`, these folds will be put into the new row.
+#'
+#' For file saving, [`save_plot`] is used.
+#' If you want to save the returned object manually, make sure to set `ncol` and `nrow` accordingly in [`save_plot`].
+#'
+#' @section CRS:
+#'
+#' If the specified CRS does not match the CRS of your data + coordinates, the resulting grid will most likely not show coordinate information.
+#'
 #' @examples
 #'
-#' data(spatial.task, package = "mlr", envir = environment())
+#' rdesc = makeResampleDesc("SpRepCV", folds = 5, reps = 4)
+#' r = resample(makeLearner("classif.qda"), spatial.task, rdesc)
 #'
-#' lrn.ksvm = makeLearner("classif.ksvm",
-#'                        predict.type = "prob",
-#'                        kernel = "rbfdot")
+#' ##------------------------------------------------------------
+#' ## single unnamed input with 5 folds and 2 repetitions
+#' ##------------------------------------------------------------
 #'
-#' ps = makeParamSet(makeNumericParam("C", lower = 1, upper = 1),
-#'                   makeNumericParam("sigma", lower = 1, upper = 1))
+#' plotSpatialResampling(spatial.task, r, crs = 32630, repetitions = 2)
 #'
-#' ctrl = makeTuneControlRandom(maxit = 1)
-#' inner = makeResampleDesc("SpCV", iters = 2)
+#' ##------------------------------------------------------------
+#' ## single named input with 5 folds and 1 repetition
+#' ##------------------------------------------------------------
 #'
-#' wrapper.ksvm = makeTuneWrapper(lrn.ksvm, resampling = inner, par.set = ps,
-#'                                control = ctrl, show.info = FALSE, measures = list(auc))
+#' plotSpatialResampling(spatial.task, list("Resamp" = r), crs = 32630, repetitions = 1)
 #'
-#' outer = makeResampleDesc("SpRepCV", folds = 5, reps = 4)
+#' ##------------------------------------------------------------
+#' ## multiple named inputs with 5 folds and 2 repetitions
+#' ##------------------------------------------------------------
 #'
-#' set.seed(12)
-#' out = resample(wrapper.ksvm, spatial.task,
-#'                resampling = outer, show.info = TRUE, measures = list(auc))
+#' rdesc1 = makeResampleDesc("SpRepCV", folds = 5, reps = 4)
+#' r1 = resample(makeLearner("classif.qda"), spatial.task, rdesc1)
+#' rdesc2 = makeResampleDesc("RepCV", folds = 5, reps = 4)
+#' r2 = resample(makeLearner("classif.qda"), spatial.task, rdesc2)
 #'
-#' plotPartitions(spatial.task, list(out, out), 32630, repetitions = 1, filename = "~/Downloads/cowplot.png")
+#' plotSpatialResampling(spatial.task, list("SpRepCV" = r1, "RepCV" = r2),
+#'   crs = 32630, repetitions = 1)
+#'
 #' @export
-plotPartitions <- function (task = NULL, resample = NULL, crs = 4326,
-                            repetitions = 1, filename = NULL) {
+plotSpatialResampling <- function(task = NULL, resample = NULL, crs = 4326,
+                                  repetitions = 1, filename = NULL) {
 
   # in case one suppliesonly one resample object
   if (!class(resample)[1] == "list") {
@@ -50,6 +71,10 @@ plotPartitions <- function (task = NULL, resample = NULL, crs = 4326,
   }
   # how many resamp objects do we have?
   n.resamp = length(resample)
+
+  if (n.resamp > 1 && is.null(names(resample))) {
+    stopf("Please name multiple resample inputs.")
+  }
 
   # create plot list with length = folds
   nfolds = map_int(resample, ~ .x$pred$instance$desc$folds)[1]
@@ -61,8 +86,6 @@ plotPartitions <- function (task = NULL, resample = NULL, crs = 4326,
 
     # create 'sf' object
     data <- st_as_sf(data, coords = names(task$coordinates), crs = crs)
-    # add ID column for subsetting of indices later
-    #data$id = seq(1:nrow(data))
 
     # create plot list with length = folds
     plot_list = map(1:(nfolds * repetitions), ~ data)
@@ -81,14 +104,11 @@ plotPartitions <- function (task = NULL, resample = NULL, crs = 4326,
     )
   })
 
-  # if more than one element was supplied, flatten the resulting list
-  if (n.resamp > 1) {
-    plot_list = flatten(plot_list)
-  }
+  plot_list = flatten(plot_list)
 
   nrow = repetitions
 
-  # account for nfolds
+  # account for nfolds: Hard restrict on more than 5 columns in plot grid
   if (nfolds > 5) {
     nrow = nrow + 1
     ncol = 5
@@ -96,29 +116,50 @@ plotPartitions <- function (task = NULL, resample = NULL, crs = 4326,
     ncol = nfolds
   }
 
-
+  # more than 1 repetition?
   if (repetitions > 1) {
     labels = c(length = nfolds * repetitions)
     nfolds_reps = rep(seq_along(1:nfolds), repetitions)
     reps_nfolds = c()
+    names.resample = c()
     for (i in seq_along(1:repetitions)) {
       reps_nfolds = c(reps_nfolds, rep(i, nfolds))
+      if (!is.null(names(resample))) {
+        names.resample = c(names.resample, rep(names(resample)[i], nfolds * repetitions))
+      }
     }
-    labels = rep(sprintf("Fold %s (Rep %s)", nfolds_reps, reps_nfolds),
-                 repetitions * nfolds)
     # account for multiple resamp objects
     if (n.resamp > 1) {
-      labels = rep(labels, n.resamp)
+      labels = rep(rep(sprintf("[%s] Fold %s (Rep %s)", names.resample,
+                               nfolds_reps, reps_nfolds)), n.resamp)
+    } else {
+      if (!is.null(names(resample))) {
+        labels = sprintf("[%s] Fold %s (Rep %s)",
+                         rep(names(resample), nfolds * repetitions),
+                         seq_along(1:nfolds), reps_nfolds)
+      } else {
+        labels = rep(sprintf("Fold %s (Rep %s)", nfolds_reps, reps_nfolds))
+      }
     }
   } else {
-    labels = sprintf("Fold %s", seq_along(1:nfolds))
     # account for multiple resamp objects
     if (n.resamp > 1) {
+      names.resample = c()
+      for (i in seq_along(1:length(names(resample)))) {
+        names.resample = c(names.resample, rep(names(resample)[i], nfolds))
+      }
+      labels = sprintf("[%s] Fold %s", names.resample, seq_along(1:nfolds))
       labels = rep(labels, n.resamp)
+    } else {
+      if (!is.null(names(resample))) {
+        labels = sprintf("[%s] Fold %s", rep(names(resample), nfolds), seq_along(1:nfolds))
+      } else {
+        labels = sprintf("Fold %s", seq_along(1:nfolds))
+      }
     }
   }
 
-  # are multiple tasks
+  # multiple resample inputs?
   if (n.resamp > 1) {
     nrow = nrow * n.resamp
   }
@@ -128,9 +169,10 @@ plotPartitions <- function (task = NULL, resample = NULL, crs = 4326,
                      hjust= - 0.2, vjust = 2,
                      labels = labels)
 
-  # optionally save file
+  # optionally save file to disk
   if (!is.null(filename)) {
     save_plot(filename, grids, nrow = nrow, ncol = ncol)
+    return(invisible(grids))
   } else {
     return(grids)
   }
