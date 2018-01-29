@@ -109,7 +109,7 @@ plotSpatialResampling = function(task = NULL, resample = NULL, crs = NULL,
                                color = color.train, size = point.size, ) +
                        geom_sf(data = subset(.x,as.integer(rownames(.x)) %in%
                                                .r$pred$instance[["test.inds"]][[.y]]),
-                               color = color.train, size = point.size) +
+                               color = color.test, size = point.size) +
                        theme_ipsum_rc() +
                        theme(axis.text.x = element_text(size = axis.text.size),
                              axis.text.y = element_text(size = axis.text.size),
