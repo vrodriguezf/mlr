@@ -14,6 +14,8 @@
 #'   As returned by [resample].
 #' @param crs [integer]\cr
 #'   Coordinate reference system (EPSG code number) for the supplied coordinates in the `Task`.
+#' @param datum [integer]\cr
+#'   Coordinate reference system which should be used in the resulting map.
 #' @param repetitions [integer]\cr
 #'   Number of repetitions.
 #' @param color.train Color for train set.
@@ -27,18 +29,24 @@
 #' If a named list is given to `resample`, names will appear in the title of each fold.
 #' If multiple inputs are given to `resample`, these must be named.
 #'
-#' This function makes a hard cut at five columns of the resulting grid.
+#' This function makes a hard cut at five columns of the resulting gridded plot.
 #' This means if the `resample` object consists of `folds > 5`, these folds will be put into the new row.
 #'
 #' For file saving, [`save_plot`] is used.
 #' If you want to save the returned object manually, make sure to set `ncol` and `nrow` accordingly in [`save_plot`].
 #'
+#' When viewing the resulting plot in RStudio, margins may appear to be different than they really are.
+#' Make sure to save the file to disk and inspect the image.
+#'
+#' When modifying axis breaks, negative values need to be used if the area is located in either the western or southern hemisphere.
+#' Use positive values for the northern and eastern hemisphere.
+#'
 #' @section CRS:
 #'
 #' The crs has to be suitable for the coordinates stored in the `Task`.
 #' For example, if the coordinates are UTM, `crs` should be set to a UTM projection.
-#' Due to a limited axis space in the resulting grid, the data will always be projected into a lat/lon projection, specifically EPSG 4326.
-#' If projection (`crs`) and coordinates do not match, axis labels will be empty.
+#' Due to a limited axis space in the resulting grid (especially on the x-axis), the data will by default projected into a lat/lon projection, specifically EPSG 4326.
+#' If other projections are desired for the resulting map, please set argument `datum` accordingly.
 #'
 #' @md
 #' @examples
@@ -51,14 +59,14 @@
 #' ##------------------------------------------------------------
 #'
 #' plotSpatialResampling(spatial.task, r, crs = 32717, repetitions = 2,
-#'   x.breaks = c(-79.055, -79.085), y.breaks = c(-3.965, -4))
+#'   x.breaks = c(-79.055, -79.085), y.breaks = c(-3.970, -4))
 #'
 #' ##------------------------------------------------------------
-#' ## single named resample input with 5 folds and 1 repetition
+#' ## single named resample input with 5 folds and 1 repetition and 32717 datum
 #' ##------------------------------------------------------------
 #'
 #' plotSpatialResampling(spatial.task, list("Resamp" = r), crs = 32717,
-#'   repetitions = 1, x.breaks = c(-79.055, -79.085), y.breaks = c(-3.965, -4))
+#'   datum = 32717, repetitions = 1)
 #'
 #' ##------------------------------------------------------------
 #' ## multiple named resample inputs with 5 folds and 2 repetitions
@@ -74,7 +82,7 @@
 #'   y.breaks = c(-3.965, -4))
 #'
 #' @export
-plotSpatialResampling = function(task = NULL, resample = NULL, crs = NULL,
+plotSpatialResampling = function(task = NULL, resample = NULL, crs = NULL, datum = 4326,
   repetitions = 1, filename = NULL, color.train = "#440154",
   color.test = "#FDE725", point.size = 0.5, axis.text.size = 14,
   x.breaks = waiver(), y.breaks = waiver()) {
@@ -116,6 +124,7 @@ plotSpatialResampling = function(task = NULL, resample = NULL, crs = NULL,
                                color = color.test, size = point.size) +
                        scale_x_continuous(breaks = x.breaks) +
                        scale_y_continuous(breaks = y.breaks) +
+                       coord_sf(datum = st_crs(datum)) +
                        theme_ipsum_rc() +
                        theme(axis.text.x = element_text(size = axis.text.size),
                              axis.text.y = element_text(size = axis.text.size),
