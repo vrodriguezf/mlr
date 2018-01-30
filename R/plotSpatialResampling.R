@@ -22,6 +22,7 @@
 #' @param color.test Color for test set.
 #' @param point.size Point size.
 #' @param axis.text.size Font size of axis labels.
+#' @param label.size Font size of the plot labels.
 #'
 #' @return [`plot_grid`] object.
 #'
@@ -84,7 +85,7 @@
 #' @export
 plotSpatialResampling = function(task = NULL, resample = NULL, crs = NULL, datum = 4326,
   repetitions = 1, filename = NULL, color.train = "#440154",
-  color.test = "#FDE725", point.size = 0.5, axis.text.size = 14,
+  color.test = "#FDE725", point.size = 0.5, axis.text.size = 14, label.size = 14,
   x.breaks = waiver(), y.breaks = waiver()) {
 
   if (is.null(crs))
@@ -195,7 +196,7 @@ plotSpatialResampling = function(task = NULL, resample = NULL, crs = NULL, datum
   # create gridded plot
   grids = plot_grid(plotlist = plot.list, nrow = nrow, ncol = ncol,
                      hjust= - 0.2, vjust = 2,
-                     labels = labels)
+                     labels = labels, label_size = label.size)
 
   # optionally save file to disk
   if (!is.null(filename)) {
