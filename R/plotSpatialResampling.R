@@ -84,8 +84,8 @@
 #'
 #' @export
 plotSpatialResampling = function(task = NULL, resample = NULL, crs = NULL, datum = 4326,
-  repetitions = 1, filename = NULL, color.train = "#440154",
-  color.test = "#FDE725", point.size = 0.5, axis.text.size = 14, label.size = 14,
+  repetitions = 1, filename = NULL, color.train = "#FDE725",
+  color.test = "#440154", point.size = 0.5, axis.text.size = 14, label.size = 14,
   x.breaks = waiver(), y.breaks = waiver()) {
 
   if (is.null(crs))
