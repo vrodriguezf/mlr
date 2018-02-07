@@ -56,7 +56,8 @@ Plot a partial dependence from \code{\link{generatePartialDependenceData}} using
 Other partial_dependence: \code{\link{generatePartialDependenceData}},
   \code{\link{plotPartialDependenceGGVIS}}
 
-Other plot: \code{\link{plotBMRBoxplots}},
+Other plot: \code{\link{createSpatialResamplingPlots}},
+  \code{\link{plotBMRBoxplots}},
   \code{\link{plotBMRRanksAsBarChart}},
   \code{\link{plotBMRSummary}},
   \code{\link{plotCalibration}},

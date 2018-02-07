@@ -1,8 +1,7 @@
-#' @title Plot (spatial) resampling objects.
+#' @title Create (spatial) resampling plot objects.
 #'
 #' @description Visualize partitioning of resample objects with spatial information.
 #' @import ggplot2
-#' @importFrom cowplot plot_grid save_plot
 #' @import sf
 #' @importFrom purrr map imap is_list flatten map_int
 #' @import hrbrthemes
@@ -22,9 +21,8 @@
 #' @param color.test Color for test set.
 #' @param point.size Point size.
 #' @param axis.text.size Font size of axis labels.
-#' @param label.size Font size of the plot labels.
 #'
-#' @return [`plot_grid`] object.
+#' @return ([list] of `2L` containing (1) multiple `gg`` objects and (2) their corresponding labels.
 #'
 #' @details
 #' If a named list is given to `resample`, names will appear in the title of each fold.
@@ -59,18 +57,20 @@
 #' ## single unnamed resample input with 5 folds and 2 repetitions
 #' ##------------------------------------------------------------
 #'
-#' plotSpatialResampling(spatial.task, r, crs = 32717, repetitions = 2,
-#'   x.breaks = c(-79.055, -79.085), y.breaks = c(-3.970, -4))
+#' plots = createSpatialResamplingPlots(spatial.task, r, crs = 32717,
+#'   repetitions = 2, x.breaks = c(-79.065, -79.085), y.breaks = c(-3.970, -4))
+#' plot_grid(plotlist = plots[["Plots"]], ncol = 5, nrow = 2, labels = plots[["Labels"]])
 #'
 #' ##------------------------------------------------------------
 #' ## single named resample input with 5 folds and 1 repetition and 32717 datum
 #' ##------------------------------------------------------------
 #'
-#' plotSpatialResampling(spatial.task, list("Resamp" = r), crs = 32717,
-#'   datum = 32717, repetitions = 1)
+#' plots = createSpatialResamplingPlots(spatial.task, list("Resamp" = r),
+#'   crs = 32717,datum = 32717, repetitions = 1)
+#' plot_grid(plotlist = plots[["Plots"]], ncol = 5, nrow = 1, labels = plots[["Labels"]])
 #'
 #' ##------------------------------------------------------------
-#' ## multiple named resample inputs with 5 folds and 2 repetitions
+#' ## multiple named resample inputs with 5 folds and 1 repetition
 #' ##------------------------------------------------------------
 #'
 #' rdesc1 = makeResampleDesc("SpRepCV", folds = 5, reps = 4)
@@ -78,14 +78,31 @@
 #' rdesc2 = makeResampleDesc("RepCV", folds = 5, reps = 4)
 #' r2 = resample(makeLearner("classif.qda"), spatial.task, rdesc2)
 #'
-#' plotSpatialResampling(spatial.task, list("SpRepCV" = r1, "RepCV" = r2),
+#' plots = createSpatialResamplingPlots(spatial.task, list("SpRepCV" = r1, "RepCV" = r2),
 #'   crs = 32717, repetitions = 1, x.breaks = c(-79.055, -79.085),
-#'   y.breaks = c(-3.965, -4))
+#'   y.breaks = c(-3.975, -4))
+#' plot_grid(plotlist = plots[["Plots"]], ncol = 5, nrow = 2, labels = plots[["Labels"]])
+#'
+#' ##-------------------------------------------------------------------------------------
+#' ## Complex arrangements of multiple named resample inputs with 5 folds and 1 repetition
+#' ##-------------------------------------------------------------------------------------
+#'
+#' p1 <- plot_grid(plist[["Plots"]][[1]], plist[["Plots"]][[2]], plist[["Plots"]][[3]], ncol = 3, nrow = 1, labels = plist[["Labels"]][1:3],
+#'                label_size = 18)
+#' p12 <- plot_grid(plist[["Plots"]][[4]], plist[["Plots"]][[5]], ncol = 2, nrow = 1, labels = plist[["Labels"]][4:5],
+#'                 label_size = 18)
+#'
+#' p2 <- plot_grid(plist[["Plots"]][[6]], plist[["Plots"]][[7]], plist[["Plots"]][[8]], ncol = 3, nrow = 1, labels = plist[["Labels"]][6:8],
+#'                 label_size = 18)
+#' p22 <- plot_grid(plist[["Plots"]][[9]], plist[["Plots"]][[10]], ncol = 2, nrow = 1, labels = plist[["Labels"]][9:10],
+#'                  label_size = 18)
+#'
+#' plot_grid(p1, p12, p2, p22, ncol = 1)
 #'
 #' @export
-plotSpatialResampling = function(task = NULL, resample = NULL, crs = NULL, datum = 4326,
-  repetitions = 1, filename = NULL, color.train = "#FDE725",
-  color.test = "#440154", point.size = 0.5, axis.text.size = 14, label.size = 14,
+createSpatialResamplingPlots = function(task = NULL, resample = NULL, crs = NULL, datum = 4326,
+  repetitions = 1, filename = NULL, color.train = "#440154",
+  color.test = "#FDE725", point.size = 0.5, axis.text.size = 14,
   x.breaks = waiver(), y.breaks = waiver()) {
 
   if (is.null(crs))
@@ -138,9 +155,9 @@ plotSpatialResampling = function(task = NULL, resample = NULL, crs = NULL, datum
   nrow = repetitions
 
   # account for nfolds: Hard restrict on more than 5 columns in plot grid
-  if (nfolds > 5) {
+  if (nfolds > 3) {
     nrow = nrow + 1
-    ncol = 5
+    ncol = 3
   } else {
     ncol = nfolds
   }
@@ -193,16 +210,6 @@ plotSpatialResampling = function(task = NULL, resample = NULL, crs = NULL, datum
     nrow = nrow * n.resamp
   }
 
-  # create gridded plot
-  grids = plot_grid(plotlist = plot.list, nrow = nrow, ncol = ncol,
-                     hjust= - 0.2, vjust = 2,
-                     labels = labels, label_size = label.size)
+  return(invisble(list("Plots" = plot.list, "Labels" = labels)))
 
-  # optionally save file to disk
-  if (!is.null(filename)) {
-    save_plot(filename, grids, nrow = nrow, ncol = ncol)
-    return(invisible(grids))
-  } else {
-    return(grids)
-  }
 }

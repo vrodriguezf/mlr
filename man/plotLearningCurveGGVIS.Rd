@@ -30,7 +30,8 @@ a ggvis plot object.
 Visualizes data size (percentage used for model) vs. performance measure(s).
 }
 \seealso{
-Other plot: \code{\link{plotBMRBoxplots}},
+Other plot: \code{\link{createSpatialResamplingPlots}},
+  \code{\link{plotBMRBoxplots}},
   \code{\link{plotBMRRanksAsBarChart}},
   \code{\link{plotBMRSummary}},
   \code{\link{plotCalibration}},
