@@ -210,6 +210,6 @@ createSpatialResamplingPlots = function(task = NULL, resample = NULL, crs = NULL
     nrow = nrow * n.resamp
   }
 
-  return(invisble(list("Plots" = plot.list, "Labels" = labels)))
+  return(invisible(list("Plots" = plot.list, "Labels" = labels)))
 
 }
