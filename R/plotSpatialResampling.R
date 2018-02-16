@@ -58,7 +58,7 @@
 #' ##------------------------------------------------------------
 #'
 #' plots = createSpatialResamplingPlots(spatial.task, r, crs = 32717,
-#'   repetitions = 2, x.breaks = c(-79.065, -79.085), y.breaks = c(-3.970, -4))
+#'   repetitions = 2, x.axis.breaks = c(-79.065, -79.085), y.axis.breaks = c(-3.970, -4))
 #' plot_grid(plotlist = plots[["Plots"]], ncol = 5, nrow = 2, labels = plots[["Labels"]])
 #'
 #' ##------------------------------------------------------------
@@ -79,8 +79,8 @@
 #' r2 = resample(makeLearner("classif.qda"), spatial.task, rdesc2)
 #'
 #' plots = createSpatialResamplingPlots(spatial.task, list("SpRepCV" = r1, "RepCV" = r2),
-#'   crs = 32717, repetitions = 1, x.breaks = c(-79.055, -79.085),
-#'   y.breaks = c(-3.975, -4))
+#'   crs = 32717, repetitions = 1, x.axis.breaks = c(-79.055, -79.085),
+#'   y.axis.breaks = c(-3.975, -4))
 #' plot_grid(plotlist = plots[["Plots"]], ncol = 5, nrow = 2, labels = plots[["Labels"]])
 #'
 #' ##-------------------------------------------------------------------------------------
@@ -100,15 +100,18 @@
 #' plot_grid(p1, p12, p2, p22, ncol = 1)
 #'
 #' @export
-createSpatialResamplingPlots = function(task = NULL, resample = NULL, crs = NULL, datum = 4326,
-  repetitions = 1, filename = NULL, color.train = "#440154",
-  color.test = "#FDE725", point.size = 0.5, axis.text.size = 14,
-  x.breaks = waiver(), y.breaks = waiver()) {
+createSpatialResamplingPlots = function(task = NULL, resample = NULL, crs = NULL,
+  datum = 4326, repetitions = 1, color.train = "#440154", color.test = "#FDE725",
+  point.size = 0.5, axis.text.size = 14, x.axis.breaks = waiver(), y.axis.breaks = waiver()) {
 
+  # some checks
   if (is.null(crs))
-    stopf("Please specify a crs that matches the coordinates of the Task.")
+    stopf("Please specify a crs that matches the coordinates of the task.")
+  if(task$task.desc$has.coordinates == FALSE)
+    stopf("The supplied task needs to have coordinates.")
 
-  # in case one suppliesonly one resample object
+  # in case one supplies only one resample object, wrap it into a list
+  # to work with map()
   if (!class(resample)[1] == "list") {
     resample = list(resample)
   }
@@ -116,7 +119,8 @@ createSpatialResamplingPlots = function(task = NULL, resample = NULL, crs = NULL
   n.resamp = length(resample)
 
   if (n.resamp > 1 && is.null(names(resample))) {
-    stopf("Please name multiple resample inputs.")
+    length.n.resamp = length(resample)
+    names(resample) = seq(1:length.n.resamp)
   }
 
   # create plot list with length = folds
@@ -140,8 +144,8 @@ createSpatialResamplingPlots = function(task = NULL, resample = NULL, crs = NULL
                        geom_sf(data = subset(.x,as.integer(rownames(.x)) %in%
                                                .r$pred$instance[["test.inds"]][[.y]]),
                                color = color.test, size = point.size) +
-                       scale_x_continuous(breaks = x.breaks) +
-                       scale_y_continuous(breaks = y.breaks) +
+                       scale_x_continuous(breaks = x.axis.breaks) +
+                       scale_y_continuous(breaks = y.axis.breaks) +
                        coord_sf(datum = st_crs(datum)) +
                        theme_ipsum_rc() +
                        theme(axis.text.x = element_text(size = axis.text.size),
@@ -152,15 +156,15 @@ createSpatialResamplingPlots = function(task = NULL, resample = NULL, crs = NULL
 
   plot.list = flatten(plot.list)
 
-  nrow = repetitions
+  # nrow = repetitions
 
   # account for nfolds: Hard restrict on more than 5 columns in plot grid
-  if (nfolds > 3) {
-    nrow = nrow + 1
-    ncol = 3
-  } else {
-    ncol = nfolds
-  }
+  # if (nfolds > 5) {
+  #   nrow = nrow + 1
+  #   ncol = 5
+  # } else {
+  #   ncol = nfolds
+  # }
 
   # more than 1 repetition?
   if (repetitions > 1) {
@@ -206,10 +210,9 @@ createSpatialResamplingPlots = function(task = NULL, resample = NULL, crs = NULL
   }
 
   # multiple resample inputs?
-  if (n.resamp > 1) {
-    nrow = nrow * n.resamp
-  }
+  # if (n.resamp > 1) {
+  #   nrow = nrow * n.resamp
+  # }
 
   return(invisible(list("Plots" = plot.list, "Labels" = labels)))
-
 }
