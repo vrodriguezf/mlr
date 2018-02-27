@@ -27,10 +27,10 @@
 #' @return Object of class \dQuote{Filter}.
 #' @export
 #' @family filter
-makeFilter = function(name, desc, pkg, supported.tasks, supported.features, fun) {
+makeFilter = function(name, desc, pkg = NULL, supported.tasks, supported.features, fun) {
   assertString(name)
   assertString(desc)
-  assertCharacter(pkg, any.missing = FALSE)
+  assertString(pkg, any.missing = FALSE, null.ok = TRUE, na.ok = FALSE, min.chars = 1)
   assertCharacter(supported.tasks, any.missing = FALSE)
   assertCharacter(supported.features, any.missing = FALSE)
   assertFunction(fun, c("task", "nselect"))
