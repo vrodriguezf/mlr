@@ -26,7 +26,7 @@ getThresholdFromOptPath = function(opt.path, inds) {
 getThresholdFromExtra = function(extra) {
   ns = names(extra)
   extra = extra[stri_detect_regex(ns, "^threshold")]
-  setNames(ex, stri_replace_first(names(extra), "", regex = "^threshold\\."))
+  setNames(extra, stri_replace_first(names(extra), "", regex = "^threshold\\."))
 }
 
 ##### tuning #####

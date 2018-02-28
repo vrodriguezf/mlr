@@ -35,16 +35,14 @@ tuneMBO = function(learner, task, resampling, measures, par.set, control,
   # if threshold tuning is on, we extract the threshold from extras
   if (control$tune.threshold) {
     el = getOptPathEl(or$opt.path, or$best.ind)
-    th = mean(getThresholdFromExtra(el$extra))
+    th = mean(getThresholdFromExtra(el$extra)$threshold)
   } else {
     th = NULL
   }
   if (multicrit) {
-    res = makeTuneMultiCritResult(learner, ind, removeMissingValues(x), y, control,
-      opt.path, measures, mbo.result = or)
+    res = makeTuneMultiCritResult(learner, ind, removeMissingValues(x), y, control, opt.path, measures, mbo.result = or)
   } else {
-    res = makeTuneResult(learner, control, removeMissingValues(x), y, th, opt.path,
-      mbo.result = or)
+    res = makeTuneResult(learner, control, removeMissingValues(x), y, th, opt.path, mbo.result = or)
   }
 
   return(res)
