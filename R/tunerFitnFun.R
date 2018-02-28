@@ -25,7 +25,7 @@ tunerFitnFun = function(x, learner, task, resampling, measures, par.set, ctrl,
   }
   addOptPathEl(opt.path, x = x, y = res$y, dob = dob, eol = NA, check.feasible = TRUE,
     exec.time = res$exec.time, error.message = res$errmsg, extra = extra)
-  convertYForTuner(res$y, measures, ctrl, always.minimize)
+  convertYForTuner(res$y, measures, ctrl, always.minimize, extra)
 }
 
 tunerSmoofFun = function(learner, task, resampling, measures, par.set, ctrl, opt.path, show.info, convertx, remove.nas, resample.fun) {
@@ -66,7 +66,7 @@ tunerFitnFunVectorized = function(xs, learner, task, resampling, measures, par.s
 }
 
 # short helper that imputes illegal values and also negates for maximization problems
-convertYForTuner = function(y, measures, ctrl, always.minimize = TRUE) {
+convertYForTuner = function(y, measures, ctrl, always.minimize = TRUE, extra = NULL) {
   is.multicrit = inherits(ctrl, "TuneMultiCritControl")
   k = ifelse(is.multicrit, length(y), 1L)
   for (j in seq_len(k)) {
@@ -78,8 +78,13 @@ convertYForTuner = function(y, measures, ctrl, always.minimize = TRUE) {
     y[[j]] = if (always.minimize && !measures[[j]]$minimize) -1 * z else z
   }
   # for multicrit, return vector (without names), otherwise just scalar y
-  if (inherits(ctrl, "TuneMultiCritControl"))
-    return(as.numeric(y))
-  else
-    return(y[[1L]])
+  if (inherits(ctrl, "TuneMultiCritControl")) {
+    y = as.numeric(y)
+  } else {
+    y = y[[1L]]
+  }
+  if (!is.null(extra) && (inherits(ctrl, "TuneControlMBO") || inherits(ctrl, "TuneMultiCritControlMBO"))) {
+    attr(y, "extras") = extra
+  }
+  return(y)
 }
