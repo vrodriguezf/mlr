@@ -21,12 +21,16 @@ test_that("tuneThreshold", {
 test_that("tuheThreshold works with all tuning methods", {
   lrn = makeLearner("classif.lda", predict.type = "prob")
   ps = makeParamSet(makeNumericParam("nu", lower = 2, upper = 3))
+  mbo.ctrl = makeMBOControl()
+  mbo.ctrl = setMBOControlTermination(iters = 1)
+  mbo.des = generateDesign(n = 1, par.set = ps)
   ctrls = list(
     gensa = makeTuneControlGenSA(start = list(nu = 2.5), maxit = 1, tune.threshold = TRUE),
     cmaes = makeTuneControlCMAES(start = list(nu = 2.5), maxit = 1, tune.threshold = TRUE),
     design = makeTuneControlDesign(design = generateDesign(n = 2, par.set = ps),  tune.threshold = TRUE),
     grid = makeTuneControlGrid(resolution = 2L, tune.threshold = TRUE),
-    irace = makeTuneControlIrace(maxExperiments = 12, nbIterations = 1L, minNbSurvival = 1, tune.threshold = TRUE)
+    irace = makeTuneControlIrace(maxExperiments = 12, nbIterations = 1L, minNbSurvival = 1, tune.threshold = TRUE),
+    mbo = makeTuneControlMBO(mbo.control = mbo.ctrl, mbo.design = mbo.des, tune.threshold = TRUE)
   )
   for (ctrl in ctrls) {
     lrn.tuned = makeTuneWrapper(lrn, resampling = cv2, measures = acc, par.set = ps, control = ctrl)
