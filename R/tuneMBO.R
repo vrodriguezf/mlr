@@ -35,7 +35,7 @@ tuneMBO = function(learner, task, resampling, measures, par.set, control,
   # if threshold tuning is on, we extract the threshold from extras
   if (control$tune.threshold) {
     el = getOptPathEl(or$opt.path, or$best.ind)
-    th = mean(getThresholdFromExtra(el$extra)$threshold)
+    th = unlist(getThresholdFromExtra(el$extra))
   } else {
     th = NULL
   }
