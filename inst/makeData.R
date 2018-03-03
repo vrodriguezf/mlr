@@ -1,13 +1,9 @@
 library(mlr)
 library(BBmisc)
 library(devtools)
-<<<<<<< HEAD
 load_all("..")
-
 dn = "../data"
 stopifnot(isDirectory(dn))
-=======
->>>>>>> oneclass_RLearner_h2o
 DATASEED = 7761  # nolint
 COMPRESSION = "xz" # nolint
 # classification
