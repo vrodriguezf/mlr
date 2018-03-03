@@ -33,13 +33,14 @@ Authors@R: c(
     person("Martin", "Binder", email = "ma.binder@campus.lmu.de", role = "ctb"),
     person("Florian", "Pfisterer", email = "pfistererf@googlemail.com", role = "ctb"),
     person("Stefan", "Coors", email = "stefan.coors@gmx.net", role = "ctb"),
-    person("Patrick", "Schratz", email = "patrick.schratz@gmail.com", role = "ctb"))
-    person("Minh-Anh", "Le", email = "minh-anh.le@cdtm.de", role = "ctb"))
+    person("Minh Anh", "Le", email = "minh-anh.le@cdtm.de", role = "ctb"),
+    person("Patrick", "Schratz", email = "patrick.schratz@gmail.com", role = "ctb"),
+    person("Steve", "Bronder", email = "sab2287@columbia.edu", role = "ctb"))
 URL: https://github.com/mlr-org/mlr
 BugReports: https://github.com/mlr-org/mlr/issues
 License: BSD_2_clause + file LICENSE
 Encoding: UTF-8
-Roxygen: list(wrap = FALSE)
+Roxygen: list(wrap = FALSE, markdown = TRUE)
 Depends:
     R (>= 3.0.2),
     ParamHelpers (>= 1.10)
@@ -96,7 +97,6 @@ Suggests:
     FSelector,
     gbm,
     GenSA,
-    ggvis,
     glmnet,
     h2o (>= 3.6.0.8),
     GPfit,
@@ -118,6 +118,7 @@ Suggests:
     mlbench,
     mldr,
     mlrMBO,
+    mmpf,
     modeltools,
     mRMRe,
     nnet,
@@ -137,7 +138,6 @@ Suggests:
     refund,
     Rfast,
     rFerns,
-    rjson,
     rknn,
     rmarkdown,
     robustbase,

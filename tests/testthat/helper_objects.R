@@ -2,6 +2,7 @@ library(Matrix)
 library(MASS)
 data(Sonar, package = "mlbench", envir = environment())
 data(BreastCancer, package = "mlbench", envir = environment())
+data(spatial.task, package = "mlr", envir = environment())
 
 binaryclass.df = Sonar
 binaryclass.formula = Class~.
@@ -14,17 +15,17 @@ binaryclass.class.col = 61
 binaryclass.class.levs = levels(binaryclass.df[, binaryclass.class.col])
 binaryclass.task = makeClassifTask("binary", data = binaryclass.df, target = binaryclass.target)
 
-data("bc.task.spatial", package = "mlr")
-binaryclass.spatial.df = bc.task.spatial$env$data
-binaryclass.spatial.formula = diplo01~.
-binaryclass.spatial.target = "diplo01"
+binaryclass.spatial.df = spatial.task$env$data
+coordinates = spatial.task$coordinates
+binaryclass.spatial.formula = slides~.
+binaryclass.spatial.target = "slides"
 binaryclass.spatial.train.inds = c(1:300, 600:900)
 binaryclass.spatial.test.inds  = setdiff(seq_len(nrow(binaryclass.spatial.df)), binaryclass.spatial.train.inds)
 binaryclass.spatial.train = binaryclass.spatial.df[binaryclass.spatial.train.inds, ]
 binaryclass.spatial.test  = binaryclass.spatial.df[binaryclass.spatial.test.inds, ]
 binaryclass.spatial.class.col = 3
 binaryclass.spatial.class.levs = levels(binaryclass.spatial.df[, binaryclass.spatial.class.col])
-binaryclass.spatial.task = makeClassifTask("binary", data = binaryclass.spatial.df, target = binaryclass.spatial.target, spatial = TRUE)
+binaryclass.spatial.task = makeClassifTask("binary", data = binaryclass.spatial.df, target = binaryclass.spatial.target, coordinates = coordinates)
 
 data(iris, package = "datasets")
 multiclass.df = iris
@@ -71,32 +72,34 @@ noclass.task = makeClusterTask("noclass", data = noclass.df)
 # one-classification (anomaly detection)
 set.seed(123)
 sigma = matrix(c(2, 0, 0, 5, 0, 0), 2, 2)
-normal = MASS::mvrnorm(n = 100, rep(0, 2), sigma)
+normal = MASS::mvrnorm(n = 1000, rep(0, 2), sigma)
 colnames(normal) = paste0("V", 1:2)
 normal = as.data.frame(normal)
 normal$Target = "normal"
 
-anomaly = matrix(sample(size = 5 * 2, x = 20:100, replace = TRUE), 5, 2)
+anomaly = matrix(sample(size = 50 * 2, x = 20:100, replace = TRUE), 50, 2)
 colnames(anomaly) = paste0("V", 1:2)
 anomaly = as.data.frame(anomaly)
 anomaly$Target = "anomaly"
 data = rbind(normal, anomaly)
 data = na.omit(data)
 data$Target = factor(data$Target)
-data[, 1:2] = normalize(data[ ,1:2])
+data[, 1:2] = scale(data[, 1:2])
 
 oneclass.truth = data$Target
 oneclass.df = data
 oneclass.target = "Target"
 
 oneclass.col = 3
-oneclass.train.inds = c(1:100)
+oneclass.train.inds = c(1:700)
 oneclass.test.inds  = setdiff(seq_len(nrow(oneclass.df)), oneclass.train.inds)
 oneclass.train = oneclass.df[oneclass.train.inds, ]
 oneclass.test  = oneclass.df[oneclass.test.inds, ]
 oneclass.positive = "anomaly"
 oneclass.negative = "normal"
-oneclass.task = makeOneClassTask("oneclass", data = oneclass.df, target = oneclass.target, positive = oneclass.positive, negative = oneclass.negative)
+
+oneclass.task = makeOneClassTask("oneclass", data = oneclass.df,
+  target = oneclass.target, positive = oneclass.positive, negative = oneclass.negative)
 
 data(BostonHousing, package = "mlbench", envir = environment())
 regr.df = BostonHousing
