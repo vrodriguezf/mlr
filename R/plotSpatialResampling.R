@@ -126,7 +126,7 @@ createSpatialResamplingPlots = function(task = NULL, resample = NULL, crs = NULL
   # create plot list with length = folds
   nfolds = map_int(resample, ~ .x$pred$instance$desc$folds)[1]
 
-  plot.list = map(resample, function(.r) {
+  plot.list.out.all = map(resample, function(.r) {
 
     # bind coordinates to data
     data = cbind(task$env$data, task$coordinates)
@@ -137,7 +137,7 @@ createSpatialResamplingPlots = function(task = NULL, resample = NULL, crs = NULL
     # create plot list with length = folds
     plot.list = map(1:(nfolds * repetitions), ~ data)
 
-    plot.list = imap(plot.list, ~ ggplot(.x) +
+    plot.list.out = imap(plot.list, ~ ggplot(.x) +
                        geom_sf(data = subset(.x, as.integer(rownames(.x)) %in%
                                                .r$pred$instance[["train.inds"]][[.y]]),
                                color = color.train, size = point.size, ) +
@@ -152,9 +152,10 @@ createSpatialResamplingPlots = function(task = NULL, resample = NULL, crs = NULL
                              axis.text.y = element_text(size = axis.text.size),
                              plot.margin = unit(c(0.5, 0.2, 0.2, 0.2), "cm"))
     )
+    return(plot.list.out)
   })
 
-  plot.list = flatten(plot.list)
+  plot.list = flatten(plot.list.out.all)
 
   # nrow = repetitions
 
