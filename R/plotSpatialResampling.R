@@ -101,7 +101,7 @@
 #'
 #' @export
 createSpatialResamplingPlots = function(task = NULL, resample = NULL, crs = NULL,
-  datum = 4326, repetitions = 1, color.train = "#440154", color.test = "#FDE725",
+  datum = 4326, repetitions = 1, color.train = "#0072B5", color.test = "#E18727",
   point.size = 0.5, axis.text.size = 14, x.axis.breaks = waiver(), y.axis.breaks = waiver()) {
 
   # some checks
