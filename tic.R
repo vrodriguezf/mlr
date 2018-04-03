@@ -12,6 +12,13 @@ if (Sys.getenv("RCMDCHECK") == "TRUE") {
   get_stage("before_script") %>%
     add_code_step(system2("java", args = c("-cp", "$HOME/R/Library/RWekajars/java/weka.jar weka.core.WekaPackageManager",
                                            "-install-package", "thirdparty/XMeans1.0.4.zip")))
+
+  get_stage("before_deploy") %>%
+    add_step(step_setup_ssh())
+
+  get_stage("deploy") %>%
+    add_code_step(system2("bash", args = c("inst/convert_to_ascii_news.sh"))) %>%
+    add_step(step_push_deploy(orphan = FALSE, branch = "travis_test_deploy", commit_paths = c("man/*", "NEWS")))
 }
 
 if (Sys.getenv("TUTORIAL") == "HTML") {
