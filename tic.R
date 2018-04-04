@@ -18,6 +18,7 @@ if (Sys.getenv("RCMDCHECK") == "TRUE") {
 
   get_stage("deploy") %>%
     add_code_step(system2("bash", args = c("inst/convert_to_ascii_news.sh"))) %>%
+    add_code_step(devtools::document()) %>%
     add_step(step_push_deploy(orphan = FALSE, branch = "travis_test_deploy", commit_paths = c("man/*", "NEWS")))
 }
 
