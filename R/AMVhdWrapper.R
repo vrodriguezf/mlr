@@ -10,10 +10,12 @@
 #' Afterwards AMV can be applied on each subsamples, yielding partial scores AMV_k.
 #' The mean of the partial scores is the new performance criteria AMVhd (see \code{makeAMVhdMeasure}).
 #'
+#' The wrapper is used within the AMVhd measure.
+#'
 #' Training is implemented as follows:
 #' For each iteration a data subset with random feature subsample is drawn
 #' (without replacement). On each subset the model is trained with the base learner.
-#' Addtionally the model on the full data set is also trained. The training with
+#' Addtionally, the model on the full data set is also trained. The training with
 #' the wrapper returns a list of all models. The first element of the list contrains
 #' the model on the full data set.
 #'
@@ -41,7 +43,7 @@
 #' @family wrapper
 #' @export
 
-makeAMVhdWrapper = function(learner, amv.iters = 10L, amv.feats = 3) {
+makeAMVhdWrapper = function(learner, amv.iters, amv.feats) {
   learner = checkLearner(learner, type = "oneclass")
   pv = list()
   if (!missing(amv.iters)) {
@@ -74,14 +76,14 @@ print.AMVhdModel = function(x, ...) {
 
 #' @export
 trainLearner.AMVhdWrapper = function(.learner, .task, .subset = NULL, .weights = NULL,
-  amv.iters = 10, amv.feats = 3, ...) {
+  amv.iters, amv.feats, ...) {
   .task = subsetTask(.task, subset = .subset)
   d = getTaskNFeats(.task)
 
   fullmodel = train(.learner$next.learner, .task)
   args = list(d = d, dsub = amv.feats,  task = .task, learner = .learner, weights = .weights)
   parallelLibrary("mlr", master = FALSE, show.info = FALSE)
-  exportMlrOptions(level = "mlr.ensemble")
+  #exportMlrOptions(level = "mlr.ensemble")
   models = parallelMap(doAMVhdTrainIteration, i = seq_len(amv.iters), more.args = args)
   models[[amv.iters + 1]] =  fullmodel
   models = rev(models)

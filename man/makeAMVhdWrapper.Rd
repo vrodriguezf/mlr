@@ -5,23 +5,23 @@
 \title{Preprocessing for using the anomaly detecion performance measure
 Area under the Mass Volume Curve for high dimensional data (AMVhd).}
 \usage{
-makeAMVhdWrapper(learner, amv.iters = 10L, amv.feats = 3)
+makeAMVhdWrapper(learner, amv.iters, amv.feats)
 }
 \arguments{
-\item{learner}{[\code{\link{Learner}} | \code{character(1)}]\cr
+\item{learner}{([Learner] | `character(1)`)\cr
 The learner.
-If you pass a string the learner will be created via \code{\link{makeLearner}}.}
+If you pass (`character(1)`) string the learner will be created via [makeLearner].}
 
-\item{amv.iters}{[\code{integer(1)}]\cr
+\item{amv.iters}{\link{\code{integer(1)}}\cr
 Iterations = number of fitted sub models.
 Default is 10.}
 
-\item{amv.feats}{[\code{numeric(1)}]\cr
+\item{amv.feats}{\link{\code{numeric(1)}}\cr
 Size of randomly selected features for the sub models.
 Default is 3.}
 }
 \value{
-[\code{\link{Learner}}].
+[Learner].
 }
 \description{
 For prediction on data with dimension higher than eight the AMV should not be
@@ -30,12 +30,14 @@ The basic idea is that the wrapper does several feature sub-samplings
 (of dimension less than 8) to reduce the dimension of the subsets and applying
 the model and the prediction on each subsample.
 Afterwards AMV can be applied on each subsamples, yielding partial scores AMV_k.
-The mean of the partial scores is the new performancecriteria AMVhd (see \code{makeAMVhdMeasure}).
+The mean of the partial scores is the new performance criteria AMVhd (see \code{makeAMVhdMeasure}).
+
+The wrapper is used within the AMVhd measure.
 
 Training is implemented as follows:
 For each iteration a data subset with random feature subsample is drawn
-(without replacement)). On each subset the model is trained with the base learner.
-Addtionally the model on the full data set is also trained. The training with
+(without replacement). On each subset the model is trained with the base learner.
+Addtionally, the model on the full data set is also trained. The training with
 the wrapper returns a list of all models. The first element of the list contrains
 the model on the full data set.
 

@@ -1,5 +1,3 @@
-library(checkmate)
-
 requirePackagesOrSkip = function(packs, default.method = "attach") {
   ok = requirePackages(packs, why = "unit test", stop = FALSE, suppress.warnings = TRUE, default.method = default.method)
   if (any(!ok))
@@ -60,7 +58,7 @@ testSimple = function(t.name, df, target, train.inds, old.predicts, parset = lis
     stop("Should not happen!")
   m = try(train(lrn, task, subset = inds))
 
-  if (inherits(m, "FailureModel")){
+  if (inherits(m, "FailureModel")) {
     expect_is(old.predicts, "try-error")
   } else {
     cp = predict(m, newdata = test)
@@ -69,14 +67,19 @@ testSimple = function(t.name, df, target, train.inds, old.predicts, parset = lis
       rownames(cp$data) = NULL
       expect_equal(unname(cp$data[, substr(colnames(cp$data), 1, 8) == "response"]), unname(old.predicts))
     } else {
-      # to avoid issues with dropped levels in the class factor we only check the elements as chars
-      if (is.numeric(cp$data$response) && is.numeric(old.predicts))
+    # to avoid issues with dropped levels in the class factor we only check the elements as chars
+    if (is.numeric(cp$data$response) && is.numeric(old.predicts))
+      if (lrn$predict.type == "se") {
+        expect_equal(unname(cbind(cp$data$response, cp$data$se)), unname(old.predicts), tol = 1e-5)
+      } else {
         expect_equal(unname(cp$data$response), unname(old.predicts), tol = 1e-5)
-      else
-        expect_equal(as.character(cp$data$response), as.character(old.predicts))
+      }
+    else
+      expect_equal(as.character(cp$data$response), as.character(old.predicts))
     }
   }
 }
+
 
 testSimpleParsets = function(t.name, df, target, train.inds, old.predicts.list, parset.list) {
   inds = train.inds
@@ -129,6 +132,41 @@ testProb = function(t.name, df, target, train.inds, old.probs, parset = list(), 
   }
 }
 
+testProbWithTol = function(t.name, df, target, train.inds, old.probs, parset = list(),
+  tol = 1e-04) {
+  inds = train.inds
+  train = df[inds, ]
+  test = df[-inds, ]
+
+  if (length(target) == 1) {
+    task = makeClassifTask(data = df, target = target)
+  } else {
+    task = makeMultilabelTask(data = df, target = target)
+  }
+  lrn = do.call("makeLearner", c(t.name, parset, predict.type = "prob"))
+  m = try(train(lrn, task, subset = inds))
+
+  if (inherits(m, "FailureModel")) {
+    expect_is(old.predicts, "try-error")
+  } else{
+    cp = predict(m, newdata = test)
+    # dont need names for num vector, 2 classes
+    if (is.numeric(old.probs))
+      names(old.probs) = NULL
+    else
+      old.probs = as.matrix(old.probs)
+
+    p = getPredictionProbabilities(cp)
+    if (is.data.frame(p))
+      p = as.matrix(p)
+    # we change names a bit so dont check them
+    colnames(p) = colnames(old.probs) = NULL
+    rownames(p) = rownames(old.probs) = NULL
+    class(old.probs) = NULL
+    expect_equal(p, old.probs, tolerance = tol)
+  }
+}
+
 testProbParsets = function(t.name, df, target, train.inds, old.probs.list, parset.list, positive = NULL, negative = NULL) {
   inds = train.inds
   train = df[inds, ]
@@ -140,6 +178,21 @@ testProbParsets = function(t.name, df, target, train.inds, old.probs.list, parse
     testProb(t.name, df, target, train.inds, old.probs, parset, positive, negative)
   }
 }
+
+
+testProbParsetsWithTol = function(t.name, df, target, train.inds, old.probs.list, parset.list,
+  tol = 1e-04) {
+  inds = train.inds
+  train = df[inds, ]
+  test = df[-inds, ]
+
+  for (i in seq_along(parset.list)) {
+    parset = parset.list[[i]]
+    old.probs = old.probs.list[[i]]
+    testProbWithTol(t.name, df, target, train.inds, old.probs, parset, tol = tol)
+  }
+}
+
 
 testCV = function(t.name, df, target, folds = 2, parset = list(), tune.train, tune.predict = predict) {
   requirePackages("e1071", default.method = "load")
@@ -178,6 +231,7 @@ testCV = function(t.name, df, target, folds = 2, parset = list(), tune.train, tu
     expect_equal(mean(ms[, "mse"]), tr$performances[1, 2], check.names = FALSE)
     expect_equal(sd(ms[, "mse"]), tr$performances[1, 3], check.names = FALSE)
   }
+  invisible(TRUE)
 }
 
 testCVParsets = function(t.name, df, target, folds = 2, tune.train, tune.predict = predict, parset.list) {
@@ -229,18 +283,6 @@ mylist = function(..., create = FALSE) {
 testFacetting = function(obj, nrow = NULL, ncol = NULL) {
   expect_equal(obj$facet$params$nrow, nrow)
   expect_equal(obj$facet$params$ncol, ncol)
-}
-
-quickcheckTest = function(...) {
-  skip_if_not_installed("quickcheck")
-  qc = quickcheck::test(...)
-
-  if (any(!qc$pass)) {
-    print("Quickcheck tests failed with input:")
-    print(qc$cases[[which.first(!qc$pass)]])
-  }
-
-  expect_true(all(qc$pass), info = "Some Quickcheck tests failed.")
 }
 
 testDocForStrings = function(doc, x, grid.size = 1L, ordered = FALSE) {
