@@ -84,9 +84,8 @@ jobs:
          provider: script
          script: R -q -e 'tic::deploy()'
          on:
-           branch: master
+           branch: fix
            condition:
-             - $TRAVIS_PULL_REQUEST = false
              - $TRAVIS_EVENT_TYPE != cron
     - stage: Tutorial
       env: TUTORIAL=PDFdev
@@ -105,9 +104,8 @@ jobs:
          provider: script
          script: R -q -e 'tic::deploy()'
          on:
-           branch: master
+           branch: fix
            condition:
-             - $TRAVIS_PULL_REQUEST = false
              - $TRAVIS_EVENT_TYPE != cron
     - stage: Tutorial
       env: TUTORIAL=PDFrelease
@@ -126,9 +124,8 @@ jobs:
          provider: script
          script: R -q -e 'tic::deploy()'
          on:
-           branch: master
+           branch: fix
            condition:
-             - $TRAVIS_PULL_REQUEST = false
              - $TRAVIS_EVENT_TYPE != cron
 
 notifications:
