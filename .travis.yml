@@ -95,7 +95,7 @@ jobs:
            - libgmp-dev
            - libgsl0-dev
            - ghostscript # for mlr-tutorial pdf
-      pandoc_version: 2.2.1
+      pandoc_version: 2.1.3
       before_install: R -q -e 'install.packages("devtools"); devtools::install_github("ropenscilabs/tic"); tic::prepare_all_stages()'
       install: R -q -e 'tic::install()'
       script:  R -q -e 'tic::script()'
@@ -115,7 +115,7 @@ jobs:
            - libgmp-dev
            - libgsl0-dev
            - ghostscript # for mlr-tutorial pdf
-      pandoc_version: 2.2.1
+      pandoc_version: 2.1.3
       before_install: R -q -e 'install.packages("devtools"); devtools::install_github("ropenscilabs/tic"); tic::prepare_all_stages()'
       install: R -q -e 'tic::install()'
       script:  R -q -e 'tic::script()'
