@@ -18,7 +18,9 @@ if (Sys.getenv("RCMDCHECK") == "TRUE") {
 
   get_stage("script") %>%
     add_code_step(devtools::document()) %>%
-    add_step(step_rcmdcheck())
+    add_code_step(system("R CMD build .")) %>%
+    add_code_step(system("R CMD check mlr*.tar.gz --as-cran --run-donttest"))
+    #add_step(step_rcmdcheck())
 
   get_stage("deploy") %>%
     add_code_step(system2("bash", args = c("inst/convert_to_ascii_news.sh"))) %>%
