@@ -22,7 +22,7 @@ get_stage("script") %>%
     add_step(step_rcmdcheck(notes_are_errors = FALSE))
 
   get_stage("deploy") %>%
-    add_code_step(devtools::install_github("ropenscilabs/git2r")) %>%
+    add_code_step(devtools::install_github("ropensci/git2r")) %>%
     add_code_step(system2("bash", args = c("inst/convert_to_ascii_news.sh"))) %>%
     add_step(step_push_deploy(orphan = FALSE, branch = "git2r-debug", commit_paths = c("NAMESPACE", "man/*", "NEWS")))
 }
@@ -47,7 +47,8 @@ if (Sys.getenv("TUTORIAL") == "HTML") {
     add_code_step(system2("sed", c("-i","-e", '/^##/ s/#/', "-e", "'/^###/ s/#/'", "'/^####/ s/#/'", "vignettes/tutorial/release/*.Rmd")))
 
   get_stage("deploy") %>%
-    add_code_step(devtools::install_github("ropenscilabs/git2r")) %>%
+    add_code_step(devtools::install_github("ropensci/git2r")) %>%
+    add_code_step(install.packages("processx")) %>%
     add_code_step(devtools::document(roclets=c('rd', 'collate', 'namespace'))) %>%
     add_step(step_build_pkgdown()) %>%
     add_step(step_push_deploy(orphan = TRUE, path = "docs", branch = "gh-pages"))
