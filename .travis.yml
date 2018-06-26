@@ -23,7 +23,7 @@ addons:
   artifacts:
     s3_region: "eu-west-1" # defaults to "us-east-1"
     paths:
-      - $HOME/rcmdcheck.rda
+      - /home/travis/rcmdcheck.rda
 
 jobs:
   include:
