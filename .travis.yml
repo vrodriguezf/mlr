@@ -64,7 +64,7 @@ jobs:
          on:
            branch: git2r-debug
            condition:
-             - $TRAVIS_PULL_REQUEST = true
+             - $TRAVIS_PULL_REQUEST = false
              - $TRAVIS_EVENT_TYPE != cron
     - stage: Tutorial
       env: TUTORIAL=HTML
@@ -86,7 +86,7 @@ jobs:
          on:
            branch: git2r-debug
            condition:
-             - $TRAVIS_PULL_REQUEST = true
+             - $TRAVIS_PULL_REQUEST = false
              - $TRAVIS_EVENT_TYPE != cron
     - stage: Tutorial
       env: TUTORIAL=PDFdev
