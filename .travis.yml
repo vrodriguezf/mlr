@@ -19,12 +19,6 @@ r_github_packages:
   - berndbischl/ParamHelpers
   - jimhester/lintr
 
-addons:
-  artifacts: true
-    s3_region: "eu-west-1" # defaults to "us-east-1"
-    paths:
-      - $HOME/rcmdcheck.rda
-
 jobs:
   include:
     - stage: warmup-1
@@ -54,6 +48,10 @@ jobs:
     - stage: check
       env: RCMDCHECK=TRUE
       addons:
+        artifacts:
+          s3_region: "eu-west-1" # defaults to "us-east-1"
+            paths:
+              - /home/travis/rcmdcheck.rda
         apt:
           packages:
            - libgmp-dev
