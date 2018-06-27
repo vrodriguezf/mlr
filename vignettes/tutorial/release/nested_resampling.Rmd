@@ -28,7 +28,7 @@ knitr::include_graphics("img/nested_resampling.png")
 ```
 
 ```{r echo=FALSE, out.width = "600px", fig.align='center', fig.cap="Nested Resampling Figure", eval = knitr::opts_knit$get("rmarkdown.pandoc.to") != "latex"}
-knitr::include_graphics("https://raw.githubusercontent.com/pat-s/mlr/master/vignettes/tutorial/devel/pdf/img/nested_resampling.png")
+knitr::include_graphics("https://raw.githubusercontent.com/mlr-org/mlr/master/vignettes/tutorial/devel/pdf/img/nested_resampling.png")
 ```
 
 The graphic above illustrates nested resampling for parameter tuning with 3-fold cross-validation in the outer and 4-fold cross-validation in the inner loop.
