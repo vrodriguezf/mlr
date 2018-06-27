@@ -63,7 +63,7 @@ jobs:
       warnings_are_errors: false
       before_script: R -q -e 'tic::before_script()'
       script: R -q -e 'tic::script()'
-      after_success: R -q -e 'tic::after_success()'
+      after_success: true
       before_deploy: R -q -e 'tic::before_deploy()'
       deploy:
          provider: script
