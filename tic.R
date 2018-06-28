@@ -64,7 +64,6 @@ if (Sys.getenv("TUTORIAL") == "HTML") {
   get_stage("install") %>%
     add_code_step(if (length(find.package("pander", quiet = TRUE)) == 0) install.packages("pander")) %>%
     add_code_step(if (length(find.package("fs", quiet = TRUE)) == 0) install.packages("fs")) %>%
-    add_code_step(devtools::install_github("rstudio/rmarkdown@9bc516a")) %>%
     add_code_step(if (length(find.package("bookdown", quiet = TRUE)) == 0) install.packages("bookdown")) %>%
     add_code_step(if (length(find.package("roxygen2", quiet = TRUE)) == 0) devtools::install_github("klutometis/roxygen")) %>%
     add_code_step(devtools::install_deps(upgrade = TRUE, dependencies = TRUE))
@@ -95,7 +94,6 @@ if (Sys.getenv("TUTORIAL") == "PDFrelease") {
   get_stage("install") %>%
     add_code_step(if (length(find.package("pander", quiet = TRUE)) == 0) install.packages("pander")) %>%
     add_code_step(if (length(find.package("fs", quiet = TRUE)) == 0) install.packages("fs")) %>%
-    add_code_step(devtools::install_github("rstudio/rmarkdown@9bc516a")) %>%
     add_code_step(if (length(find.package("bookdown", quiet = TRUE)) == 0) install.packages("bookdown")) %>%
     add_code_step(if (length(find.package("roxygen2", quiet = TRUE)) == 0) devtools::install_github("klutometis/roxygen")) %>%
     add_code_step(devtools::install_deps(upgrade = TRUE, dependencies = TRUE))
