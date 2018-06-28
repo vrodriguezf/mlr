@@ -67,7 +67,8 @@ if (Sys.getenv("TUTORIAL") == "HTML") {
     add_code_step(if (length(find.package("bookdown", quiet = TRUE)) == 0) install.packages("bookdown")) %>%
     add_code_step(if (length(find.package("roxygen2", quiet = TRUE)) == 0) devtools::install_github("klutometis/roxygen")) %>%
     add_code_step(devtools::install_deps(upgrade = TRUE, dependencies = TRUE)) %>%
-    add_code_step(devtools::document(roclets=c('rd', 'collate', 'namespace')))
+    add_code_step(system("R CMD build .")) %>%
+    add_code_step(system("R CMD INSTALL mlr*"))
 
   get_stage("before_deploy") %>%
     add_step(step_setup_ssh())
