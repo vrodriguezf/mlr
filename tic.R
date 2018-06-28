@@ -66,14 +66,13 @@ if (Sys.getenv("TUTORIAL") == "HTML") {
     add_code_step(if (length(find.package("rmarkdown", quiet = TRUE)) == 0) install.packages("rmarkdown")) %>%
     add_code_step(if (length(find.package("bookdown", quiet = TRUE)) == 0) install.packages("bookdown")) %>%
     add_code_step(if (length(find.package("roxygen2", quiet = TRUE)) == 0) devtools::install_github("klutometis/roxygen")) %>%
-    add_code_step(devtools::install_deps(upgrade = TRUE, dependencies = TRUE)) %>%
-    add_code_step(system("R CMD build .")) %>%
-    add_code_step(system("R CMD INSTALL mlr*"))
+    add_code_step(devtools::install_deps(upgrade = TRUE, dependencies = TRUE))
 
   get_stage("before_deploy") %>%
     add_step(step_setup_ssh())
 
   get_stage("deploy") %>%
+    add_code_step(devtools::install_github("mlr-org/mlr")) %>%
     add_code_step(rmarkdown::render("vignettes/tutorial/devel/pdf/_pdf_wrapper.Rmd")) %>%
     add_code_step(fs::file_move("vignettes/tutorial/devel/pdf/_pdf_wrapper.pdf", "vignettes/tutorial/devel/pdf/mlr-tutorial_dev.pdf")) %>%
     add_step(step_push_deploy(orphan = FALSE, commit_paths = "vignettes/tutorial/dev/pdf/mlr-tutorial_dev.pdf", branch = "tutorial_pdf"))
