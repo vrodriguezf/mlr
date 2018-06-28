@@ -18,11 +18,11 @@ if (Sys.getenv("RCMDCHECK") == "TRUE") {
 
 get_stage("script") %>%
     add_code_step(devtools::install_github("r-lib/rcmdcheck")) %>%
-    add_code_step(devtools::document()) %>%
+  add_code_step(devtools::document(roclets=c('rd', 'collate', 'namespace'))) %>%
     add_step(step_rcmdcheck(notes_are_errors = FALSE))
 
   get_stage("deploy") %>%
-    add_code_step(devtools::document()) %>%
+    add_code_step(devtools::document(roclets=c('rd', 'collate', 'namespace'))) %>%
     add_code_step(system2("bash", args = c("inst/convert_to_ascii_news.sh"))) %>%
     add_step(step_push_deploy(orphan = FALSE, branch = "tic-s4-debug", commit_paths = c("NAMESPACE", "man/*", "NEWS")))
 }
