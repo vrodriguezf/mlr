@@ -22,8 +22,9 @@ get_stage("script") %>%
     add_step(step_rcmdcheck(notes_are_errors = FALSE))
 
   get_stage("deploy") %>%
+    add_code_step(devtools::document()) %>%
     add_code_step(system2("bash", args = c("inst/convert_to_ascii_news.sh"))) %>%
-    add_step(step_push_deploy(orphan = FALSE, branch = "master", commit_paths = c("NAMESPACE", "man/*", "NEWS")))
+    add_step(step_push_deploy(orphan = FALSE, branch = "tic-s4-debug", commit_paths = c("NAMESPACE", "man/*", "NEWS")))
 }
 
 if (Sys.getenv("TUTORIAL") == "HTML") {
