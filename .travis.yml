@@ -73,7 +73,7 @@ jobs:
           packages:
            - libgmp-dev
            - libgsl0-dev
-           - imagemagick # for favicon
+           - libmagick++-dev # for favicon
       latex: false
       pandoc_version: 2.2.1
       before_install: R -q -e 'install.packages("devtools"); devtools::install_github("ropenscilabs/tic"); tic::prepare_all_stages()'
