@@ -16,13 +16,15 @@ if (Sys.getenv("RCMDCHECK") == "TRUE") {
   get_stage("before_deploy") %>%
     add_step(step_setup_ssh())
 
-  get_stage("script") %>%
-    add_code_step(devtools::document()) %>%
-    add_step(step_rcmdcheck())
+get_stage("script") %>%
+    add_code_step(devtools::install_github("r-lib/rcmdcheck")) %>%
+  add_code_step(devtools::document(roclets=c('rd', 'collate', 'namespace'))) %>%
+    add_step(step_rcmdcheck(notes_are_errors = FALSE))
 
   get_stage("deploy") %>%
+    add_code_step(devtools::document(roclets=c('rd', 'collate', 'namespace'))) %>%
     add_code_step(system2("bash", args = c("inst/convert_to_ascii_news.sh"))) %>%
-    add_step(step_push_deploy(orphan = FALSE, branch = "master", commit_paths = c("NAMESPACE", "man/*", "NEWS")))
+    add_step(step_push_deploy(orphan = FALSE, branch = "tic-s4-debug", commit_paths = c("NAMESPACE", "man/*", "NEWS")))
 }
 
 if (Sys.getenv("TUTORIAL") == "HTML") {
@@ -35,17 +37,18 @@ if (Sys.getenv("TUTORIAL") == "HTML") {
     add_code_step(devtools::install_deps(upgrade = TRUE, dependencies = TRUE))
 
   get_stage("install") %>%
-    add_code_step(if (length(find.package("magick", quiet = TRUE)) == 0) install.packages("magick")) %>% # favicon creation
     add_code_step(if (length(find.package("pander", quiet = TRUE)) == 0) install.packages("pander")) %>%
     add_code_step(devtools::install_deps(upgrade = TRUE, dependencies = TRUE))
 
   get_stage("before_deploy") %>%
     add_step(step_setup_ssh()) %>%
-    add_code_step(system2("sed", c("-i","-e", '/^##/ s/#/', "-e", "'/^###/ s/#/'", "'/^####/ s/#/'", "vignettes/tutorial/devel/*.Rmd"))) %>%
-    add_code_step(system2("sed", c("-i","-e", '/^##/ s/#/', "-e", "'/^###/ s/#/'", "'/^####/ s/#/'", "vignettes/tutorial/release/*.Rmd")))
+    add_code_step(system("sed -i -e '/^##/ s/#/' -e '/^###/ s/#/' -e '/^####/ s/#/' vignettes/tutorial/devel/*.Rmd")) %>%
+    add_code_step(system("sed -i -e '/^##/ s/#/' -e '/^###/ s/#/' -e '/^####/ s/#/' vignettes/tutorial/release/*.Rmd"))
 
   get_stage("deploy") %>%
-    add_step(step_build_pkgdown(lazy = TRUE)) %>%
+    add_code_step(install.packages("magick")) %>% # favicon creation
+    add_code_step(devtools::document(roclets=c('rd', 'collate', 'namespace'))) %>%
+    add_step(step_build_pkgdown()) %>%
     add_step(step_push_deploy(orphan = TRUE, path = "docs", branch = "gh-pages"))
 
 } else if (Sys.getenv("TUTORIAL") == "PDFdev") {
@@ -65,14 +68,11 @@ if (Sys.getenv("TUTORIAL") == "HTML") {
     add_code_step(if (length(find.package("roxygen2", quiet = TRUE)) == 0) devtools::install_github("klutometis/roxygen")) %>%
     add_code_step(devtools::install_deps(upgrade = TRUE, dependencies = TRUE))
 
-  # this ensures that the NAMESPACE is correct. R CMD Build is not enough for the PDF build.
-  get_stage("script") %>%
-    add_code_step(devtools::document())
-
   get_stage("before_deploy") %>%
     add_step(step_setup_ssh())
 
   get_stage("deploy") %>%
+    add_code_step(devtools::install_github("mlr-org/mlr")) %>%
     add_code_step(rmarkdown::render("vignettes/tutorial/devel/pdf/_pdf_wrapper.Rmd")) %>%
     add_code_step(fs::file_move("vignettes/tutorial/devel/pdf/_pdf_wrapper.pdf", "vignettes/tutorial/devel/pdf/mlr-tutorial_dev.pdf")) %>%
     add_step(step_push_deploy(orphan = FALSE, commit_paths = "vignettes/tutorial/dev/pdf/mlr-tutorial_dev.pdf", branch = "tutorial_pdf"))
@@ -95,14 +95,11 @@ if (Sys.getenv("TUTORIAL") == "PDFrelease") {
     add_code_step(if (length(find.package("roxygen2", quiet = TRUE)) == 0) devtools::install_github("klutometis/roxygen")) %>%
     add_code_step(devtools::install_deps(upgrade = TRUE, dependencies = TRUE))
 
-  # this ensures that the NAMESPACE is correct. R CMD Build is not enough for the PDF build.
-  get_stage("script") %>%
-    add_code_step(devtools::document())
-
   get_stage("before_deploy") %>%
     add_step(step_setup_ssh())
 
   get_stage("deploy") %>%
+    add_code_step(devtools::document(roclets=c('rd', 'collate', 'namespace'))) %>%
     add_code_step(rmarkdown::render("vignettes/tutorial/release/pdf/_pdf_wrapper.Rmd")) %>%
     add_code_step(fs::file_move("vignettes/tutorial/release/pdf/_pdf_wrapper.pdf", "vignettes/tutorial/release/pdf/mlr-tutorial_release.pdf")) %>%
     add_step(step_push_deploy(orphan = FALSE, commit_paths = "vignettes/tutorial/release/pdf/mlr-tutorial_release.pdf", branch = "tutorial_pdf"))
