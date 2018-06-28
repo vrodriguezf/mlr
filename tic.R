@@ -42,8 +42,8 @@ if (Sys.getenv("TUTORIAL") == "HTML") {
 
   get_stage("before_deploy") %>%
     add_step(step_setup_ssh()) %>%
-    add_code_step(system2("sed", c("-i","-e", '/^##/ s/#/', "-e", "'/^###/ s/#/'", "'/^####/ s/#/'", "vignettes/tutorial/devel/*.Rmd"))) %>%
-    add_code_step(system2("sed", c("-i","-e", '/^##/ s/#/', "-e", "'/^###/ s/#/'", "'/^####/ s/#/'", "vignettes/tutorial/release/*.Rmd")))
+    add_code_step(system("sed -i -e '/^##/ s/#/' -e '/^###/ s/#/' -e '/^####/ s/#/' vignettes/tutorial/devel/*.Rmd")) %>%
+    add_code_step(system("sed -i -e '/^##/ s/#/' -e '/^###/ s/#/' -e '/^####/ s/#/' vignettes/tutorial/release/*.Rmd"))
 
   get_stage("deploy") %>%
     add_code_step(install.packages("magick")) %>% # favicon creation
