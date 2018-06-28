@@ -46,7 +46,7 @@ if (Sys.getenv("TUTORIAL") == "HTML") {
     add_code_step(system2("sed", c("-i","-e", '/^##/ s/#/', "-e", "'/^###/ s/#/'", "'/^####/ s/#/'", "vignettes/tutorial/release/*.Rmd")))
 
   get_stage("deploy") %>%
-    add_code_step(if (length(find.package("magick", quiet = TRUE)) == 0) install.packages("magick")) %>% # favicon creation
+    add_code_step(install.packages("magick")) %>% # favicon creation
     add_code_step(devtools::document(roclets=c('rd', 'collate', 'namespace'))) %>%
     add_step(step_build_pkgdown()) %>%
     add_step(step_push_deploy(orphan = TRUE, path = "docs", branch = "gh-pages"))
