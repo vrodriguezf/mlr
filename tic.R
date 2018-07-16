@@ -17,7 +17,7 @@ get_stage("before_deploy") %>%
 
 get_stage("script") %>%
   add_code_step(devtools::document()) %>%
-  add_step(step_rcmdcheck(notes_are_errors = FALSE, build_args = "--no-build-vignettes",
+  add_step(step_rcmdcheck(warnings_are_errors = FALSE, notes_are_errors = FALSE, build_args = "--no-build-vignettes",
                           check_args = "--ignore-vignettes --no-manual --as-cran"))
 
 
