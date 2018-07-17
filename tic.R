@@ -43,4 +43,5 @@ if (Sys.getenv("TUTORIAL") == "HTML") {
     add_code_step(devtools::document(roclets=c('rd', 'collate', 'namespace'))) %>%
     add_step(step_build_pkgdown()) %>%
     add_step(step_push_deploy(orphan = TRUE, path = "docs", branch = "gh-pages"))
+
 }
