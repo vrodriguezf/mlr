@@ -23,9 +23,6 @@ if (Sys.getenv("RCMDCHECK") == "TRUE") {
                             build_args = "--no-build-vignettes",
                             check_args = "--ignore-vignettes --no-manual --as-cran"))
 
-  get_stage("after_success") %>%
-    add_code_step(covr::codecov(quiet = FALSE))
-
 }
 
 if (Sys.getenv("TUTORIAL") == "HTML") {
