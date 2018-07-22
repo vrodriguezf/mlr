@@ -43,9 +43,9 @@ environment:
   _R_CHECK_FORCE_SUGGESTS_: false
   WARMUPPKGS: 'roxygen2 pander mlrMBO purrr mlbench mldr RWeka RWekajars knitr dplyr ggplot2 ranger randomForest kernlab Rfast igraph rjson rmarkdown xgboost xml2'
 
-  matrix:
-    - R_VERSION: devel
-    - R_VERSION: release
+#  matrix:
+#    - R_VERSION: devel
+#    - R_VERSION: release
 
 artifacts:
   - path: '*.Rcheck\**\*.log'
