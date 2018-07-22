@@ -41,12 +41,14 @@ on_finish: R -q -e "tic::after_script()"
 #  - appveyor PushArtifact failure.zip
 
 environment:
-  R_VERSION: devel
-  R_VERSION: release
   GITHUB_PAT:
     secure: VXO22OHLkl4YhVIomSMwCZyOTx03Xf2WICaVng9xH7gISlAg8a+qrt1DtFtk8sK5
   RCMDCHECK: TRUE
   WARMUPPKGS: 'roxygen2 pander mlrMBO purrr mlbench mldr RWeka RWekajars knitr dplyr ggplot2 ranger randomForest kernlab Rfast igraph rjson rmarkdown xgboost xml2'
+
+matrix:
+  R_VERSION: devel
+  R_VERSION: release
 
 artifacts:
   - path: '*.Rcheck\**\*.log'
