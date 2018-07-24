@@ -121,6 +121,9 @@
     <loc>https://mlr-org.github.io/mlr/reference/createDummyFeatures.html</loc>
   </url>
   <url>
+    <loc>https://mlr-org.github.io/mlr/reference/createSpatialResamplingPlots.html</loc>
+  </url>
+  <url>
     <loc>https://mlr-org.github.io/mlr/reference/crossover.html</loc>
   </url>
   <url>

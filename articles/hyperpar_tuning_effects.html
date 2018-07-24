@@ -5,6 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Google Site Verification --><meta name="google-site-verification" content="BrjL5fpoyHZu1rR8rwnnM2MBO3u3iIFB8NsmSuOsY84">
 <title>Evaluating Hyperparameter Tuning • mlr</title>
 <!-- jquery --><script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script><!-- Font Awesome icons --><link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
@@ -289,19 +290,19 @@
 <ul>
 <li>the hyperparameter search space:</li>
 </ul>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1">### ex: create a search space for the C hyperparameter from 0.01 to 0.1</a>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="co"># ex: create a search space for the C hyperparameter from 0.01 to 0.1</span></a>
 <a class="sourceLine" id="cb1-2" data-line-number="2">ps =<span class="st"> </span><span class="kw">makeParamSet</span>(</a>
 <a class="sourceLine" id="cb1-3" data-line-number="3">  <span class="kw">makeNumericParam</span>(<span class="st">"C"</span>, <span class="dt">lower =</span> <span class="fl">0.01</span>, <span class="dt">upper =</span> <span class="fl">0.1</span>)</a>
 <a class="sourceLine" id="cb1-4" data-line-number="4">)</a></code></pre></div>
 <ul>
 <li>the optimization algorithm (aka tuning method):</li>
 </ul>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">### ex: random search with 100 iterations</a>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="co"># ex: random search with 100 iterations</span></a>
 <a class="sourceLine" id="cb2-2" data-line-number="2">ctrl =<span class="st"> </span><span class="kw"><a href="../reference/makeTuneControlRandom.html">makeTuneControlRandom</a></span>(<span class="dt">maxit =</span> 100L)</a></code></pre></div>
 <ul>
 <li>an evaluation method, i.e., a resampling strategy and a performance measure:</li>
 </ul>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">### ex: 2-fold CV</a>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="co"># ex: 2-fold CV</span></a>
 <a class="sourceLine" id="cb3-2" data-line-number="2">rdesc =<span class="st"> </span><span class="kw"><a href="../reference/makeResampleDesc.html">makeResampleDesc</a></span>(<span class="st">"CV"</span>, <span class="dt">iters =</span> 2L)</a></code></pre></div>
 <p>After tuning, you may want to evaluate the tuning process in order to answer questions such as:</p>
 <ul>
@@ -324,19 +325,19 @@
 <a class="sourceLine" id="cb4-6" data-line-number="6">res =<span class="st"> </span><span class="kw"><a href="../reference/tuneParams.html">tuneParams</a></span>(<span class="st">"classif.ksvm"</span>, <span class="dt">task =</span> pid.task, <span class="dt">control =</span> ctrl,</a>
 <a class="sourceLine" id="cb4-7" data-line-number="7">  <span class="dt">measures =</span> <span class="kw">list</span>(acc, mmce), <span class="dt">resampling =</span> rdesc, <span class="dt">par.set =</span> ps, <span class="dt">show.info =</span> <span class="ot">FALSE</span>)</a>
 <a class="sourceLine" id="cb4-8" data-line-number="8"><span class="kw"><a href="../reference/generateHyperParsEffectData.html">generateHyperParsEffectData</a></span>(res, <span class="dt">trafo =</span> T, <span class="dt">include.diagnostics =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb4-9" data-line-number="9">## HyperParsEffectData:</a>
-<a class="sourceLine" id="cb4-10" data-line-number="10">## Hyperparameters: C</a>
-<a class="sourceLine" id="cb4-11" data-line-number="11">## Measures: acc.test.mean,mmce.test.mean</a>
-<a class="sourceLine" id="cb4-12" data-line-number="12">## Optimizer: TuneControlRandom</a>
-<a class="sourceLine" id="cb4-13" data-line-number="13">## Nested CV Used: FALSE</a>
-<a class="sourceLine" id="cb4-14" data-line-number="14">## Snapshot of data:</a>
-<a class="sourceLine" id="cb4-15" data-line-number="15">##            C acc.test.mean mmce.test.mean iteration exec.time</a>
-<a class="sourceLine" id="cb4-16" data-line-number="16">## 1  0.4197196     0.7708333      0.2291667         1     1.094</a>
-<a class="sourceLine" id="cb4-17" data-line-number="17">## 2 19.7671457     0.7421875      0.2578125         2     0.056</a>
-<a class="sourceLine" id="cb4-18" data-line-number="18">## 3  0.4424862     0.7695312      0.2304688         3     0.042</a>
-<a class="sourceLine" id="cb4-19" data-line-number="19">## 4  2.1754486     0.7500000      0.2500000         4     0.046</a>
-<a class="sourceLine" id="cb4-20" data-line-number="20">## 5 16.5159354     0.7356771      0.2643229         5     0.053</a>
-<a class="sourceLine" id="cb4-21" data-line-number="21">## 6 15.7250360     0.7356771      0.2643229         6     0.065</a></code></pre></div>
+<a class="sourceLine" id="cb4-9" data-line-number="9"><span class="co">## HyperParsEffectData:</span></a>
+<a class="sourceLine" id="cb4-10" data-line-number="10"><span class="co">## Hyperparameters: C</span></a>
+<a class="sourceLine" id="cb4-11" data-line-number="11"><span class="co">## Measures: acc.test.mean,mmce.test.mean</span></a>
+<a class="sourceLine" id="cb4-12" data-line-number="12"><span class="co">## Optimizer: TuneControlRandom</span></a>
+<a class="sourceLine" id="cb4-13" data-line-number="13"><span class="co">## Nested CV Used: FALSE</span></a>
+<a class="sourceLine" id="cb4-14" data-line-number="14"><span class="co">## Snapshot of data:</span></a>
+<a class="sourceLine" id="cb4-15" data-line-number="15"><span class="co">##           C acc.test.mean mmce.test.mean iteration exec.time</span></a>
+<a class="sourceLine" id="cb4-16" data-line-number="16"><span class="co">## 1 1.1275618     0.7734375      0.2265625         1     0.766</span></a>
+<a class="sourceLine" id="cb4-17" data-line-number="17"><span class="co">## 2 1.1693609     0.7734375      0.2265625         2     0.033</span></a>
+<a class="sourceLine" id="cb4-18" data-line-number="18"><span class="co">## 3 0.0639428     0.6510417      0.3489583         3     0.032</span></a>
+<a class="sourceLine" id="cb4-19" data-line-number="19"><span class="co">## 4 0.0781760     0.6575521      0.3424479         4     0.240</span></a>
+<a class="sourceLine" id="cb4-20" data-line-number="20"><span class="co">## 5 0.2220490     0.7721354      0.2278646         5     0.034</span></a>
+<a class="sourceLine" id="cb4-21" data-line-number="21"><span class="co">## 6 6.2273904     0.7343750      0.2656250         6     0.035</span></a></code></pre></div>
 <p>As a reminder from the <a href="resample.html" target="_blank">resampling</a> tutorial, if we wanted to generate data on the training set as well as the validation set, we only need to make a few minor changes:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">ps =<span class="st"> </span><span class="kw">makeParamSet</span>(</a>
 <a class="sourceLine" id="cb5-2" data-line-number="2">  <span class="kw">makeNumericParam</span>(<span class="st">"C"</span>, <span class="dt">lower =</span> <span class="dv">-5</span>, <span class="dt">upper =</span> <span class="dv">5</span>, <span class="dt">trafo =</span> <span class="cf">function</span>(x) <span class="dv">2</span><span class="op">^</span>x)</a>
@@ -347,26 +348,26 @@
 <a class="sourceLine" id="cb5-7" data-line-number="7">  <span class="dt">measures =</span> <span class="kw">list</span>(acc, <span class="kw"><a href="../reference/setAggregation.html">setAggregation</a></span>(acc, train.mean), mmce, <span class="kw"><a href="../reference/setAggregation.html">setAggregation</a></span>(mmce,</a>
 <a class="sourceLine" id="cb5-8" data-line-number="8">    train.mean)), <span class="dt">resampling =</span> rdesc, <span class="dt">par.set =</span> ps, <span class="dt">show.info =</span> <span class="ot">FALSE</span>)</a>
 <a class="sourceLine" id="cb5-9" data-line-number="9"><span class="kw"><a href="../reference/generateHyperParsEffectData.html">generateHyperParsEffectData</a></span>(res, <span class="dt">trafo =</span> T, <span class="dt">include.diagnostics =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb5-10" data-line-number="10">## HyperParsEffectData:</a>
-<a class="sourceLine" id="cb5-11" data-line-number="11">## Hyperparameters: C</a>
-<a class="sourceLine" id="cb5-12" data-line-number="12">## Measures: acc.test.mean,acc.train.mean,mmce.test.mean,mmce.train.mean</a>
-<a class="sourceLine" id="cb5-13" data-line-number="13">## Optimizer: TuneControlRandom</a>
-<a class="sourceLine" id="cb5-14" data-line-number="14">## Nested CV Used: FALSE</a>
-<a class="sourceLine" id="cb5-15" data-line-number="15">## Snapshot of data:</a>
-<a class="sourceLine" id="cb5-16" data-line-number="16">##            C acc.test.mean acc.train.mean mmce.test.mean mmce.train.mean</a>
-<a class="sourceLine" id="cb5-17" data-line-number="17">## 1 0.28853849     0.7330729      0.8203125      0.2669271       0.1796875</a>
-<a class="sourceLine" id="cb5-18" data-line-number="18">## 2 0.08161680     0.6640625      0.6731771      0.3359375       0.3268229</a>
-<a class="sourceLine" id="cb5-19" data-line-number="19">## 3 0.73905530     0.7343750      0.8476562      0.2656250       0.1523438</a>
-<a class="sourceLine" id="cb5-20" data-line-number="20">## 4 0.04614689     0.6510417      0.6510417      0.3489583       0.3489583</a>
-<a class="sourceLine" id="cb5-21" data-line-number="21">## 5 0.33361940     0.7343750      0.8216146      0.2656250       0.1783854</a>
-<a class="sourceLine" id="cb5-22" data-line-number="22">## 6 0.06581621     0.6523438      0.6562500      0.3476562       0.3437500</a>
-<a class="sourceLine" id="cb5-23" data-line-number="23">##   iteration exec.time</a>
-<a class="sourceLine" id="cb5-24" data-line-number="24">## 1         1     0.064</a>
-<a class="sourceLine" id="cb5-25" data-line-number="25">## 2         2     0.074</a>
-<a class="sourceLine" id="cb5-26" data-line-number="26">## 3         3     0.059</a>
-<a class="sourceLine" id="cb5-27" data-line-number="27">## 4         4     0.067</a>
-<a class="sourceLine" id="cb5-28" data-line-number="28">## 5         5     0.060</a>
-<a class="sourceLine" id="cb5-29" data-line-number="29">## 6         6     0.067</a></code></pre></div>
+<a class="sourceLine" id="cb5-10" data-line-number="10"><span class="co">## HyperParsEffectData:</span></a>
+<a class="sourceLine" id="cb5-11" data-line-number="11"><span class="co">## Hyperparameters: C</span></a>
+<a class="sourceLine" id="cb5-12" data-line-number="12"><span class="co">## Measures: acc.test.mean,acc.train.mean,mmce.test.mean,mmce.train.mean</span></a>
+<a class="sourceLine" id="cb5-13" data-line-number="13"><span class="co">## Optimizer: TuneControlRandom</span></a>
+<a class="sourceLine" id="cb5-14" data-line-number="14"><span class="co">## Nested CV Used: FALSE</span></a>
+<a class="sourceLine" id="cb5-15" data-line-number="15"><span class="co">## Snapshot of data:</span></a>
+<a class="sourceLine" id="cb5-16" data-line-number="16"><span class="co">##            C acc.test.mean acc.train.mean mmce.test.mean mmce.train.mean</span></a>
+<a class="sourceLine" id="cb5-17" data-line-number="17"><span class="co">## 1 0.30179253     0.7578125      0.8046875      0.2421875       0.1953125</span></a>
+<a class="sourceLine" id="cb5-18" data-line-number="18"><span class="co">## 2 0.13880087     0.7447917      0.7734375      0.2552083       0.2265625</span></a>
+<a class="sourceLine" id="cb5-19" data-line-number="19"><span class="co">## 3 0.09812624     0.6783854      0.6979167      0.3216146       0.3020833</span></a>
+<a class="sourceLine" id="cb5-20" data-line-number="20"><span class="co">## 4 2.40709089     0.7552083      0.8554688      0.2447917       0.1445312</span></a>
+<a class="sourceLine" id="cb5-21" data-line-number="21"><span class="co">## 5 0.04605755     0.6510417      0.6510417      0.3489583       0.3489583</span></a>
+<a class="sourceLine" id="cb5-22" data-line-number="22"><span class="co">## 6 0.72108114     0.7708333      0.8138021      0.2291667       0.1861979</span></a>
+<a class="sourceLine" id="cb5-23" data-line-number="23"><span class="co">##   iteration exec.time</span></a>
+<a class="sourceLine" id="cb5-24" data-line-number="24"><span class="co">## 1         1     0.058</span></a>
+<a class="sourceLine" id="cb5-25" data-line-number="25"><span class="co">## 2         2     0.054</span></a>
+<a class="sourceLine" id="cb5-26" data-line-number="26"><span class="co">## 3         3     0.060</span></a>
+<a class="sourceLine" id="cb5-27" data-line-number="27"><span class="co">## 4         4     0.050</span></a>
+<a class="sourceLine" id="cb5-28" data-line-number="28"><span class="co">## 5         5     0.059</span></a>
+<a class="sourceLine" id="cb5-29" data-line-number="29"><span class="co">## 6         6     0.045</span></a></code></pre></div>
 <p>In the example below, we perform grid search on the <code>C</code> parameter for SVM on the Pima Indians dataset using nested cross validation. We generate the hyperparameter effect data so that the <code>C</code> parameter is on the untransformed scale and we do not include diagnostic data. As you can see below, nested cross validation is supported without any extra work by the user, allowing the user to obtain an unbiased estimator for the performance.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">ps =<span class="st"> </span><span class="kw">makeParamSet</span>(</a>
 <a class="sourceLine" id="cb6-2" data-line-number="2">  <span class="kw">makeNumericParam</span>(<span class="st">"C"</span>, <span class="dt">lower =</span> <span class="dv">-5</span>, <span class="dt">upper =</span> <span class="dv">5</span>, <span class="dt">trafo =</span> <span class="cf">function</span>(x) <span class="dv">2</span><span class="op">^</span>x)</a>
@@ -377,26 +378,26 @@
 <a class="sourceLine" id="cb6-7" data-line-number="7">  <span class="dt">measures =</span> <span class="kw">list</span>(acc, mmce), <span class="dt">resampling =</span> rdesc, <span class="dt">par.set =</span> ps, <span class="dt">show.info =</span> <span class="ot">FALSE</span>)</a>
 <a class="sourceLine" id="cb6-8" data-line-number="8">res =<span class="st"> </span><span class="kw"><a href="../reference/resample.html">resample</a></span>(lrn, <span class="dt">task =</span> pid.task, <span class="dt">resampling =</span> cv2, <span class="dt">extract =</span> getTuneResult, <span class="dt">show.info =</span> <span class="ot">FALSE</span>)</a>
 <a class="sourceLine" id="cb6-9" data-line-number="9"><span class="kw"><a href="../reference/generateHyperParsEffectData.html">generateHyperParsEffectData</a></span>(res)</a>
-<a class="sourceLine" id="cb6-10" data-line-number="10">## HyperParsEffectData:</a>
-<a class="sourceLine" id="cb6-11" data-line-number="11">## Hyperparameters: C</a>
-<a class="sourceLine" id="cb6-12" data-line-number="12">## Measures: acc.test.mean,mmce.test.mean</a>
-<a class="sourceLine" id="cb6-13" data-line-number="13">## Optimizer: TuneControlGrid</a>
-<a class="sourceLine" id="cb6-14" data-line-number="14">## Nested CV Used: TRUE</a>
-<a class="sourceLine" id="cb6-15" data-line-number="15">## Snapshot of data:</a>
-<a class="sourceLine" id="cb6-16" data-line-number="16">##            C acc.test.mean mmce.test.mean iteration exec.time</a>
-<a class="sourceLine" id="cb6-17" data-line-number="17">## 1 -5.0000000     0.6302083      0.3697917         1     0.029</a>
-<a class="sourceLine" id="cb6-18" data-line-number="18">## 2 -3.8888889     0.6302083      0.3697917         2     0.029</a>
-<a class="sourceLine" id="cb6-19" data-line-number="19">## 3 -2.7777778     0.6979167      0.3020833         3     0.030</a>
-<a class="sourceLine" id="cb6-20" data-line-number="20">## 4 -1.6666667     0.7526042      0.2473958         4     0.029</a>
-<a class="sourceLine" id="cb6-21" data-line-number="21">## 5 -0.5555556     0.7630208      0.2369792         5     0.029</a>
-<a class="sourceLine" id="cb6-22" data-line-number="22">## 6  0.5555556     0.7656250      0.2343750         6     0.029</a>
-<a class="sourceLine" id="cb6-23" data-line-number="23">##   nested_cv_run</a>
-<a class="sourceLine" id="cb6-24" data-line-number="24">## 1             1</a>
-<a class="sourceLine" id="cb6-25" data-line-number="25">## 2             1</a>
-<a class="sourceLine" id="cb6-26" data-line-number="26">## 3             1</a>
-<a class="sourceLine" id="cb6-27" data-line-number="27">## 4             1</a>
-<a class="sourceLine" id="cb6-28" data-line-number="28">## 5             1</a>
-<a class="sourceLine" id="cb6-29" data-line-number="29">## 6             1</a></code></pre></div>
+<a class="sourceLine" id="cb6-10" data-line-number="10"><span class="co">## HyperParsEffectData:</span></a>
+<a class="sourceLine" id="cb6-11" data-line-number="11"><span class="co">## Hyperparameters: C</span></a>
+<a class="sourceLine" id="cb6-12" data-line-number="12"><span class="co">## Measures: acc.test.mean,mmce.test.mean</span></a>
+<a class="sourceLine" id="cb6-13" data-line-number="13"><span class="co">## Optimizer: TuneControlGrid</span></a>
+<a class="sourceLine" id="cb6-14" data-line-number="14"><span class="co">## Nested CV Used: TRUE</span></a>
+<a class="sourceLine" id="cb6-15" data-line-number="15"><span class="co">## Snapshot of data:</span></a>
+<a class="sourceLine" id="cb6-16" data-line-number="16"><span class="co">##            C acc.test.mean mmce.test.mean iteration exec.time</span></a>
+<a class="sourceLine" id="cb6-17" data-line-number="17"><span class="co">## 1 -5.0000000     0.6666667      0.3333333         1     0.023</span></a>
+<a class="sourceLine" id="cb6-18" data-line-number="18"><span class="co">## 2 -3.8888889     0.6666667      0.3333333         2     0.030</span></a>
+<a class="sourceLine" id="cb6-19" data-line-number="19"><span class="co">## 3 -2.7777778     0.6953125      0.3046875         3     0.027</span></a>
+<a class="sourceLine" id="cb6-20" data-line-number="20"><span class="co">## 4 -1.6666667     0.7317708      0.2682292         4     0.021</span></a>
+<a class="sourceLine" id="cb6-21" data-line-number="21"><span class="co">## 5 -0.5555556     0.7630208      0.2369792         5     0.022</span></a>
+<a class="sourceLine" id="cb6-22" data-line-number="22"><span class="co">## 6  0.5555556     0.7760417      0.2239583         6     0.022</span></a>
+<a class="sourceLine" id="cb6-23" data-line-number="23"><span class="co">##   nested_cv_run</span></a>
+<a class="sourceLine" id="cb6-24" data-line-number="24"><span class="co">## 1             1</span></a>
+<a class="sourceLine" id="cb6-25" data-line-number="25"><span class="co">## 2             1</span></a>
+<a class="sourceLine" id="cb6-26" data-line-number="26"><span class="co">## 3             1</span></a>
+<a class="sourceLine" id="cb6-27" data-line-number="27"><span class="co">## 4             1</span></a>
+<a class="sourceLine" id="cb6-28" data-line-number="28"><span class="co">## 5             1</span></a>
+<a class="sourceLine" id="cb6-29" data-line-number="29"><span class="co">## 6             1</span></a></code></pre></div>
 <p>After generating the hyperparameter effect data, the next step is to visualize it. <code>mlr</code> has several methods built-in to visualize the data, meant to support the needs of the researcher and the engineer in industry. The next few sections will walk through the visualization support for several use-cases.</p>
 </div>
 <div id="visualizing-the-effect-of-a-single-hyperparameter" class="section level1">
@@ -405,20 +406,22 @@
 <p>In a situation when the user is tuning a single hyperparameter for a learner, the user may wish to plot the performance of the learner against the values of the hyperparameter.</p>
 <p>In the example below, we tune the number of clusters against the silhouette score on the mtcars dataset. We specify the x-axis with the <code>x</code> argument and the y-axis with the <code>y</code> argument. If the <code>plot.type</code> argument is not specified, <code>mlr</code> will attempt to plot a scatterplot by default. Since <code><a href="../reference/plotHyperParsEffect.html">plotHyperParsEffect()</a></code> returns a <code><a href="http://www.rdocumentation.org/packages/ggplot2/topics/ggplot">ggplot2::ggplot()</a></code> object, we can easily customize it to our liking!</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="kw">library</span>(<span class="st">"clusterSim"</span>)</a>
-<a class="sourceLine" id="cb7-2" data-line-number="2">ps =<span class="st"> </span><span class="kw">makeParamSet</span>(</a>
-<a class="sourceLine" id="cb7-3" data-line-number="3">  <span class="kw">makeDiscreteParam</span>(<span class="st">"centers"</span>, <span class="dt">values =</span> <span class="dv">3</span><span class="op">:</span><span class="dv">10</span>)</a>
-<a class="sourceLine" id="cb7-4" data-line-number="4">)</a>
-<a class="sourceLine" id="cb7-5" data-line-number="5">ctrl =<span class="st"> </span><span class="kw"><a href="../reference/makeTuneControlGrid.html">makeTuneControlGrid</a></span>()</a>
-<a class="sourceLine" id="cb7-6" data-line-number="6">rdesc =<span class="st"> </span><span class="kw"><a href="../reference/makeResampleDesc.html">makeResampleDesc</a></span>(<span class="st">"Holdout"</span>)</a>
-<a class="sourceLine" id="cb7-7" data-line-number="7">res =<span class="st"> </span><span class="kw"><a href="../reference/tuneParams.html">tuneParams</a></span>(<span class="st">"cluster.kmeans"</span>, <span class="dt">task =</span> mtcars.task, <span class="dt">control =</span> ctrl,</a>
-<a class="sourceLine" id="cb7-8" data-line-number="8">  <span class="dt">measures =</span> silhouette, <span class="dt">resampling =</span> rdesc, <span class="dt">par.set =</span> ps, <span class="dt">show.info =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb7-9" data-line-number="9">data =<span class="st"> </span><span class="kw"><a href="../reference/generateHyperParsEffectData.html">generateHyperParsEffectData</a></span>(res)</a>
-<a class="sourceLine" id="cb7-10" data-line-number="10">plt =<span class="st"> </span><span class="kw"><a href="../reference/plotHyperParsEffect.html">plotHyperParsEffect</a></span>(data, <span class="dt">x =</span> <span class="st">"centers"</span>, <span class="dt">y =</span> <span class="st">"silhouette.test.mean"</span>)</a>
-<a class="sourceLine" id="cb7-11" data-line-number="11">### add our own touches to the plot</a>
-<a class="sourceLine" id="cb7-12" data-line-number="12">plt <span class="op">+</span><span class="st"> </span><span class="kw">geom_point</span>(<span class="dt">colour =</span> <span class="st">"red"</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb7-13" data-line-number="13"><span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">"Evaluating Number of Cluster Centers on mtcars"</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb7-14" data-line-number="14"><span class="st">  </span><span class="kw">scale_x_continuous</span>(<span class="dt">breaks =</span> <span class="dv">3</span><span class="op">:</span><span class="dv">10</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb7-15" data-line-number="15"><span class="st">  </span><span class="kw">theme_bw</span>()</a></code></pre></div>
+<a class="sourceLine" id="cb7-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb7-3" data-line-number="3">ps =<span class="st"> </span><span class="kw">makeParamSet</span>(</a>
+<a class="sourceLine" id="cb7-4" data-line-number="4">  <span class="kw">makeDiscreteParam</span>(<span class="st">"centers"</span>, <span class="dt">values =</span> <span class="dv">3</span><span class="op">:</span><span class="dv">10</span>)</a>
+<a class="sourceLine" id="cb7-5" data-line-number="5">)</a>
+<a class="sourceLine" id="cb7-6" data-line-number="6">ctrl =<span class="st"> </span><span class="kw"><a href="../reference/makeTuneControlGrid.html">makeTuneControlGrid</a></span>()</a>
+<a class="sourceLine" id="cb7-7" data-line-number="7">rdesc =<span class="st"> </span><span class="kw"><a href="../reference/makeResampleDesc.html">makeResampleDesc</a></span>(<span class="st">"Holdout"</span>)</a>
+<a class="sourceLine" id="cb7-8" data-line-number="8">res =<span class="st"> </span><span class="kw"><a href="../reference/tuneParams.html">tuneParams</a></span>(<span class="st">"cluster.kmeans"</span>, <span class="dt">task =</span> mtcars.task, <span class="dt">control =</span> ctrl,</a>
+<a class="sourceLine" id="cb7-9" data-line-number="9">  <span class="dt">measures =</span> silhouette, <span class="dt">resampling =</span> rdesc, <span class="dt">par.set =</span> ps, <span class="dt">show.info =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb7-10" data-line-number="10">data =<span class="st"> </span><span class="kw"><a href="../reference/generateHyperParsEffectData.html">generateHyperParsEffectData</a></span>(res)</a>
+<a class="sourceLine" id="cb7-11" data-line-number="11">plt =<span class="st"> </span><span class="kw"><a href="../reference/plotHyperParsEffect.html">plotHyperParsEffect</a></span>(data, <span class="dt">x =</span> <span class="st">"centers"</span>, <span class="dt">y =</span> <span class="st">"silhouette.test.mean"</span>)</a>
+<a class="sourceLine" id="cb7-12" data-line-number="12"></a>
+<a class="sourceLine" id="cb7-13" data-line-number="13"><span class="co"># add our own touches to the plot</span></a>
+<a class="sourceLine" id="cb7-14" data-line-number="14">plt <span class="op">+</span><span class="st"> </span><span class="kw">geom_point</span>(<span class="dt">colour =</span> <span class="st">"red"</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb7-15" data-line-number="15"><span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">"Evaluating Number of Cluster Centers on mtcars"</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb7-16" data-line-number="16"><span class="st">  </span><span class="kw">scale_x_continuous</span>(<span class="dt">breaks =</span> <span class="dv">3</span><span class="op">:</span><span class="dv">10</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb7-17" data-line-number="17"><span class="st">  </span><span class="kw">theme_bw</span>()</a></code></pre></div>
 <p>In the example below, we tune SVM with the <code>C</code> hyperparameter on the Pima dataset. We will use simulated annealing optimizer, so we are interested in seeing if the optimization algorithm actually improves with iterations. By default, <code>mlr</code> only plots improvements to the global optimum.</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1">ps =<span class="st"> </span><span class="kw">makeParamSet</span>(</a>
 <a class="sourceLine" id="cb8-2" data-line-number="2">  <span class="kw">makeNumericParam</span>(<span class="st">"C"</span>, <span class="dt">lower =</span> <span class="dv">-5</span>, <span class="dt">upper =</span> <span class="dv">5</span>, <span class="dt">trafo =</span> <span class="cf">function</span>(x) <span class="dv">2</span><span class="op">^</span>x)</a>
@@ -427,11 +430,14 @@
 <a class="sourceLine" id="cb8-5" data-line-number="5">rdesc =<span class="st"> </span><span class="kw"><a href="../reference/makeResampleDesc.html">makeResampleDesc</a></span>(<span class="st">"Holdout"</span>)</a>
 <a class="sourceLine" id="cb8-6" data-line-number="6">res =<span class="st"> </span><span class="kw"><a href="../reference/tuneParams.html">tuneParams</a></span>(<span class="st">"classif.ksvm"</span>, <span class="dt">task =</span> pid.task, <span class="dt">control =</span> ctrl,</a>
 <a class="sourceLine" id="cb8-7" data-line-number="7">  <span class="dt">resampling =</span> rdesc, <span class="dt">par.set =</span> ps, <span class="dt">show.info =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb8-8" data-line-number="8">data =<span class="st"> </span><span class="kw"><a href="../reference/generateHyperParsEffectData.html">generateHyperParsEffectData</a></span>(res)</a>
-<a class="sourceLine" id="cb8-9" data-line-number="9">plt =<span class="st"> </span><span class="kw"><a href="../reference/plotHyperParsEffect.html">plotHyperParsEffect</a></span>(data, <span class="dt">x =</span> <span class="st">"iteration"</span>, <span class="dt">y =</span> <span class="st">"mmce.test.mean"</span>,</a>
-<a class="sourceLine" id="cb8-10" data-line-number="10">  <span class="dt">plot.type =</span> <span class="st">"line"</span>)</a>
-<a class="sourceLine" id="cb8-11" data-line-number="11">plt <span class="op">+</span><span class="st"> </span><span class="kw">ggtitle</span>(<span class="st">"Analyzing convergence of simulated annealing"</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb8-12" data-line-number="12"><span class="st">  </span><span class="kw">theme_minimal</span>()</a></code></pre></div>
+<a class="sourceLine" id="cb8-8" data-line-number="8"><span class="co">## Warning in sel.func(learner, task, resampling, measures, par.set,</span></a>
+<a class="sourceLine" id="cb8-9" data-line-number="9"><span class="co">## control, : GenSA used 163 function calls, exceededing the given budget of</span></a>
+<a class="sourceLine" id="cb8-10" data-line-number="10"><span class="co">## 100 evaluations.</span></a>
+<a class="sourceLine" id="cb8-11" data-line-number="11">data =<span class="st"> </span><span class="kw"><a href="../reference/generateHyperParsEffectData.html">generateHyperParsEffectData</a></span>(res)</a>
+<a class="sourceLine" id="cb8-12" data-line-number="12">plt =<span class="st"> </span><span class="kw"><a href="../reference/plotHyperParsEffect.html">plotHyperParsEffect</a></span>(data, <span class="dt">x =</span> <span class="st">"iteration"</span>, <span class="dt">y =</span> <span class="st">"mmce.test.mean"</span>,</a>
+<a class="sourceLine" id="cb8-13" data-line-number="13">  <span class="dt">plot.type =</span> <span class="st">"line"</span>)</a>
+<a class="sourceLine" id="cb8-14" data-line-number="14">plt <span class="op">+</span><span class="st"> </span><span class="kw">ggtitle</span>(<span class="st">"Analyzing convergence of simulated annealing"</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb8-15" data-line-number="15"><span class="st">  </span><span class="kw">theme_minimal</span>()</a></code></pre></div>
 <p><img src="hyperpar_tuning_effects_files/figure-html/sa_single-1.png" width="700"></p>
 <p>In the case of a learner crash, <code>mlr</code> will impute the crash with the worst value graphically and indicate the point. In the example below, we give the <code>C</code> parameter negative values, which will result in a learner crash for SVM.</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1">ps =<span class="st"> </span><span class="kw">makeParamSet</span>(</a>
@@ -480,16 +486,16 @@
 <a class="sourceLine" id="cb11-14" data-line-number="14">med_plt =<span class="st"> </span><span class="kw">mean</span>(<span class="kw">c</span>(min_plt, max_plt))</a>
 <a class="sourceLine" id="cb11-15" data-line-number="15">plt <span class="op">+</span><span class="st"> </span><span class="kw">scale_fill_gradient2</span>(<span class="dt">breaks =</span> <span class="kw">seq</span>(min_plt, max_plt, <span class="dt">length.out =</span> <span class="dv">5</span>),</a>
 <a class="sourceLine" id="cb11-16" data-line-number="16">  <span class="dt">low =</span> <span class="st">"blue"</span>, <span class="dt">mid =</span> <span class="st">"white"</span>, <span class="dt">high =</span> <span class="st">"red"</span>, <span class="dt">midpoint =</span> med_plt)</a>
-<a class="sourceLine" id="cb11-17" data-line-number="17">## Scale for 'fill' is already present. Adding another scale for 'fill',</a>
-<a class="sourceLine" id="cb11-18" data-line-number="18">## which will replace the existing scale.</a></code></pre></div>
+<a class="sourceLine" id="cb11-17" data-line-number="17"><span class="co">## Scale for 'fill' is already present. Adding another scale for 'fill',</span></a>
+<a class="sourceLine" id="cb11-18" data-line-number="18"><span class="co">## which will replace the existing scale.</span></a></code></pre></div>
 <p><img src="hyperpar_tuning_effects_files/figure-html/two-1.png" width="700"></p>
 <p>We can use the <code>show.experiments</code> argument in order to visualize which points were specifically passed to the learner in the original experiment and which points were interpolated by <code>mlr</code>:</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1">plt =<span class="st"> </span><span class="kw"><a href="../reference/plotHyperParsEffect.html">plotHyperParsEffect</a></span>(data, <span class="dt">x =</span> <span class="st">"C"</span>, <span class="dt">y =</span> <span class="st">"sigma"</span>, <span class="dt">z =</span> <span class="st">"acc.test.mean"</span>,</a>
 <a class="sourceLine" id="cb12-2" data-line-number="2">  <span class="dt">plot.type =</span> <span class="st">"heatmap"</span>, <span class="dt">interpolate =</span> <span class="st">"regr.earth"</span>, <span class="dt">show.experiments =</span> <span class="ot">TRUE</span>)</a>
 <a class="sourceLine" id="cb12-3" data-line-number="3">plt <span class="op">+</span><span class="st"> </span><span class="kw">scale_fill_gradient2</span>(<span class="dt">breaks =</span> <span class="kw">seq</span>(min_plt, max_plt, <span class="dt">length.out =</span> <span class="dv">5</span>),</a>
 <a class="sourceLine" id="cb12-4" data-line-number="4">  <span class="dt">low =</span> <span class="st">"blue"</span>, <span class="dt">mid =</span> <span class="st">"white"</span>, <span class="dt">high =</span> <span class="st">"red"</span>, <span class="dt">midpoint =</span> med_plt)</a>
-<a class="sourceLine" id="cb12-5" data-line-number="5">## Scale for 'fill' is already present. Adding another scale for 'fill',</a>
-<a class="sourceLine" id="cb12-6" data-line-number="6">## which will replace the existing scale.</a></code></pre></div>
+<a class="sourceLine" id="cb12-5" data-line-number="5"><span class="co">## Scale for 'fill' is already present. Adding another scale for 'fill',</span></a>
+<a class="sourceLine" id="cb12-6" data-line-number="6"><span class="co">## which will replace the existing scale.</span></a></code></pre></div>
 <p><img src="hyperpar_tuning_effects_files/figure-html/two_showargs-1.png" width="700"></p>
 <p>We can also visualize how long the optimizer takes to reach an optima for the same example:</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1"><span class="kw"><a href="../reference/plotHyperParsEffect.html">plotHyperParsEffect</a></span>(data, <span class="dt">x =</span> <span class="st">"iteration"</span>, <span class="dt">y =</span> <span class="st">"acc.test.mean"</span>,</a>
@@ -527,8 +533,8 @@
 <a class="sourceLine" id="cb15-16" data-line-number="16">med_plt =<span class="st"> </span><span class="kw">mean</span>(<span class="kw">c</span>(min_plt, max_plt))</a>
 <a class="sourceLine" id="cb15-17" data-line-number="17">plt <span class="op">+</span><span class="st"> </span><span class="kw">scale_fill_gradient2</span>(<span class="dt">breaks =</span> <span class="kw">seq</span>(min_plt, max_plt, <span class="dt">length.out =</span> <span class="dv">5</span>),</a>
 <a class="sourceLine" id="cb15-18" data-line-number="18">  <span class="dt">low =</span> <span class="st">"red"</span>, <span class="dt">mid =</span> <span class="st">"white"</span>, <span class="dt">high =</span> <span class="st">"blue"</span>, <span class="dt">midpoint =</span> med_plt)</a>
-<a class="sourceLine" id="cb15-19" data-line-number="19">## Scale for 'fill' is already present. Adding another scale for 'fill',</a>
-<a class="sourceLine" id="cb15-20" data-line-number="20">## which will replace the existing scale.</a></code></pre></div>
+<a class="sourceLine" id="cb15-19" data-line-number="19"><span class="co">## Scale for 'fill' is already present. Adding another scale for 'fill',</span></a>
+<a class="sourceLine" id="cb15-20" data-line-number="20"><span class="co">## which will replace the existing scale.</span></a></code></pre></div>
 <p><img src="hyperpar_tuning_effects_files/figure-html/two_nested-1.png" width="700"></p>
 </div>
 <div id="visualizing-the-effects-of-more-than-2-hyperparameters" class="section level1">
@@ -549,7 +555,7 @@
 <p>You can generate a plot for a single hyperparameter like <code>C</code> as shown below. The <code>partial.dep.learn</code> can be any regression Learner (<code><a href="../reference/makeLearner.html">makeLearner()</a></code>) in <code>mlr</code> and is used to regress the attained performance values on the values of the 3 hyperparameters visited during tuning. The fitted model serves as basis for calculating partial dependences.</p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" data-line-number="1"><span class="kw"><a href="../reference/plotHyperParsEffect.html">plotHyperParsEffect</a></span>(data, <span class="dt">x =</span> <span class="st">"C"</span>, <span class="dt">y =</span> <span class="st">"acc.test.mean"</span>, <span class="dt">plot.type =</span> <span class="st">"line"</span>,</a>
 <a class="sourceLine" id="cb17-2" data-line-number="2">  <span class="dt">partial.dep.learn =</span> <span class="st">"regr.randomForest"</span>)</a>
-<a class="sourceLine" id="cb17-3" data-line-number="3">## Loading required package: mmpf</a></code></pre></div>
+<a class="sourceLine" id="cb17-3" data-line-number="3"><span class="co">## Loading required package: mmpf</span></a></code></pre></div>
 <p><img src="hyperpar_tuning_effects_files/figure-html/unnamed-chunk-3-1.png" width="700"></p>
 <p>We can also look at two hyperparameters simultaneously, for example <code>C</code> and <code>sigma</code>.</p>
 <div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" data-line-number="1"><span class="kw"><a href="../reference/plotHyperParsEffect.html">plotHyperParsEffect</a></span>(data, <span class="dt">x =</span> <span class="st">"C"</span>, <span class="dt">y =</span> <span class="st">"sigma"</span>, <span class="dt">z =</span> <span class="st">"acc.test.mean"</span>,</a>
