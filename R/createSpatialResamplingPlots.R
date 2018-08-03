@@ -152,7 +152,11 @@ createSpatialResamplingPlots = function(task = NULL, resample = NULL, crs = NULL
   }
 
   # create plot list with length = folds
-  nfolds = purrr::map_int(resample, ~ .x$pred$instance$desc$folds)[1]
+  if (!is.null(resample$pred$instance$desc$folds)) {
+    nfolds = purrr::map_int(resample, ~ .x$pred$instance$desc$folds)[1]
+  } else {
+    nfolds = purrr::map_int(resample, ~ .x$pred$instance$desc$iters)
+  }
 
   plot.list.out.all = purrr::map(resample, function(.r) {
 
