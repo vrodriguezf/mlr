@@ -1,23 +1,22 @@
 #' @title Constructor for FDA feature extraction methods.
 #'
 #' @description
-#' This can be used to implement custom feature FDA extraction.
+#' This can be used to implement custom FDA feature extraction.
+#' Takes a \code{learn} and a \code{reextract} function along with some optional
+#' parameters to those as argument.
 #'
 #' @param learn (`function(data, target, col, ...)`)\cr
 #'   Function to learn and extract information on functional column `col`.
 #'   Arguments are:
 #'   \itemize{
 #'   \item data [data.frame]\cr
-#'     Data.frame with one row per observation of a single functional feature
+#'     Data.frame containing matricies with one row per observation of a single functional
 #'     or time series and one column per measurement time point.
 #'     All entries need to be numeric.
-#'   \item data [data.frame]\cr
-#'     Data.frame containing matricies with one row per observation of a single functional
-#'     or time series and one column per measurement time point. All entries need to be numeric.
-#'   \item target [character]\cr
+#'   \item target (`character(1)`)\cr
 #'     Name of the target variable. Default: \dQuote{NULL}.
 #'     The variable is only set to be consistent with the API.
-#'   \item col ([character] | [numeric])\cr
+#'   \item col (`character(1)` | `numeric(1)`)\cr
 #'     column names or indices, the extraction should be performed on.
 #'     The function has to return a named list of values.
 #'   }
@@ -26,13 +25,17 @@
 #'   Can be equal to `learn`.
 #' @param args ([list])\cr
 #'   Named list of arguments to pass to `learn` via `...`.
+#' @param par.set ([ParamSet])\cr
+#'   Paramset added to the learner if used in conjunction with a `makeExtractFDAFeatsWrapper`.
+#'   Can be `NULL`.`
 #' @export
 #' @family fda
-makeExtractFDAFeatMethod = function(learn, reextract, args = list()) {
+makeExtractFDAFeatMethod = function(learn, reextract, args = list(), par.set = NULL) {
   assertFunction(learn, args = c("data", "target", "col"))
   assertFunction(reextract, args = c("data", "target", "col"))
   assertList(args, names = "named")
-  setClasses(list(learn = learn, reextract = reextract, args = args), "extractFDAFeatMethod")
+  assertClass(par.set, classes = "ParamSet", null.ok = TRUE)
+  setClasses(list(learn = learn, reextract = reextract, args = args, par.set = par.set), "extractFDAFeatMethod")
 }
 
 #' @title Fast Fourier transform features.
@@ -41,7 +44,7 @@ makeExtractFDAFeatMethod = function(learn, reextract, args = list()) {
 #' The function extracts features from functional data based on the fast fourier
 #' transform. For more details refer to [stats::fft].
 #'
-#' @param trafo.coeff ([character])\cr
+#' @param trafo.coeff (`character(1)`)\cr
 #'   Specifies which transformation of the complex frequency domain
 #'   representation should be calculated as a feature representation.
 #'   Must be one of \dQuote{amplitude} or \dQuote{phase}.
@@ -64,10 +67,12 @@ extractFDAFourier = function(trafo.coeff = "phase") {
 
     # Calculate fourier coefficients (row wise) which are complex numbers
     fft.trafo = t(apply(data, 1, fft))
+
     # Extract amplitude or phase of fourier coefficients which are real numbers
     fft.pa = switch(trafo.coeff,
       amplitude = sqrt(apply(fft.trafo, 2, function(x) Re(x)^2 + Im(x)^2)),
-      phase = apply(fft.trafo, 2, function(x) atan(Im(x) / Re(x)))
+      # In some cases the fft values are very small and rounded to 0.
+      phase = apply(fft.trafo, 2, function(x) atan(Im(x) / ifelse(abs(Re(x)) < .Machine$double.eps, .Machine$double.eps, Re(x))))
     )
 
     # If there is only one row in data, fft returns an array
@@ -76,13 +81,17 @@ extractFDAFourier = function(trafo.coeff = "phase") {
     }
     # Add more legible column names to the output
     df = as.data.frame(fft.pa)
-    colnames(df) = stri_paste(trafo.coeff, seq_len(ncol(fft.pa)), sep = ".")
+    colnames(df) = stri_paste(trafo.coeff, seq_len(ncol(fft.pa)))
     df
   }
+
+  ps = makeParamSet(makeDiscreteParam("trafo.coeff", values = c("phase", "amplitude")))
+
   makeExtractFDAFeatMethod(
     learn = lrn,
     reextract = lrn,
-    args = list(trafo.coeff = trafo.coeff)
+    args = list(trafo.coeff = trafo.coeff),
+    par.set = ps
   )
 }
 
@@ -94,173 +103,142 @@ extractFDAFourier = function(trafo.coeff = "phase") {
 #' functional data.
 #' See [wavelets::dwt] for more information.
 #'
-#' @param filter ([character])\cr
+#' @param filter (`character(1)`)\cr
 #'   Specifies which filter should be used.
-#'   Default is \dQuote{la8}.
-#' @param boundary ([character])\cr
+#'   Must be one of `d`|`la`|`bl`|`c` followed by an even
+#'   number for the level of the filter.
+#'   The level of the filter needs to be smaller or equal then the time-series length.
+#'   For more information and acceptable filters see \code{help(wt.filter)}.
+#'   Defaults to `la8`.
+#' @param boundary (`character(1)`)\cr
 #'   Boundary to be used.
 #'   \dQuote{periodic} assumes circular time series,
 #'   for \dQuote{reflection} the series is extended to twice its length.
 #'   Default is \dQuote{periodic}.
+#  @param n.levels [\code{integer(1)}]\cr
+#    Level of decomposition. See \code{\link[wavelets]{dwt}} for details.
+#    FIXME: Find out how to set this.
 #' @return ([data.frame]).
 #' @export
 #' @family fda_featextractor
 extractFDAWavelets = function(filter = "la8", boundary = "periodic") {
-  assertCharacter(filter)
+
+  # All possible values for the filters
+  filter.vals = c(
+    paste0("d", c(2, 4, 6, 8, 10, 12, 14, 16, 18, 20)),
+    paste0("la", c(8, 10, 12, 14, 16, 18, 20)),
+    paste0("bl", c(14, 18, 20)),
+    paste0("c", c(6, 12, 18, 24, 30)),
+    "haar"
+  )
+  assertChoice(filter, filter.vals)
   assertChoice(boundary, c("periodic", "reflection"))
+
+  # FIXME: Add n.levels parameter. This param does not have defaults, I do not know how
+  # to handle it right now.
+  # @param n.levels [\code{integer(1)}]\cr
+  #   Level of decomposition. See \code{\link[wavelets]{dwt}} for details.
+  # FIXME: Add n.levels parameter. Has no default. When n.leves are not provided, we do not understand yet if there is a difference
 
   lrn = function(data, target = NULL, col, filter, boundary) {
     requirePackages("wavelets", default.method = "load")
+    assertDataFrame(data)
+    assertChoice(col, choices = colnames(data))
 
-    assertClass(data, "data.frame")
-    assertNumeric(as.matrix(data[, col]))
+    assertDataFrame(data)
+    assertChoice(col, choices = colnames(data))
+    # Convert to list in order to catch params that do not have defaults (n.levels)
+    args = learnerArgsToControl(list, filter = filter, boundary = boundary)
 
-    df = convertRowsToList(data[, col, drop = FALSE])
-    wtdata = t(dapply(df, fun = function(x) {
-      wt = wavelets::dwt(as.numeric(x), filter = filter, boundary = boundary)
+    # Convert to list of rows and extract wavelets from each time-series.
+    rowlst = convertRowsToList(data[, col, drop = FALSE])
+    wtdata = t(dapply(rowlst, fun = function(x) {
+      args$X = as.numeric(x)
+      wt = do.call(wavelets::dwt, args)
+      # Extract wavelet coefficients W and level scaling coeffictients V
       unlist(c(wt@W, wt@V[[wt@level]]))
     }))
-
     df = as.data.frame(wtdata)
-    colnames(df) = stri_paste("wav", filter, seq_len(ncol(wtdata)), sep = ".")
+    colnames(df) = stri_paste("wav", filter, seq_len(ncol(df)), sep = ".")
     return(df)
   }
-  makeExtractFDAFeatMethod(learn = lrn, reextract = lrn, args = list(filter = filter, boundary = boundary))
+  ps = makeParamSet(
+    makeDiscreteParam("filter", values = filter.vals),
+    makeDiscreteParam("boundary", values = c("periodic", "reflection"))
+  )
+  makeExtractFDAFeatMethod(learn = lrn, reextract = lrn, args = list(filter = filter, boundary = boundary), par.set = ps)
 }
 
-#' @title Extract functional principal component analysis features.
+
+
+#' @title Time-Series Feature Heuristics
 #'
 #' @description
-#' The function extracts the functional principal components from a data.frame
-#' containing functional features.
+#' The function extracts features from functional data based on known Heuristics.
+#' For more details refer to \code{\link[tsfeatures]{tsfeatures}}.
+#' Under the hood this function uses the package \code{\link[tsfeatures]{tsfeatures}}
+#' For more information see Hyndman, Wang and Laptev, Large-Scale Unusual Time Series Detection, ICDM 2015.
 #'
-#' @param pve ([numeric])\cr
-#'   Fraction of variance explained for the functional principal components.
-#'   Default is 0.99.
-#' @param npc ([integer])\cr
-#'   Number of principal components to extract. Overrides `pve` param.
-#'   Default is `NULL`
-#' @return ([data.frame]).
+#' @param tsfeatures.scale (`logical(1)`)\cr
+#'   If TRUE, time series are scaled to mean 0 and sd 1 before features are computed.
+#' @param trim (`logical(1)`)\cr
+#'   If TRUE, time series are trimmed by \code{trim_amount} before features are computed.
+#'   Values larger than trim_amount in absolute value are set to NA.
+#' @param trim_amount (`numeric(1)`)\cr
+#'   Default level of trimming if trim==TRUE.
+#' @param parallel (`logical(1)`)\cr
+#'   If TRUE, multiple cores (or multiple sessions) will be used.
+#'   This only speeds things up when there are a large number of time series.
+#' @param na.action (`logical(1)`)\cr
+#'   A function to handle missing values. Use na.interp to estimate missing values
+#'@param ... (any)\cr
+#'   Further arguments passed on to the respective tsfeatures functions.
+#' @return ([data.frame])
+#' @references Hyndman, Wang and Laptev, Large-Scale Unusual Time Series Detection, ICDM 2015.
 #' @export
 #' @family fda_featextractor
-extractFDAFPCA = function(pve = 0.99, npc = NULL) {
-  assertNumber(pve, lower = 0, upper = 1)
-  assertCount(npc, null.ok = TRUE)
+extractFDATsfeatures = function(tsfeatures.scale = TRUE, trim = FALSE, trim_amount = 0.1, parallel = FALSE, na.action = na.pass, ...) {
+  lrn = function(data, target = NULL, col, tsfeatures.scale = TRUE, trim = FALSE, trim_amount = 0.1, parallel = FALSE, na.action = na.pass, ...) {
+    assertClass(data, "data.frame")
+    assertLogical(tsfeatures.scale)
+    assertLogical(trim)
+    assertLogical(parallel)
+    assertNumeric(trim_amount)
+    assertFunction(na.action)
 
-  lrn = function(data, target, col, vals, pve, npc) {
-    requirePackages("mboost", default.method = "load")
-    requirePackages("refund", default.method = "load")
-    assert(
-      checkClass(data, "data.frame"),
-      checkClass(data, "matrix")
-    )
+    # Transform data to matrix
+    data = as.matrix(data[, col, drop = FALSE])
+    assertNumeric(data)
+    # Convert to list of rows
+    row.lst = as.list(data.frame(t(data)))
 
-    data = data[, col, drop = FALSE]
+    requirePackages("tsfeatures", why = "time-series feature extraction")
+    # We do not compute heterogeneity, hw_parameters
+    feats = c("frequency", "stl_features", "entropy", "acf_features", "arch_stat",
+      "crossing_points", "flat_spots", "hurst",  "holt_parameters", "lumpiness",
+      "max_kl_shift", "max_var_shift", "max_level_shift", "stability", "nonlinearity")
 
-    # transform dataframe into matrix
-    if (inherits(data, "data.frame"))
-      data = as.matrix(data)
+    tsfeats = tsfeatures::tsfeatures(row.lst, features = feats)
 
-    # extract fpca features
-    # FIXME: Add other fpca. options, maybe via function args ?
-    rst = refund::fpca.sc(Y = data, pve = pve, npc = npc)
-    # Order the columns by score
-    features.fpca = rst$scores[, order(rst$evalues,  decreasing = TRUE)]
-    df.fpca = as.data.frame(features.fpca)
-    names(df.fpca) = paste0("Fpca", seq_len(ncol(df.fpca)))
-    return(df.fpca)
+    # Get rid of series and type columns
+    tsfeats = data.frame(lapply(tsfeats, as.numeric))
+    # Get rid of constant features
+    const.feats = which(viapply(tsfeats, function(x) length(unique(x))) == 1L)
+
+    return(tsfeats[, - const.feats])
   }
-
-  makeExtractFDAFeatMethod(learn = lrn, reextract = lrn, args = list(pve = pve, npc = npc))
+  ps = makeParamSet(
+    makeLogicalParam("tsfeatures.scale", default = TRUE),
+    makeLogicalParam("trim", default = FALSE),
+    makeNumericParam("trim_amount", lower = 0L, upper = 1L, default = 0.1),
+    makeLogicalParam("parallel", default = FALSE),
+    makeFunctionParam("na.action", default = na.pass)
+  )
+  makeExtractFDAFeatMethod(
+    learn = lrn,
+    reextract = lrn,
+    args = list(tsfeatures.scale = tsfeatures.scale, trim = trim, trim_amount = trim_amount, parallel = parallel, na.action = na.action, ...),
+    par.set = ps
+  )
 }
 
-#' @title Multiresolution feature extraction.
-#'
-#' @description
-#' The function extracts currently the mean of multiple segments of each curve and stacks them
-#' as features. The segments length are set in a hierachy way so the features
-#' cover different resolution levels.
-#'
-#' @param res.level (`integer(1)`)\cr
-#'   The number of resolution hierachy, each length is divided by a factor of 2.
-#' @param shift (`numeric(1)`)\cr
-#'   The overlapping proportion when slide the window for one step.
-#' @param curve.lens ([integer])\cr
-#'   Curve subsequence lengths. Needs to sum up to the length of the functional.
-#' @return ([data.frame]).
-#' @export
-#' @family fda_featextractor
-extractFDAMultiResFeatures = function(res.level = 3L, shift = 0.5, curve.lens = NULL) {
-
-  # Helper function for getFDAMultiResFeatures, extracts for a whole subsequence.
-  getUniFDAMultiResFeatures = function(data, res.level, shift) {
-    feat.list = apply(data, 1, getCurveFeatures, res.level = res.level, shift = shift)
-    data.frame(t(feat.list))
-  }
-
-  getFDAMultiResFeatures = function(data, res.level = 3L, shift = 0.5, curve.lens) {
-    # Assert that curve.lens sums up to ncol(data)
-    stopifnot(sum(curve.lens) == ncol(data))
-
-    clsum = cumsum(curve.lens)
-    feat.list = apply(data, 1, function(x) {
-      # Extract the data from the different subcurves specified by curve.lens
-      subfeats = Map(function(seqstart, seqend) {
-        getCurveFeatures(x[seqstart:seqend], res.level = res.level, shift = shift)
-      }, clsum - curve.lens + 1, cumsum(curve.lens))
-      # And return as vector
-      unlist(subfeats)
-    })
-    data.frame(t(feat.list))
-  }
-
-
-  #  Get Features from a single (sub-)curve
-  getCurveFeatures = function(x, res.level = 3, shift = 0.5) {
-    m = length(x)
-    start = 1L
-    feats = numeric(0L)
-    ssize = m  # initialize segment size to be the length of the curve
-    for (rl in 1:res.level) {  # ssize is divided by 2 at the end of the loop
-      soffset = ceiling(shift * ssize)  # overlap distance
-      # messagef("reslev = %i, ssize = %i, soffset=%i", rl, ssize, soffset)
-      sstart = 1L
-      send = sstart + ssize - 1L  # end position
-      while (send <= m) {  # until the segment reach the end
-        # messagef("start, end: %i, %i", sstart, send)
-        f = getSegmentFeatures(x[sstart:send])
-        # print(f)
-        feats = c(feats, f)  # append the feats from the last resolution hierachy
-        sstart = sstart + soffset
-        send = send + soffset
-      }
-      ssize = ceiling(ssize / 2)  # decrease the segment size
-      if (ssize < 1L)  # if the the divide by 2 is too much
-        break
-    }
-    return(feats)
-  }
-
-  getSegmentFeatures = function(x) {
-    mean(x)
-  }
-
-  lrn = function(data, target, col, res.level, shift, curve.lens) {
-
-    data = data[, col, drop = FALSE]
-    if (is.data.frame(data))
-      data = as.matrix(data)
-    assertMatrix(data, mode = "numeric")
-
-    # The difference is that for the getFDAMultiResFeatures, the curve is again subdivided into
-    # subcurves from which the features are extracted
-    if (is.null(curve.lens)) {
-      getUniFDAMultiResFeatures(data = data, res.level = res.level, shift = shift)
-    } else {
-      getFDAMultiResFeatures(data = data, res.level = res.level, shift = shift, curve.lens = curve.lens)
-    }
-  }
-
-  makeExtractFDAFeatMethod(learn = lrn, reextract = lrn,
-    args = list(res.level = res.level, shift = shift, curve.lens = curve.lens))
-}
