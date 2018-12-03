@@ -5,8 +5,10 @@ makeBaseParamSet.hmm = function() {
     # Initial state probabilities (A N-sized vector)
     makeNumericVectorLearnerParam(id = "init", lower = 0L, upper = 1L,
       default = "equal", special.vals = list("equal", "random")),
-    # Initial transition probabilities (A NxN matrix for each class)
-    # If trans it is a vector (of numbers smaller than 1) then these are taken to be
+    # Initial transition probabilities (A J^2 vector for each class)
+    # If trans is a J^2 sized vector, it is transformed into a JxJ matrix, processing
+    # the elements BY ROW.
+    # If trans is a J-sized vector (of numbers smaller than 1) then these are taken to be
     # the diagonal of the transition matrix and the off–diagonal elements are then,
     # within each row, taken to be identical so that the rows sum to 1.  Elements of
     # trans are recycled so as to make the dimensions match.  Under the hood, the
@@ -118,7 +120,7 @@ hmmspecWrapper = function(fd.matrix, J, init, trans, parms.emission, family.emis
     trans = mhsmm::createTransition(trans, J)
   } else {
     # The parameter trans is given as a J^2 numeric vector, byBY COLUMN
-    trans = matrix(trans, nrow = J, ncol = J)
+    trans = matrix(trans, nrow = J, ncol = J, byrow = TRUE)
   }
   if (is.character(parms.emission)) {
     parms.emission = switch(parms.emission,
