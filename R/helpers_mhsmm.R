@@ -1,9 +1,10 @@
 makeBaseParamSet.hmm = function() {
   makeParamSet(
     # Number of states in the model(s)
-    makeIntegerLearnerParam(id = "J", lower = 1L, upper = 50L),
+    makeIntegerLearnerParam(id = "J", lower = 2L, upper = 50L),
     # Initial state probabilities (A N-sized vector)
-    makeNumericVectorLearnerParam(id = "init", default = "equal", special.vals = list("equal")),
+    makeNumericVectorLearnerParam(id = "init", lower = 0L, upper = 1L,
+      default = "equal", special.vals = list("equal", "random")),
     # Initial transition probabilities (A NxN matrix for each class)
     # If trans it is a vector (of numbers smaller than 1) then these are taken to be
     # the diagonal of the transition matrix and the off–diagonal elements are then,
@@ -17,7 +18,7 @@ makeBaseParamSet.hmm = function() {
     makeNumericVectorLearnerParam(
       id = "trans",
       default = "equal",
-      special.vals = list("equal", "createTransition")
+      special.vals = list("equal", "random")
     ),
     # Distribution family for the state emissions (one for all the states)
     makeDiscreteLearnerParam(
@@ -31,7 +32,7 @@ makeBaseParamSet.hmm = function() {
     makeUntypedLearnerParam(
       id = "parms.emission",
       default = "equal",
-      special.vals = list("equal", "uniform")
+      special.vals = list("equal", "uniform", "random")
     ),
     # Density function of the emission distribution (for custom families)
     makeFunctionLearnerParam(
@@ -100,17 +101,24 @@ hmmspecWrapper = function(fd.matrix, J, init, trans, parms.emission, family.emis
 
   if (is.character(init)) {
     init = switch(init,
-      equal = rep(1/J, J)
+      equal = rep(1/J, J),
+      random = {
+        aux = runif(J, 0, 1)
+        aux/sum(aux) # Sum 1
+      }
     )
   }
   if (!is.numeric(trans)) {
     trans = switch(trans,
       equal = matrix(rep(1/J, J^2), J),
-      createTransition = mhsmm::createTransition(0.9, J)
+      random = generateRandomTransitionMatrix(J)
     )
   } else if (length(trans) == 1L | length(trans) == J) {
     # integer to control the argument of the diagonal values
     trans = mhsmm::createTransition(trans, J)
+  } else {
+    # The parameter trans is given as a J^2 numeric vector, byBY COLUMN
+    trans = matrix(trans, nrow = J, ncol = J)
   }
   if (is.character(parms.emission)) {
     parms.emission = switch(parms.emission,
@@ -131,6 +139,13 @@ hmmspecWrapper = function(fd.matrix, J, init, trans, parms.emission, family.emis
         }
       ),
       uniform = stop("uniform parms.emission not implemented yet"),
+      random = switch(
+        family.emission,
+        normal = list(mu = runif(J, min(fd.matrix), max(fd.matrix)),
+          sd = runif(J, min(fd.matrix), max(fd.matrix))),
+        poisson = stop("Not implemented yet."), #FIXME
+        multinomial = list(pmf = generateRandomPMFMatrix(length(factor.levels), J))
+      ),
       stop("Wrong special value for parms.emission")
     )
   }
@@ -227,4 +242,17 @@ mstep.multinom = function(x, wt) {
     for (j in 1:J)
       ans[i, j] <- sum(wt[which(x == i), j])/sum(wt[, j], na.rm = TRUE)
   list(pmf = ans)
+}
+
+# Generate random right sotchastic matrices
+generateRandomTransitionMatrix <- function(J) {
+  aux = matrix(runif(J^2), ncol = J)
+  t(apply(aux, 1, function(x) x/sum(x)))
+}
+
+# Generate random matrix where each column represents the probabily mass function (pmf)
+# of each state of a discrete H(S)MM
+generateRandomPMFMatrix = function(sizeDiscreteSpace, J) {
+  aux = matrix(runif(sizeDiscreteSpace*J), ncol = J)
+  apply(aux, 2, function (x) x/sum(x))
 }

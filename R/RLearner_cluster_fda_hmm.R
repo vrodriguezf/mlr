@@ -7,7 +7,7 @@ makeRLearner.cluster.fda.hmm = function() {
     par.vals = list(
       J = 3,
       init = "equal",
-      trans = "createTransition",
+      trans = 0.8,
       family.emission = "multinomial",
       parms.emission = "equal",
       missing.value.symbol = ".",
@@ -44,6 +44,8 @@ trainLearner.cluster.fda.hmm = function(.learner, .task, .subset, .weights = NUL
   mod.fit = mhsmm::hmmfit(mhsmm_data, mod.start, mstep = mod.start$mstep, ...)
   if (!is.null(mod.start$factor.levels))
     mod.fit$factor.levels = mod.start$factor.levels
+
+  mod.fit$initial = mod.start
   mod.fit
 }
 

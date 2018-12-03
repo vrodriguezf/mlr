@@ -7,33 +7,17 @@
 # FIXME missing values? missing values in mstep.multinom?
 # FIXME Warnings neen la prediccion?
 # FIXME Define correctly the forbidden region of each param
-# FIXME Convertir los parametros init, trans en vector y en matriz respectivamente
 #'@export
 #'
 makeRLearner.classif.fda.hmm = function() {
   makeRLearnerClassif(
     cl = "classif.fda.hmm",
     package = "mhsmm",
-    par.set = c(
-      dropParams(makeBaseParamSet.hmm(), "J"),
-      makeParamSet(
-        makeIntegerVectorLearnerParam(id = "J", len = 2L, lower = 2L, upper = 50L),
-        # Prediction method
-        makeDiscreteLearnerParam(
-          id = "method",
-          values = c("viterbi", "smoothed"),
-          default = "viterbi",
-          when = "predict",
-          tunable = FALSE
-        ),
-        keys = c("J"),
-        forbidden = expression(any(J <= 1))
-      )
-    ),
+    par.set = makeBaseParamSet.hmm(),
     par.vals = list(
-      J = c(3, 4),
+      J = 3,
       init = "equal",
-      trans = "createTransition",
+      trans = 0.8,
       family.emission = "multinomial",
       parms.emission = "equal",
       missing.value.symbol = "."
@@ -41,9 +25,10 @@ makeRLearner.classif.fda.hmm = function() {
     properties = c("single.functional", "twoclass", "prob", "numerics", "missings"),
     name = "Hidden Markov Models (HMMs) on FDA",
     short.name = "fda.hmm",
-    note = getMhsmmNote(),
+    note = paste(getMhsmmNote(), "As a restriction, all the HMMs in the classifier
+      must have the same number of states"),
     callees = c("hmmspec", "hmmfit", "dnorm.hsmm", "mstep.hsmm",
-                "rnorm.hsmm", "createTransition")
+      "rnorm.hsmm", "createTransition")
   )
 }
 
@@ -68,12 +53,19 @@ trainLearner.classif.fda.hmm = function(.learner, .task, .subset, .weights = NUL
   #
   td = getTaskDesc(.task)
   class.levels.ordered = c(td$positive, td$negative) # It is assumed that the first model is the positive class
-  names(J) = class.levels.ordered
+  nclasses = length(class.levels.ordered)
+  #names(J) = class.levels.ordered
 
   # Listify parameters that are common for all the HMMs in the classifier
-  if (is.character(init)) init = setNames(rep(init, length(class.levels.ordered)), class.levels.ordered)
-  if (is.character(trans)) trans = setNames(rep(trans, length(class.levels.ordered)), class.levels.ordered)
-  if (is.character(parms.emission)) parms.emission = setNames(rep(parms.emission, length(class.levels.ordered)), class.levels.ordered)
+  #FIXME Make the number of states flexible
+  J = setNames(purrr::rerun(nclasses, J), class.levels.ordered)
+  init = setNames(purrr::rerun(nclasses, init), class.levels.ordered)
+  trans = setNames(purrr::rerun(nclasses, trans), class.levels.ordered)
+  parms.emission = setNames(purrr::rerun(nclasses, parms.emission), class.levels.ordered)
+  # if (length(init) == 1L)
+  #   init = setNames(rep(init, length(class.levels.ordered)), class.levels.ordered)
+  # if (length(trans) == 1L) trans = setNames(rep(trans, length(class.levels.ordered)), class.levels.ordered)
+  # if (length(parms.emission) == 1L) parms.emission = setNames(rep(parms.emission, length(class.levels.ordered)), class.levels.ordered)
 
   # Parameters for the specification of the HMMs
   mods = purrr::imap(
@@ -95,6 +87,8 @@ trainLearner.classif.fda.hmm = function(.learner, .task, .subset, .weights = NUL
         mstep = mod.start$mstep, ...)
       if (!is.null(mod.start$factor.levels))
         mod.fit$factor.levels = mod.start$factor.levels
+
+      mod.fit$initial = mod.start
       mod.fit
     }
 

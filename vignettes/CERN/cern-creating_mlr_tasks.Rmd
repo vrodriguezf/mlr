@@ -1,0 +1,167 @@
+---
+title: "Creating MLR tasks from CERN data"
+author: "Victor Rodriguez"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  echo = FALSE
+)
+library(tidyverse)
+library(stringi)
+library(mlr)
+library(BBmisc)
+library(ParamHelpers)
+DATA_DIR = "/home/victor/data/CERN/tapeserver_selected_fields/"
+```
+
+## Load and munge data
+
+First, we create the original dataset by binding the rows of every **.csv.gz** file
+found in the folder `DATA_DIR`.
+```{r load data, echo=FALSE, cache=TRUE, warning=FALSE}
+cern.data = dplyr::bind_rows(
+  purrr::map(list.files(DATA_DIR, pattern = "*.csv.gz", full.names = T),
+    ~ read_csv(.))
+)
+```
+
+We are not interested (YET) in analysing missing values, thus we remove missing values from the
+`MSG` column. Also, remove some unimportant messages and cluster together those that
+are similar.
+```{r munge data, include = FALSE, cache = TRUE}
+##
+# Cluster the messages of the object cern.data
+##
+cern.data.munged = cern.data %>%
+  tidyr::drop_na(MSG) %>%
+  dplyr::filter(
+    !stri_detect(MSG, regex = "tapeserverd started|Configuration entry|The external startup script *|[ReadFile::position] - Reading *|In XrootC2FSReadFile:: *|In XrootReadFile:: *|ProcessForker*|Stack trace|The external startup script*|Got process ID*|Handling *|TapeDaemon parent process succesfully created socket pair *|TPCONFIG line")
+  ) %>%
+  mutate(
+    MSG = dplyr::case_when(
+      stri_detect(MSG, regex = "Recall order of FSEQs*") ~ "Recall order of FSEQs",
+      MSG %in% c("TapeReadSingleThread : tape unmounted", "TapeReadSingleThread: Tape unloaded") ~ "TapeReadSingleThread: tape unmounted",
+      MSG %in% c("TapeWriteSingleThread : tape unmounted", "TapeWriteSingleThread: Tape unloaded") ~ "TapeWriteSingleThread: tape unmounted",
+      MSG %in% c("Cleaner unloaded tape", "Cleaner unloading tape") ~ "Cleaner unloaded tape",
+      MSG %in% c("Cleaner rewinding tape", "Cleaner successfully rewound tape") ~ "Cleaner rewound tape",
+      MSG %in% c("Label session dismounted tape", "Label session dismounting tape") ~ "Label session dismounted tape",
+      MSG %in% c("Label session is writing label to tape", "Label session is writing label with LBP to tape", "Label session has written label to tape", "Label session has written label with LBP to tape") ~ "Label session has written label to tape",
+      MSG %in% c("Label session mounted tape", "Label session mounting tape") ~ "Label session mounted tape",
+      MSG %in% c("Opened disk file for read", "Opened disk file for writing") ~ "Opened disk file",
+      MSG %in% c("Reported end of session with error to client after sending file errors", "Reported failed file(s) to the client before end of session") ~ "Reported end of session with errors",
+      MSG %in% c("SCSI error in positionToLogicalObject: status=0 host_status=0x3 driver_status=0: SCSI command failed with host_status: TIME OUT", "SCSI error in positionToLogicalObject: status=0x2 host_status=0 driver_status=0x8: SCSI command failed with status CHECK CONDITION: Sense Information: Blank Check: End-of-data detected", "SCSI error in positionToLogicalObject: status=0x2 host_status=0 driver_status=0x8: SCSI command failed with status CHECK CONDITION: Sense Information: Hardware Error: Internal target failure") ~ "SCSI error",
+      MSG %in% c("Set process capabilities", "Set process capabilities for using tape") ~ "Set process capabilities",
+      MSG %in% c("Failed to open tape file for reading", "Failed to open tape file for writing") ~ "Failed to open tape file",
+      TRUE ~ MSG
+    )
+  ) %>%
+  mutate(MSG = as.factor(MSG))
+```
+
+```{r factor levels}
+cern.factor.levels = levels(cern.data.munged$MSG)
+cern.factor.levels
+```
+
+The complete list of message types has `r length(cern.factor.levels)` messages. 
+
+The column volReqId identifies messages of the same session. We have to group
+together the messages with the same `volReqId` and sort them by timestamp. We will 
+only keep the sessions with more than 100 messages and less than 100000. Also,
+we will remove those sessions in which the last message is not "Tape session finished",
+because that indicates that the sequence is not complete.
+```{r group sequences by volReqId and filter}
+cern.data.sub = cern.data.munged %>%
+  group_by(volReqId) %>%
+  arrange(timestamp) %>%
+  tidyr::nest() %>%
+  #slice(1:100000) %>%
+  dplyr::filter(purrr::map_lgl(data, ~ nrow(.) >= 100 & nrow(.) <= 10000)) %>%
+  dplyr::filter(purrr::map_lgl(data, ~ .$MSG[nrow(.)] == "Tape session finished")) # Last message is tape session finished
+cern.data.sub
+```
+
+## Convert data into FDA format (Functional Data Analysis)
+
+```{r, include = FALSE}
+max.time.points = max(purrr::map_int(cern.data.sub$data, nrow))
+```
+mlr requires that functional features are introduced as matrices, where each row
+represents a subject (case) and each column represents a data point. In our case,
+we have `r nrow(cern.data.sub)` subjects (distinct values of `volReqId`) and a
+maximum of `r max.time.points` time points. Missing values are imputed to fill the
+gaps of the sequences that do not reach the maximum number of time points.
+
+Now we create a list with our functional features and the target variable (status).
+```{r list of features and target}
+cern.data.sub.list = cern.data.sub %>%
+  dplyr::mutate(data = purrr::map(data,
+                           ~ dplyr::summarise(.,
+                                       timestamp = list(timestamp),
+                                       MSG = list(as.integer(MSG)),
+                                       status = status[length(status)]))) %>%
+  tidyr::unnest() %>%
+  as.list %>%
+  purrr::modify_at(.at = "status", factor) %>% # Drop empty factor levels
+  purrr::modify_at(.at = c("timestamp", "MSG"),
+                   .f = ~ t(data.frame(purrr::map(., ~ .[seq(max.time.points)]))))
+
+str(cern.data.sub.list)
+```
+
+We are not interested (YET) in using the timestamps of the records, only the order
+of the sequences, so the timestamp is removed from the list. Finally, we use the
+function `makeFunctionalData` from mlr to convert all of this in a proper dataframe
+for mlr tasks.
+```{r use mlr::makeFunctionalData, include=FALSE}
+cern.data.sub.df = data.frame(cern.data.sub.list[c("MSG", "status")]) #Timestamp is not used for now
+
+fd.features = list("MSG" = which(startsWith(colnames(cern.data.sub.df), "MSG.")))
+cern.data.sub.fdf = makeFunctionalData(data = cern.data.sub.df,
+                                       fd.features = fd.features)
+rownames(cern.data.sub.fdf) = NULL
+```
+
+A classification and a clustering task are created
+```{r create tasks}
+cern.classif.task = makeClassifTask(id = "cern.classification",
+  data = cern.data.sub.fdf,
+  target = "status",
+  positive = "success",
+  fixup.data = "warn")
+
+cern.cluster.task = makeClusterTask(id = "cern.cluster",
+  data = select(cern.data.sub.fdf, -status)
+)
+cern.classif.task
+cern.cluster.task
+```
+
+In order to balance the dataset for classification, we prun the dataset, taking
+the same number of elements for each class.
+```{r}
+indicesPositiveClass = which(getTaskData(cern.classif.task)[["status"]] == "success")
+indicesNegativeClass = which(getTaskData(cern.classif.task)[["status"]] == "failure")
+cern.classif.task.balanced = subsetTask(task = cern.classif.task, 
+  subset = c(indicesNegativeClass, sample(indicesPositiveClass, length(indicesNegativeClass))))
+```
+
+
+
+```{r write feather file}
+
+```
+
+
+

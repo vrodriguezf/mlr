@@ -1,0 +1,146 @@
+---
+title: "Benchmarking HMMs in the CERN dataset"
+author: "Víctor Rodríguez"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+library(tidyverse)
+```
+
+## VignetteData preprocessing
+
+First we want to format the data properly so that it is suitable for the mlr
+package. The initial dataset is:
+```{r}
+# CERN Data as FDA
+cern.data = dplyr::bind_rows(
+  purrr::map(list.files("/home/victor/data/CERN/tapeserver_selected_fields/", pattern = "*.csv.gz", full.names = T),
+    ~ read_csv(.))
+)
+cern.data
+```
+From this dataset, a classification task is created. For each session (value of
+the column `volReqId`), a sequence of messages (column `MSG`) is extracted. Only
+sessions with more that 100 messages and less than 10000 are taken into account.
+The end of a session is identified with a message "Tape session finished", and in
+that moment, the value of the column `status` marks whether the process went right 
+(status = success) or wrong (status = failure). That will be used as the target 
+variable of the classification task created.
+```{r echo=FALSE}
+cern.data.munged = cern.data %>%
+  dplyr::mutate(MSG = ifelse(
+    stri_detect(MSG, regex = "Recall order of FSEQs*"),
+    "Recall order of FSEQs",
+    MSG)
+  ) %>%
+  dplyr::mutate(MSG = as.factor(MSG))
+cern.factor.levels = levels(cern.data.munged$MSG)
+
+cern.data.sub = cern.data.munged %>%
+  group_by(volReqId) %>%
+  arrange(timestamp) %>%
+  tidyr::nest() %>%
+  #slice(1:100000) %>%
+  dplyr::filter(purrr::map_lgl(data, ~ nrow(.) >= 100 & nrow(.) <= 10000)) %>%
+  dplyr::filter(purrr::map_lgl(data, ~ .$MSG[nrow(.)] == "Tape session finished")) # Last message is tape session finished
+
+max.time.points = max(purrr::map_int(cern.data.sub$data, nrow))
+
+cern.data.sub.list = cern.data.sub %>%
+  dplyr::mutate(data = purrr::map(data,
+                           ~ dplyr::summarise(.,
+                                       timestamp = list(timestamp),
+                                       MSG = list(as.integer(MSG)),
+                                       status = status[length(status)]))) %>%
+  tidyr::unnest() %>%
+  as.list %>%
+  purrr::modify_at(.at = "status", factor) %>% # Drop empty factor levels
+  purrr::modify_at(.at = c("timestamp", "MSG"),
+                   .f = ~ t(data.frame(purrr::map(., ~ .[seq(max.time.points)]))))
+
+cern.data.sub.df = data.frame(cern.data.sub.list[c("MSG", "status")]) #Timestamp is not used for now
+
+fd.features = list("MSG" = which(startsWith(colnames(cern.data.sub.df), "MSG.")))
+cern.data.sub.fdf = makeFunctionalData(data = cern.data.sub.df,
+                                       fd.features = fd.features)
+rownames(cern.data.sub.fdf) = NULL
+
+cern.classif.task = makeClassifTask(id = "cern.classification",
+  data = cern.data.sub.fdf,
+  target = "status",
+  positive = "success",
+  fixup.data = "warn")
+
+cern.cluster.task = makeClusterTask(id = "cern.cluster",
+  data = select(cern.data.sub.fdf, -status)
+)
+
+cern.lrn = makeLearner("classif.fda.hmm")
+
+d = getTaskData(cern.classif.task, subset = NULL, target.extra = TRUE, functionals.as = "matrix")
+fd = mlr:::getFunctionalFeatures.data.frame(d$data)
+fd.matrix = fd[[1]]
+
+cern.classif.task
+```
+
+## Tuning the parameters to find the best HMM classifier
+
+```{r, echo=FALSE}
+makeLearner("classif.fda.hmm", family.emission = "multinomial")
+```
+
+```{r}
+cern.res = tuneParams(
+  learner = makeLearner("classif.fda.hmm", family.emission = "multinomial"),
+  task = cern.classif.task,
+  resampling = makeResampleDesc("CV", iters = 5L),
+  measures = list(acc),
+  par.set = makeParamSet(
+    makeIntegerVectorParam("J", lower = c(2L, 2L), upper = c(50L, 50L), len = 2)
+  ),
+  control = makeTuneControlGrid(),
+  show.info = TRUE
+)
+```
+
+
+## Figures
+
+The figure sizes have been customised so that you can easily put two images side-by-side. 
+
+```{r, fig.show='hold'}
+plot(1:10)
+plot(10:1)
+```
+
+You can enable figure captions by `fig_caption: yes` in YAML:
+
+    output:
+      rmarkdown::html_vignette:
+        fig_caption: yes
+
+Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
+
+## More Examples
+
+You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
+
+```{r, echo=FALSE, results='asis'}
+knitr::kable(head(mtcars, 10))
+```
+
+Also a quote using `>`:
+
+> "He who gives up [code] safety for [code] speed deserves neither."
+([via](https://twitter.com/hadleywickham/status/504368538874703872))

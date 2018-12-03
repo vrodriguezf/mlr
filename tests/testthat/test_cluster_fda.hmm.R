@@ -5,7 +5,8 @@ test_that("cluster.fda.hmm works with the smooth.discrete example of the mhsmm v
 
   # Extracted from the mhsmm vignete "Smoothing discrete sequences, part 1"
   y1 <- as.integer(c(1,1,1,1,2,1,1,NA,1,1,2,1,1,1,2,1,1,1,1,1,2,2,2,2,1,2,2,2,1,2,2,2,1,1,1,1,1,1,1,1,2,2,2,1,1))
-  mod.compare.mhsmm = mhsmm::smooth.discrete(na.omit(y1))
+  mod.compare.mhsmm = mhsmm::smooth.
+  discrete(na.omit(y1))
 
   y1.fdf = makeFunctionalData(
     data = data.frame(t(data.frame(na.omit(y1)))),
