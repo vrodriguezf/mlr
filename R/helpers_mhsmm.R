@@ -1,3 +1,4 @@
+#FIXME Add parms.emission.normal and parms.emission.poisson
 makeBaseParamSet.hmm = function() {
   makeParamSet(
     # Number of states in the model(s)
@@ -29,12 +30,34 @@ makeBaseParamSet.hmm = function() {
       default = "multinomial",
       tunable = FALSE
     ),
+    # Probabilty mass matrix (Rows are observation values, columns are states).
+    # Each cell represents the probabilty of an observation in a state. Thus,
+    # Columns must sum up 1
+    # It must have rownames associated to the id of each observation
+    makeNumericVectorLearnerParam(
+      id = "parms.emission.multinomial",
+      len = as.integer(NA),
+      lower = 0,
+      upper = 1,
+      default = NULL,
+      requires = quote(family.emission == "multinomial"),
+      special.vals = list(NULL)
+    ),
     # Starting values for the parameters of the emission distribution
     # (A list containing the proper values for each model, depending on the param family.emission)
+    # Use this argument only if the distribution family is custom.
+    # NOTE: Custom parms.emission cannot be tuned (since it is an untyped param)
     makeUntypedLearnerParam(
-      id = "parms.emission",
+      id = "parms.emission.custom",
+      requires = quote(family.emission == "custom")
+    ),
+    # Automatic strategies for auto-initializing the emission distributions. Only
+    # allowed when manual parameters are not specified.
+    makeDiscreteLearnerParam(
+      id = "parms.emission.autoInitialization",
+      values = c("equal", "uniform", "random"),
       default = "equal",
-      special.vals = list("equal", "uniform", "random")
+      requires = quote(family.emission != "custom" && parms.emission.multinomial == NULL)
     ),
     # Density function of the emission distribution (for custom families)
     makeFunctionLearnerParam(
@@ -93,8 +116,8 @@ makeBaseParamSet.hmm = function() {
 # Wrapper for converting the parameters of the ParamSet in mlr to the aprropiate
 # format of mhsmm
 # fd.matrix contains the functional data, as a matrix
-hmmspecWrapper = function(fd.matrix, J, init, trans, parms.emission, family.emission,
-  dens.emission, rand.emission, mstep, ...) {
+hmmspecWrapper = function(fd.matrix, J, init, trans, parms.emission.multinomial,
+  parms.emission.autoInitialization, family.emission, dens.emission, rand.emission, mstep, ...) {
   factor.levels = NULL
   if (is.integer(fd.matrix)) {
     # Integer matrices are considered as categorical functional data
@@ -122,8 +145,8 @@ hmmspecWrapper = function(fd.matrix, J, init, trans, parms.emission, family.emis
     # The parameter trans is given as a J^2 numeric vector, byBY COLUMN
     trans = matrix(trans, nrow = J, ncol = J, byrow = TRUE)
   }
-  if (is.character(parms.emission)) {
-    parms.emission = switch(parms.emission,
+  if (is.null(parms.emission.multinomial)) {
+    parms.emission = switch(parms.emission.autoInitialization,
       equal = switch(
         family.emission,
         normal = list(mu = mean(fd.matrix, na.rm = TRUE), #FIXME Improve efficiency
@@ -149,6 +172,13 @@ hmmspecWrapper = function(fd.matrix, J, init, trans, parms.emission, family.emis
         multinomial = list(pmf = generateRandomPMFMatrix(length(factor.levels), J))
       ),
       stop("Wrong special value for parms.emission")
+    )
+  } else {
+    # Manual initialization of parms.emission
+    switch(family.emission,
+      multinomial = stop("Not supported yet"),
+      normal = stop("Not supported yet"),
+      poisson = stop("Not supported yet")
     )
   }
 
